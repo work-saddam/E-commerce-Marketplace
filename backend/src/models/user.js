@@ -30,16 +30,6 @@ const userSchema = new mongoose.Schema(
       enum: ["consumer", "seller", "admin"],
       default: "consumer",
     },
-    addresses: [
-      {
-        street: { type: String },
-        city: { type: String },
-        state: { type: String },
-        pincode: { type: String },
-        country: { type: String },
-        isDefault: { type: Boolean },
-      },
-    ],
   },
   { timestamps: true }
 );
