@@ -10,11 +10,12 @@ const register = async (req, res) => {
       return res.status(error.status).json({ message: error.message });
     }
 
-    const { name, email, password, phone, role, address } = req.body;
+    const { name, email, password, phone } = req.body;
 
-    const existingUser = await User.findOne({ email });
+    const existingUser = await User.findOne({ $or: [{ email }, { phone }] });
     if (existingUser) {
-      return res.status(400).json({ message: "Email already registerd!" });
+      const field = existingUser.email == email ? "Email" : "Phone number";
+      return res.status(400).json({ message: `${field} already registered!` });
     }
 
     const hashPassword = await bcrypt.hash(password, 10);
@@ -24,14 +25,12 @@ const register = async (req, res) => {
       email,
       password: hashPassword,
       phone,
-      role,
-      address,
     });
     const savedUser = await user.save();
 
     res
       .status(201)
-      .json({ message: "Registration Successfull!", data: savedUser });
+      .json({ message: "Registration Successful!", data: savedUser });
   } catch (error) {
     res
       .status(500)
@@ -41,28 +40,28 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
   try {
-    const { email, password } = req.body;
-    if (!email || !password) {
+    const { identifier, password } = req.body;
+    if (!identifier || !password) {
       return res
         .status(400)
-        .json({ message: "Email & Password are required!" });
+        .json({ message: "Email/Phone & Password are required!" });
     }
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({
+      $or: [{ email: identifier }, { phone: identifier }],
+    });
     if (!user) {
-      return res.status(400).json({ message: "Invalid Credentials!" });
+      return res.status(401).json({ message: "Invalid Credentials!" });
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      return res.status(400).json({ message: "Invalid Credentials!" });
+      return res.status(401).json({ message: "Invalid Credentials!" });
     }
 
-    const token = await jwt.sign(
-      { id: user._id, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: "3d" }
-    );
+    const token = await jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "3d",
+    });
 
     res.cookie("token", token, {
       httpOnly: true,
