@@ -17,4 +17,17 @@ const userAuth = async (req, res, next) => {
   }
 };
 
-module.exports = { userAuth };
+const requireAdmin = (req, res, next) => {
+  try {
+    if (req.user.role !== "admin") {
+      return res.status(403).json({ message: "Admin required" });
+    }
+    next();
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Internal server Error", error: error.message });
+  }
+};
+
+module.exports = { userAuth, requireAdmin };
