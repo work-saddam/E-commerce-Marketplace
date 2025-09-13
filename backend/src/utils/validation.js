@@ -13,6 +13,8 @@ const validateUserRegisterData = (req) => {
   } else if (!validator.isMobilePhone(phone)) {
     return { status: 400, message: "Invalid Phone number" };
   }
+
+  return null;
 };
 
 const validateUserEditProfileData = (req) => {
@@ -20,6 +22,8 @@ const validateUserEditProfileData = (req) => {
   if (name.length < 3) {
     return { status: 400, message: "Invalid Name" };
   }
+
+  return null;
 };
 
 const validateAddressData = (req) => {
@@ -34,6 +38,8 @@ const validateAddressData = (req) => {
   } else if (pincode.length !== 6) {
     return { status: 400, message: "Invalid Pincode" };
   }
+
+  return null;
 };
 
 const validateSellerRegisterData = (req) => {
@@ -63,6 +69,29 @@ const validateSellerRegisterData = (req) => {
   } else if (panNumber.length !== 10) {
     return { status: 400, message: "PAN Number must be 10 character" };
   }
+
+  return null;
+};
+
+const validateProductData = (req) => {
+  const { title, description, price, stock } = req.body;
+
+  if (!title || !description || !price || !stock) {
+    return { status: 400, message: "All fields are required!" };
+  } else if (title.length < 3 || title.length > 100) {
+    return { status: 400, message: "title must be between 3-100 words!" };
+  } else if (description.length < 10 || description.length > 500) {
+    return {
+      status: 400,
+      message: "Description must be between 10-500 words!",
+    };
+  } else if (!validator.isNumeric(price.toString())) {
+    return { status: 400, message: "Price must be number!" };
+  } else if (!validator.isNumeric(stock.toString())) {
+    return { status: 400, message: "Stock must be number!" };
+  }
+
+  return null;
 };
 
 module.exports = {
@@ -70,4 +99,5 @@ module.exports = {
   validateUserEditProfileData,
   validateAddressData,
   validateSellerRegisterData,
+  validateProductData,
 };
