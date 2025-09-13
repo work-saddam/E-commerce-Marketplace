@@ -30,7 +30,10 @@ const productSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    imageURL: { type: String },
+    image: {
+      url: { type: String },
+      public_id: { type: String },
+    },
     isActive: {
       type: Boolean,
       default: true,
