@@ -48,4 +48,14 @@ const addProduct = async (req, res) => {
   }
 };
 
-module.exports = { addProduct };
+const getAllSellerProduct = async (req, res) => {
+  try {
+    const products = await Product.find({ seller: req.user.id });
+    res
+      .status(200)
+      .json({ message: "Products fetch successfully!", data: products });
+  } catch (error) {
+    res.status(500).json({ message: "Fetching products failed!" });
+  }
+};
+module.exports = { addProduct, getAllSellerProduct };
