@@ -5,7 +5,11 @@ const {
   getSellerProfile,
 } = require("../controllers/sellerController");
 const { userAuth } = require("../middlewares/authMiddleware");
-const { addProduct } = require("../controllers/productControllers");
+const {
+  addProduct,
+  getAllSellerProduct,
+  deleteProduct,
+} = require("../controllers/productControllers");
 const checkSellerStatus = require("../middlewares/checkSellerStatus");
 const upload = require("../middlewares/multer");
 const router = express.Router();
@@ -21,5 +25,7 @@ router.post(
   upload.single("productImage"),
   addProduct
 );
+router.get("/products", userAuth, getAllSellerProduct);
+router.delete("/products/:id", userAuth, checkSellerStatus, deleteProduct);
 
 module.exports = router;
