@@ -9,6 +9,7 @@ const {
   addProduct,
   getAllSellerProduct,
   deleteProduct,
+  editProduct,
 } = require("../controllers/productControllers");
 const checkSellerStatus = require("../middlewares/checkSellerStatus");
 const upload = require("../middlewares/multer");
@@ -26,6 +27,13 @@ router.post(
   addProduct
 );
 router.get("/products", userAuth, getAllSellerProduct);
+router.put(
+  "/products/:id",
+  userAuth,
+  checkSellerStatus,
+  upload.single("productImage"),
+  editProduct
+);
 router.delete("/products/:id", userAuth, checkSellerStatus, deleteProduct);
 
 module.exports = router;

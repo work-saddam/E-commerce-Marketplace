@@ -89,6 +89,8 @@ const validateProductData = (req) => {
     return { status: 400, message: "Price must be number!" };
   } else if (!validator.isNumeric(stock.toString())) {
     return { status: 400, message: "Stock must be number!" };
+  } else if (!req.file) {
+    return { status: 400, message: "Product image is required!" };
   }
 
   return null;

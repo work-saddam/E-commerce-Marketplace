@@ -1,5 +1,8 @@
 const Product = require("../models/product");
-const { uploadToCloudinary } = require("../utils/cloudinaryHelper");
+const {
+  uploadToCloudinary,
+  deleteFromCloudinary,
+} = require("../utils/cloudinaryHelper");
 const { validateProductData } = require("../utils/validation");
 
 const addProduct = async (req, res) => {
@@ -7,10 +10,6 @@ const addProduct = async (req, res) => {
     const error = validateProductData(req);
     if (error) {
       return res.status(error.status).json({ message: error.message });
-    }
-
-    if (!req.file) {
-      return res.status(400).json({ message: "Product image is required!" });
     }
 
     let imageURL, imagePublicId;
@@ -61,9 +60,69 @@ const getAllSellerProduct = async (req, res) => {
   }
 };
 
+const editProduct = async (req, res) => {
+  try {
+    const error = validateProductData(req);
+    if (error) {
+      return res.status(error.status).json({ message: error.message });
+    }
+
+    const product = await Product.findOne({
+      _id: req.params.id,
+      seller: req.user.id,
+    });
+    if (!product) {
+      return res.status(404).json({ message: "Product not found!" });
+    }
+
+    let imageURL = product?.image?.url;
+    let imagePublicId = product?.image?.public_id;
+
+    if (req.file) {
+      try {
+        if (imagePublicId) {
+          await deleteFromCloudinary(imagePublicId);
+        }
+
+        const uploadRes = await uploadToCloudinary(req.file.buffer, "products");
+        imageURL = uploadRes.secure_url;
+        imagePublicId = uploadRes.public_id;
+      } catch (uploadErr) {
+        return res.status(500).json({
+          message: "Image upload failed!",
+          error: uploadErr.message,
+        });
+      }
+    }
+
+    const { title, description, price, category, stock } = req.body;
+
+    const updatedProduct = await Product.findOneAndUpdate(
+      { _id: req.params.id, seller: req.user.id },
+      {
+        title,
+        description,
+        price,
+        category,
+        stock: Number(stock),
+        image: { url: imageURL, public_id: imagePublicId },
+      },
+      { new: true }
+    );
+
+    res
+      .status(200)
+      .json({ message: "Product updated successfully!", data: updatedProduct });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Product updation failed!", error: error.message });
+  }
+};
+
 const deleteProduct = async (req, res) => {
   try {
-    const product = await Product.findOneAndDelete({
+    const product = await Product.findOne({
       seller: req.user.id,
       _id: req.params.id,
     });
@@ -71,11 +130,28 @@ const deleteProduct = async (req, res) => {
       return res.status(404).json({ message: "Product not found!" });
     }
 
-    res.status(200).json({ message: "Product Deleted Successfully!" });
+    if (product.image?.public_id) {
+      await deleteFromCloudinary(product.image.public_id);
+    }
+
+    await Product.findOneAndDelete({
+      seller: req.user.id,
+      _id: req.params.id,
+    });
+
+    res
+      .status(200)
+      .json({ message: "Product Deleted Successfully!", data: product });
   } catch (error) {
     res
       .status(500)
       .json({ message: "Product Deletion Failed!!", error: error.message });
   }
 };
-module.exports = { addProduct, getAllSellerProduct, deleteProduct };
+
+module.exports = {
+  addProduct,
+  getAllSellerProduct,
+  editProduct,
+  deleteProduct,
+};
