@@ -149,9 +149,24 @@ const deleteProduct = async (req, res) => {
   }
 };
 
+const getProducts = async (req, res) => {
+  try {
+    const products = await Product.find({});
+
+    res
+      .status(200)
+      .json({ message: "Products fetch successfully!", data: products });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Product fetch failed!", error: error.message });
+  }
+};
+
 module.exports = {
   addProduct,
   getAllSellerProduct,
   editProduct,
   deleteProduct,
+  getProducts,
 };
