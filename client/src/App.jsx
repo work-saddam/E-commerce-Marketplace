@@ -1,8 +1,16 @@
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import Body from "./components/Body";
+import Login from "./components/Login";
+
 function App() {
   return (
-    <div>
-      <h1 className="text-3xl font-bold">React + Tailwind</h1>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Body />}>
+          <Route path="/" element={<Login />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
   );
 }
 
