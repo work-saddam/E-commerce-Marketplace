@@ -1,3 +1,4 @@
+const { default: slugify } = require("slugify");
 const Product = require("../models/product");
 const {
   uploadToCloudinary,
@@ -97,6 +98,9 @@ const editProduct = async (req, res) => {
 
     const { title, description, price, category, stock } = req.body;
 
+    const baseSlug = slugify(title, { lower: true, strict: true });
+    const newSlug = `${baseSlug}-${req.params.id}`;
+
     const updatedProduct = await Product.findOneAndUpdate(
       { _id: req.params.id, seller: req.user.id },
       {
@@ -104,6 +108,7 @@ const editProduct = async (req, res) => {
         description,
         price,
         category,
+        slug: newSlug,
         stock: Number(stock),
         image: { url: imageURL, public_id: imagePublicId },
       },
