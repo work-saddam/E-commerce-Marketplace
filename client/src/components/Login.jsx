@@ -1,8 +1,12 @@
 import { useState } from "react";
 import axios from "axios";
 import { BASE_URL } from "../utils/constants";
+import { useDispatch } from "react-redux";
+import { addUser } from "../store/userSlice";
 
 const Login = () => {
+  const dispatch = useDispatch();
+
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -17,6 +21,7 @@ const Login = () => {
         { withCredentials: true }
       );
       console.log(res?.data?.data);
+      dispatch(addUser(res?.data?.data));
     } catch (error) {
       setError(error.response?.data?.message || "Something went wrong!");
     }
