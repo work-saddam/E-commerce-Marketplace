@@ -2,6 +2,7 @@ import { useState } from "react";
 import logo from "../assets/logo2.png";
 import cartImage from "../assets/cart.svg";
 import storeImage from "../assets/store.svg";
+import { Link } from "react-router-dom";
 
 const Header = () => {
   const [search, setSearch] = useState("");
@@ -26,9 +27,11 @@ const Header = () => {
         </div>
 
         <div className="flex items-center gap-4 sm:6">
-          <button className="bg-yellow-500  px-5 py-2 rounded-xl transition hover:bg-yellow-600">
-            LogIn
-          </button>
+          <Link to={"/login"}>
+            <button className="bg-yellow-500 text-white px-5 py-2 rounded-xl transition hover:bg-yellow-600">
+              Login
+            </button>
+          </Link>
           <div className="flex items-center gap-2 cursor-pointer">
             <img src={cartImage} alt="cart-image" className="w-6 shrink-0" />
             {/* <span className="font-medium hidden lg:block">Cart</span> */}
