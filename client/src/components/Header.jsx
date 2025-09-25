@@ -10,11 +10,13 @@ const Header = () => {
     <header className="w-full shadow-sm bg-white">
       <div className="container mx-auto flex gap-4 justify-between px-4 py-2">
         <div className=" flex items-center gap-6 w-full max-w-3xl">
-          <img
-            src={logo}
-            alt="Logo"
-            className="w-36 sm:w-44 md:w-52 object-contain"
-          />
+          <Link to={"/"}>
+            <img
+              src={logo}
+              alt="Logo"
+              className="w-36 sm:w-44 md:w-52 object-contain"
+            />
+          </Link>
           <div className="flex-1 hidden sm:block">
             <input
               type="text"

@@ -20,7 +20,6 @@ const Login = () => {
         { identifier, password },
         { withCredentials: true }
       );
-      console.log(res?.data?.data);
       dispatch(addUser(res?.data?.data));
     } catch (error) {
       setError(error.response?.data?.message || "Something went wrong!");
