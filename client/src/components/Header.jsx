@@ -2,10 +2,35 @@ import { useState } from "react";
 import logo from "../assets/logo2.png";
 import cartImage from "../assets/cart.svg";
 import storeImage from "../assets/store.svg";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { BASE_URL } from "../utils/constants";
+import { removeUser } from "../store/userSlice";
+import axios from "axios";
+import arrow from "../assets/down_arrow.svg";
 
 const Header = () => {
+  const userData = useSelector((store) => store.user);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const [search, setSearch] = useState("");
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const handleLogout = async () => {
+    try {
+      await axios.post(
+        `${BASE_URL}/api/auth/logout`,
+        {},
+        { withCredentials: true }
+      );
+      dispatch(removeUser());
+      navigate("/");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <header className="w-full shadow-sm bg-white">
       <div className="container mx-auto flex gap-4 justify-between px-4 py-2">
@@ -28,19 +53,59 @@ const Header = () => {
           </div>
         </div>
 
-        <div className="flex items-center gap-4 sm:6">
-          <Link to={"/login"}>
-            <button className="bg-yellow-500 text-white px-5 py-2 rounded-xl transition hover:bg-yellow-600">
-              Login
-            </button>
-          </Link>
+        <div className="flex items-center gap-4 lg:gap-9 sm:6">
+          {userData ? (
+            <div
+              className="relative"
+              onMouseEnter={() => setMenuOpen(true)}
+              onMouseLeave={() => setMenuOpen(false)}
+            >
+              <button className="flex items-center px-3 py-2 rounded-xl bg-gray-100 cursor-pointer hover:bg-gray-200">
+                <span className="truncate max-w-[100px] sm:max-w-[150px] md:max-w-[200px] font-medium">
+                  {userData?.name}
+                </span>
+                {
+                  <img
+                    className={`hidden sm:inline-block ml-2 w-3 h-3 flex-shrink-0 transition-transform duration-200 ${
+                      menuOpen ? "rotate-180" : "rotate-0"
+                    }`}
+                    src={arrow}
+                    alt="drop-down-arrow"
+                  />
+                }
+              </button>
+              {menuOpen && (
+                <ul className="absolute flex flex-col left-0 w-40 bg-white rounded-lg shadow-md">
+                  <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                    Profile
+                  </li>
+                  <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                    Orders
+                  </li>
+                  <li
+                    className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                    onClick={handleLogout}
+                  >
+                    Logout
+                  </li>
+                </ul>
+              )}
+            </div>
+          ) : (
+            <Link to={"/login"}>
+              <button className="bg-yellow-500 text-white px-5 py-2 rounded-xl transition hover:bg-yellow-600 cursor-pointer">
+                Login
+              </button>
+            </Link>
+          )}
+
           <div className="flex items-center gap-2 cursor-pointer">
             <img src={cartImage} alt="cart-image" className="w-6 shrink-0" />
-            {/* <span className="font-medium hidden lg:block">Cart</span> */}
+            <span className="font-medium hidden lg:block">Cart</span>
           </div>
           <div className="flex items-center gap-2 cursor-pointer">
             <img src={storeImage} alt="store-image" className="w-6 shrink-0" />
-            {/* <span className="font-medium hidden lg:block">Become a seller</span> */}
+            <span className="font-medium hidden lg:block">Seller</span>
           </div>
         </div>
       </div>
