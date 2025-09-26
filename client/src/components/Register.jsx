@@ -1,15 +1,13 @@
 import { useState } from "react";
-import axios from "axios";
 import { BASE_URL } from "../utils/constants";
-import { useDispatch } from "react-redux";
-import { addUser } from "../store/userSlice";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
-const Login = () => {
-  const dispatch = useDispatch();
+const Register = () => {
   const navigate = useNavigate();
-
-  const [identifier, setIdentifier] = useState("");
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
@@ -18,12 +16,11 @@ const Login = () => {
     setError("");
     try {
       const res = await axios.post(
-        `${BASE_URL}/api/auth/login`,
-        { identifier, password },
+        `${BASE_URL}/api/auth/register`,
+        { name, phone, email, password },
         { withCredentials: true }
       );
-      dispatch(addUser(res?.data?.data));
-      navigate("/");
+      navigate("/login");
     } catch (error) {
       setError(error.response?.data?.message || "Something went wrong!");
     }
@@ -32,8 +29,8 @@ const Login = () => {
   return (
     <div className="min-h-screen flex justify-center items-center bg-gray-50 px-4">
       <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-md">
-        <h1 className="mb-6 text-center text-2xl font-bold text-gray-800">
-          Login to Your Account
+        <h1 className="mb-6 text-2xl font-bold text-center text-gray-800">
+          Register new account
         </h1>
 
         {error && (
@@ -45,13 +42,39 @@ const Login = () => {
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700">
-              Email or Phone
+              Name
             </label>
             <input
               type="text"
-              placeholder="Enter email or phone number"
-              value={identifier}
-              onChange={(e) => setIdentifier(e.target.value)}
+              placeholder="Enter your name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-400"
+            />
+          </div>
+
+          <div>
+            <label className="mb-1 block text-sm font-medium text-gray-700">
+              Phone
+            </label>
+            <input
+              type="text"
+              placeholder="Enter your phone"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              className="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-400"
+            />
+          </div>
+
+          <div>
+            <label className="mb-1 block text-sm font-medium text-gray-700">
+              Email
+            </label>
+            <input
+              type="email"
+              placeholder="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-400"
             />
           </div>
@@ -62,10 +85,10 @@ const Login = () => {
             </label>
             <input
               type="password"
-              placeholder="Enter password"
+              placeholder="Enter your password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-400 "
+              className="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-400"
             />
           </div>
 
@@ -73,22 +96,12 @@ const Login = () => {
             type="submit"
             className="mt-2 w-full rounded-lg bg-yellow-500 px-4 py-2 font-medium text-white transition hover:bg-yellow-600"
           >
-            Login
+            Register
           </button>
         </form>
-
-        <p className=" mt-6 text-center text-sm text-gray-600">
-          Dont have an account?{" "}
-          <a
-            href="/register"
-            className="cursor-pointer font-medium text-blue-600 hover:underline"
-          >
-            Sign up
-          </a>
-        </p>
       </div>
     </div>
   );
 };
 
-export default Login;
+export default Register;

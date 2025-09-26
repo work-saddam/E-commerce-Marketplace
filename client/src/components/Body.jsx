@@ -11,15 +11,17 @@ const Body = () => {
   const userData = useSelector((store) => store.user);
 
   const fetchUser = async () => {
-    if (userData) return;
+    if (userData?._id) return;
 
     try {
       const res = await axios.get(`${BASE_URL}/api/users/profile`, {
         withCredentials: true,
       });
-      dispatch(addUser(res?.data?.data));
+      if (res?.data?.data) {
+        dispatch(addUser(res.data.data));
+      }
     } catch (error) {
-      console.log(error);
+      // console.log("Failed to fetch user: ", error);
     }
   };
 
