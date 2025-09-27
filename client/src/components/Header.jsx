@@ -77,7 +77,7 @@ const Header = () => {
               {menuOpen && (
                 <ul className="absolute flex flex-col left-0 w-40 bg-white rounded-lg shadow-md">
                   <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
-                    Profile
+                    <Link to={"/profile"}> Profile </Link>
                   </li>
                   <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
                     Orders
