@@ -3,7 +3,7 @@ const { validateUserEditProfileData } = require("../utils/validation");
 
 const getProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).select("-password");
+    const user = await User.findById(req.user.id).select("name email phone");
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -31,13 +31,20 @@ const editProfile = async (req, res) => {
       { name },
       { new: true }
     );
+
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
+    const userData = {
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+    };
+
     res
       .status(200)
-      .json({ message: "User updated Successfully!!", data: user });
+      .json({ message: "User updated Successfully!!", data: userData });
   } catch (error) {
     res
       .status(500)
