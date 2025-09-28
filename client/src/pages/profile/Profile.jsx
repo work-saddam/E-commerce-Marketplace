@@ -5,7 +5,7 @@ import orderPhoto from "../../assets/order-photo.png";
 import { Link, useNavigate } from "react-router-dom";
 
 const Profile = () => {
-  const user = useSelector((store) => store.user);
+  const { user } = useSelector((store) => store.user);
 
   const cards = [
     {

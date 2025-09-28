@@ -8,10 +8,10 @@ import { addUser } from "../store/userSlice";
 
 const Body = () => {
   const dispatch = useDispatch();
-  const userData = useSelector((store) => store.user);
+  const { user } = useSelector((store) => store.user);
 
   const fetchUser = async () => {
-    if (userData?._id) return;
+    if (user?._id) return;
 
     try {
       const res = await axios.get(`${BASE_URL}/api/users/profile`, {

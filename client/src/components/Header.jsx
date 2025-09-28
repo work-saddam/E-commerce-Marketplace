@@ -10,7 +10,7 @@ import axios from "axios";
 import arrow from "../assets/down_arrow.svg";
 
 const Header = () => {
-  const userData = useSelector((store) => store.user);
+  const { user } = useSelector((store) => store.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -54,7 +54,7 @@ const Header = () => {
         </div>
 
         <div className="flex items-center gap-4 lg:gap-9 sm:6">
-          {userData ? (
+          {user ? (
             <div
               className="relative"
               onMouseEnter={() => setMenuOpen(true)}
@@ -62,7 +62,7 @@ const Header = () => {
             >
               <button className="flex items-center px-3 py-2 rounded-xl bg-gray-100 cursor-pointer hover:bg-gray-200">
                 <span className="truncate max-w-[100px] sm:max-w-[150px] md:max-w-[200px] font-medium">
-                  {userData?.name}
+                  {user?.name}
                 </span>
                 {
                   <img
