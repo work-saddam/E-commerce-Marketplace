@@ -5,6 +5,8 @@ import { Provider } from "react-redux";
 import appStore from "./store/appStore";
 import Register from "./components/Register";
 import Profile from "./pages/Profile/profile";
+import EditProfile from "./pages/profile/editProfile";
+import ProtectedLayout from "./layout/ProtectedLayout";
 
 function App() {
   return (
@@ -14,7 +16,11 @@ function App() {
           <Route path="/" element={<Body />}>
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/profile" element={<Profile />} />
+
+            <Route element={<ProtectedLayout />}>
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/editProfile" element={<EditProfile />} />
+            </Route>
           </Route>
         </Routes>
       </BrowserRouter>
