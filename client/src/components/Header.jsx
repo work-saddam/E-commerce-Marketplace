@@ -93,7 +93,7 @@ const Header = () => {
             </div>
           ) : (
             <Link to={"/login"}>
-              <button className="bg-yellow-500 text-white px-5 py-2 rounded-xl transition hover:bg-yellow-600 cursor-pointer">
+              <button className="text-white px-5 py-2 rounded-xl bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 shadow-md transition-colors cursor-pointer">
                 Login
               </button>
             </Link>
