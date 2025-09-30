@@ -9,6 +9,8 @@ import EditProfile from "./pages/profile/editProfile";
 import ProtectedLayout from "./layout/ProtectedLayout";
 import Addresses from "./pages/profile/Address";
 import Main from "./components/Main";
+import ProductDetails from "./components/ProductDetails";
+import ErrorPage from "./components/ErrorPage";
 
 function App() {
   return (
@@ -17,6 +19,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Body />}>
             <Route path="/" element={<Main />} />
+            <Route path="/product/:slug" element={<ProductDetails />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
 
@@ -25,6 +28,8 @@ function App() {
               <Route path="/editProfile" element={<EditProfile />} />
               <Route path="/addresses" element={<Addresses />} />
             </Route>
+
+            <Route path="*" element={<ErrorPage />} />
           </Route>
         </Routes>
       </BrowserRouter>
