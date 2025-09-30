@@ -7,6 +7,8 @@ import Register from "./components/Register";
 import Profile from "./pages/Profile/profile";
 import EditProfile from "./pages/profile/editProfile";
 import ProtectedLayout from "./layout/ProtectedLayout";
+import Addresses from "./pages/profile/Address";
+import Main from "./components/Main";
 
 function App() {
   return (
@@ -14,12 +16,14 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Body />}>
+            <Route path="/" element={<Main />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
 
             <Route element={<ProtectedLayout />}>
               <Route path="/profile" element={<Profile />} />
               <Route path="/editProfile" element={<EditProfile />} />
+              <Route path="/addresses" element={<Addresses />} />
             </Route>
           </Route>
         </Routes>
