@@ -1,12 +1,18 @@
 import axios from "axios";
 import { BASE_URL } from "../utils/constants";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { addToCart } from "../store/cartSlice";
 
 const ProductDetails = () => {
+  const cart = useSelector((store) => store.cart);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [product, setProduct] = useState({});
   const params = useParams();
   const id = params.slug.split("-").at(-1);
+
   const fetchProductDetails = async () => {
     try {
       const res = await axios.get(`${BASE_URL}/api/products/${id}`);
@@ -20,6 +26,8 @@ const ProductDetails = () => {
   useEffect(() => {
     fetchProductDetails();
   }, []);
+
+  const itemInCart = cart.find((item) => item._id === product._id);
 
   return !product._id ? (
     <div className="p-6 text-2xl text-gray-500">Product not found!</div>
@@ -59,8 +67,17 @@ const ProductDetails = () => {
           <button
             className="mt-6 px-8 py-3 rounded-xl font-medium bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 shadow-md text-white transition-colors w-fit cursor-pointer"
             disabled={product.stock <= 0}
+            onClick={() => {
+              itemInCart
+                ? navigate("/cart")
+                : dispatch(addToCart({ _id: product._id }));
+            }}
           >
-            {product.stock > 0 ? "Add to cart" : "Out of Stock"}
+            {itemInCart
+              ? "Go to cart"
+              : product.stock > 0
+              ? "Add to cart"
+              : "Out of Stock"}
           </button>
 
           <hr className="my-8 border-gray-300" />

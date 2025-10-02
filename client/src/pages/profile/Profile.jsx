@@ -2,7 +2,7 @@ import { useSelector } from "react-redux";
 import addressLogo from "../../assets/address-map-pin.png";
 import profilePhoto from "../../assets/profile-photo.png";
 import orderPhoto from "../../assets/order-photo.png";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const Profile = () => {
   const { user } = useSelector((store) => store.user);
@@ -18,7 +18,7 @@ const Profile = () => {
       img: addressLogo,
       title: "Manage Addresses",
       desc: "Edit addresses for orders",
-      link: "/editAddress",
+      link: "/addresses",
     },
     {
       img: orderPhoto,
