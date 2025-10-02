@@ -154,17 +154,39 @@ const deleteProduct = async (req, res) => {
   }
 };
 
-const getProducts = async (req, res) => {
+const getAllProducts = async (req, res) => {
   try {
     const products = await Product.find({});
 
     res
       .status(200)
-      .json({ message: "Products fetch successfully!", data: products });
+      .json({ message: "Fetching products successfully!", data: products });
   } catch (error) {
     res
       .status(500)
-      .json({ message: "Product fetch failed!", error: error.message });
+      .json({ message: "Fetching products failed!", error: error.message });
+  }
+};
+
+const getProductbyId = async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      return res.status(404).json({ message: "Product not found!" });
+    }
+    res
+      .status(200)
+      .json({
+        message: "Fetching product details successfully!",
+        data: product,
+      });
+  } catch (error) {
+    res
+      .status(500)
+      .json({
+        message: "Fetching product details failed!",
+        error: error.message,
+      });
   }
 };
 
@@ -173,5 +195,6 @@ module.exports = {
   getAllSellerProduct,
   editProduct,
   deleteProduct,
-  getProducts,
+  getAllProducts,
+  getProductbyId,
 };
