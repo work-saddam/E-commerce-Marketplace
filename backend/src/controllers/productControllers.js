@@ -174,19 +174,37 @@ const getProductbyId = async (req, res) => {
     if (!product) {
       return res.status(404).json({ message: "Product not found!" });
     }
-    res
-      .status(200)
-      .json({
-        message: "Fetching product details successfully!",
-        data: product,
-      });
+    res.status(200).json({
+      message: "Fetching product details successfully!",
+      data: product,
+    });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message: "Fetching product details failed!",
-        error: error.message,
-      });
+    res.status(500).json({
+      message: "Fetching product details failed!",
+      error: error.message,
+    });
+  }
+};
+
+const getProductbyIds = async (req, res) => {
+  try {
+    const { ids } = req.body;
+    if (!ids || !Array.isArray(ids) || ids.length === 0) {
+      return res.status(400).json({ message: "No product IDs provided" });
+    }
+
+    const products = await Product.find({ _id: { $in: ids } }).select(
+      "title price image price stock"
+    );
+    res.status(200).json({
+      message: "Successfully fetch product details!",
+      data: products,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to fetch products!",
+      error: error.message,
+    });
   }
 };
 
@@ -197,4 +215,5 @@ module.exports = {
   deleteProduct,
   getAllProducts,
   getProductbyId,
+  getProductbyIds,
 };
