@@ -11,6 +11,7 @@ import Addresses from "./pages/profile/Address";
 import Main from "./components/Main";
 import ProductDetails from "./components/ProductDetails";
 import ErrorPage from "./components/ErrorPage";
+import Cart from "./pages/cart/Cart";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
           <Route path="/" element={<Body />}>
             <Route path="/" element={<Main />} />
             <Route path="/product/:slug" element={<ProductDetails />} />
+            <Route path="/cart" element={<Cart />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
 

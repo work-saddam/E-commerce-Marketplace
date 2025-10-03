@@ -99,10 +99,13 @@ const Header = () => {
             </Link>
           )}
 
-          <div className="flex items-center gap-2 cursor-pointer">
-            <img src={cartImage} alt="cart-image" className="w-6 shrink-0" />
-            <span className="font-medium hidden lg:block">Cart</span>
-          </div>
+          <Link to={"/cart"}>
+            <div className="flex items-center gap-2 cursor-pointer">
+              <img src={cartImage} alt="cart-image" className="w-6 shrink-0" />
+              <span className="font-medium hidden lg:block">Cart</span>
+            </div>
+          </Link>
+
           <div className="flex items-center gap-2 cursor-pointer">
             <img src={storeImage} alt="store-image" className="w-6 shrink-0" />
             <span className="font-medium hidden lg:block">Seller</span>

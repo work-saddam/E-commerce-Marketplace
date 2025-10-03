@@ -16,7 +16,6 @@ const ProductDetails = () => {
   const fetchProductDetails = async () => {
     try {
       const res = await axios.get(`${BASE_URL}/api/products/${id}`);
-      console.log(res?.data?.data);
       setProduct(res?.data?.data);
     } catch (error) {
       console.log(error);
@@ -70,7 +69,11 @@ const ProductDetails = () => {
             onClick={() => {
               itemInCart
                 ? navigate("/cart")
-                : dispatch(addToCart({ _id: product._id }));
+                : dispatch(
+                    addToCart({
+                      _id: product._id,
+                    })
+                  );
             }}
           >
             {itemInCart
