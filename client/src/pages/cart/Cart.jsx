@@ -11,35 +11,35 @@ const Cart = () => {
   const cart = useSelector((store) => store.cart);
   const [cartProducts, setCartProducts] = useState([]);
 
-  const fetchProduct = async (id) => {
+  const fetchCartProducts = async () => {
+    if (cart.length === 0) {
+      setCartProducts([]);
+      return;
+    }
+
     try {
-      const res = await axios.get(`${BASE_URL}/api/products/${id}`, {
-        withCredentials: true,
+      const ids = cart.map((item) => item._id);
+      const res = await axios.post(
+        `${BASE_URL}/api/products/bulk`,
+        { ids },
+        { withCredentials: true }
+      );
+
+      const products = res?.data?.data;
+
+      const merged = products.map((product) => {
+        const found = cart.find((item) => item._id === product._id);
+        return { ...product, quantity: found?.quantity || 1 };
       });
-      // console.log(res?.data?.data);
-      return res?.data?.data;
+
+      setCartProducts(merged);
     } catch (error) {
-      console.log(error);
-      return null;
+      console.error(error);
     }
   };
 
   useEffect(() => {
-    const fetchCartProducts = async () => {
-      const promise = cart.map(async (item) => {
-        const product = await fetchProduct(item._id);
-        return product ? { ...product, quantity: item.quantity } : null;
-      });
-
-      const productWithQty = await Promise.all(promise);
-      setCartProducts(productWithQty.filter(Boolean));
-    };
-
-    if (cart.length > 0) {
-      fetchCartProducts();
-    } else {
-      setCartProducts([]);
-    }
+    fetchCartProducts();
   }, [cart]);
 
   const totalPrice = cartProducts.reduce(
