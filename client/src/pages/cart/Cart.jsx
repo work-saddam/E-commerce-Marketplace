@@ -48,29 +48,61 @@ const Cart = () => {
   );
 
   return (
-    <div className="p-4 bg-gray-100 h-screen">
+    <div className="bg-gray-50 min-h-screen py-10 px-4 sm:px-8">
       {cartProducts.length === 0 ? (
-        <div className="bg-white p-4 flex flex-col items-center">
-          <img className="max-w-84" src={empytCart} alt="empty-cart" />
-          <p className="text-gray-500 text-lg">Your cart was empty!</p>
+        <div className="flex flex-col items-center justify-center text-center mt-16 bg-white pb-8 rounded-xl">
+          <img
+            className="max-w-xs sm:max-w-sm mb-6"
+            src={empytCart}
+            alt="empty-cart"
+          />
+          <h2 className="text-xl sm:text-2xl font-semibold text-gray-700 mb-2">
+            Your cart is empty!
+          </h2>
+          <p className="text-gray-500">
+            Looks like you haven’t added anything yet.
+          </p>
           <button
-            onClick={() => {
-              navigate("/");
-            }}
-            className="m-4 px-6 py-2 bg-blue-600 rounded-lg text-white cursor-pointer"
+            onClick={() => navigate("/")}
+            className="mt-6 px-8 py-3 bg-yellow-500 text-white font-medium rounded-lg hover:bg-yellow-600 transition-colors shadow-md"
           >
-            Shop now
+            Shop Now
           </button>
         </div>
       ) : (
-        <div className="bg-white p-4 ">
-          <h2 className="font-medium text-2xl mb-6">Your Cart</h2>
-          {cartProducts.map((pro) => {
-            return <CartProduct key={pro._id} pro={pro} />;
-          })}
-          <div className="flex justify-between pt-6 border-t-1 border-gray-300">
-            <p className="font-medium text-xl">Total: ₹{totalPrice}</p>
-            <button className="rounded-lg bg-yellow-500 px-4 py-2 font-medium text-white transition hover:bg-yellow-600 cursor-pointer">
+        <div className="grid lg:grid-cols-3 gap-6">
+          {/* LEFT SIDE - CART ITEMS */}
+          <div className="lg:col-span-2 bg-white rounded-2xl shadow p-6">
+            <h2 className="text-2xl font-semibold text-gray-800 mb-6 border-b pb-3">
+              Your Cart
+            </h2>
+
+            <div className="divide-y divide-gray-200">
+              {cartProducts.map((pro) => (
+                <CartProduct key={pro._id} pro={pro} />
+              ))}
+            </div>
+          </div>
+
+          {/* RIGHT SIDE - SUMMARY */}
+          <div className="bg-white rounded-2xl shadow p-6 h-fit sticky top-24">
+            <h3 className="text-xl font-semibold text-gray-800 mb-4">
+              Order Summary
+            </h3>
+            <div className="flex justify-between text-gray-600 mb-2">
+              <span>Subtotal</span>
+              <span>₹{totalPrice}</span>
+            </div>
+            <div className="flex justify-between text-gray-600 mb-2">
+              <span>Delivery Charges</span>
+              <span className="text-green-600 font-medium">Free</span>
+            </div>
+            <div className="border-t mt-3 pt-3 flex justify-between font-semibold text-gray-800">
+              <span>Total</span>
+              <span>₹{totalPrice}</span>
+            </div>
+
+            <button className="mt-6 w-full rounded-lg bg-yellow-500 text-white font-medium py-3 text-lg hover:bg-yellow-600 transition-all shadow-md active:scale-95">
               Place Order
             </button>
           </div>

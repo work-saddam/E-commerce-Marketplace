@@ -15,7 +15,7 @@ const ProductCard = ({ pro }) => {
       <Link to={`/product/${slug}`}>
         <div className="h-60 flex items-center justify-center">
           <img
-            className="max-h-full max-w-full object-contain"
+            className="max-h-full max-w-full object-contain pt-4"
             src={image.url}
             alt={title}
           />
@@ -37,17 +37,19 @@ const ProductCard = ({ pro }) => {
               Add to cart
             </button>
           ) : (
-            <div className="flex items-center gap-2 ">
+            <div className="flex items-center bg-gray-100 rounded-full overflow-hidden shadow-inner">
               <button
-                className="px-3 py-1 bg-gray-200 rounded-lg hover:bg-gray-300 cursor-pointer"
                 onClick={() => dispatch(decreaseQuantity({ _id }))}
+                className="px-3 py-1 text-lg font-bold text-gray-700 hover:bg-gray-200 transition-colors"
               >
                 -
               </button>
-              <span className="font-medium">{quantity}</span>
+              <span className="px-4 py-1 text-lg text-gray-800 ">
+                {quantity}
+              </span>
               <button
-                className="px-3 py-1 bg-gray-200 rounded-lg hover:bg-gray-300 cursor-pointer"
                 onClick={() => dispatch(addToCart({ _id }))}
+                className="px-3 py-1 text-lg font-bold text-gray-700 hover:bg-gray-200 transition-colors"
               >
                 +
               </button>
