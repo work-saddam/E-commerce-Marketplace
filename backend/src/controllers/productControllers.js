@@ -194,7 +194,7 @@ const getProductbyIds = async (req, res) => {
     }
 
     const products = await Product.find({ _id: { $in: ids } }).select(
-      "title price image price stock"
+      "title price image price stock slug"
     );
     res.status(200).json({
       message: "Successfully fetch product details!",
