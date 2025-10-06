@@ -85,4 +85,17 @@ const placeOrder = async (req, res) => {
   }
 };
 
-module.exports = { placeOrder };
+const getOrders = async (req, res) => {
+  try {
+    const orders = await Order.find({ buyer: req.user.id });
+    res
+      .status(200)
+      .json({ message: "Order fetched successfully!", data: orders });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Order fetch failed!", error: error.message });
+  }
+};
+
+module.exports = { placeOrder, getOrders };
