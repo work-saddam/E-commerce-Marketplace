@@ -3,7 +3,7 @@ import { BASE_URL } from "../../utils/constants";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import empytCart from "../../assets/empty-cart.png";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import CartProduct from "./CartProduct";
 
 const Cart = () => {
@@ -102,9 +102,11 @@ const Cart = () => {
               <span>₹{totalPrice}</span>
             </div>
 
-            <button className="mt-6 w-full rounded-lg bg-yellow-500 text-white font-medium py-3 text-lg hover:bg-yellow-600 transition-all shadow-md active:scale-95">
-              Place Order
-            </button>
+            <Link to={"/checkout"}>
+              <button className="mt-6 w-full rounded-lg bg-yellow-500 text-white font-medium py-3 text-lg hover:bg-yellow-600 transition-all shadow-md active:scale-95">
+                Proceed to Buy
+              </button>
+            </Link>
           </div>
         </div>
       )}
