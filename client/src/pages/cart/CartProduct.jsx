@@ -15,7 +15,7 @@ const CartProduct = ({ pro }) => {
         <div className="h-30 sm:h-38 w-30 sm:w-38 overflow-hidden flex items-center justify-center">
           <img
             className="object-contain max-h-full max-w-full"
-            src={pro.image.url}
+            src={pro.image?.url}
             alt={pro.title}
           />
         </div>
@@ -29,13 +29,13 @@ const CartProduct = ({ pro }) => {
         </Link>
         <p
           className={`sm:mt-2  ${
-            pro.stock > 0 ? "text-green-600" : "text-red-500"
+            (pro.stock ?? 0) > 0 ? "text-green-600" : "text-red-500"
           }`}
         >
-          {pro.stock > 0 ? "In Stock" : "Out of Stock"}
+          {(pro.stock ?? 0) > 0 ? "In Stock" : "Out of Stock"}
         </p>
         <p className="mt-1 sm:text-xl font-medium text-gray-900">
-          ₹{pro.price}
+          ₹{pro.price ?? 0}
         </p>
 
         <div className="mt-3 flex  items-center gap-3">

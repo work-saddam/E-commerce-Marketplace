@@ -11,7 +11,6 @@ const Order = () => {
       const res = await axios.get(`${BASE_URL}/api/users/orders`, {
         withCredentials: true,
       });
-      console.log(res?.data?.data);
       setOrders(res?.data?.data);
     } catch (error) {
       console.error(error);

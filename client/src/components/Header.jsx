@@ -78,10 +78,10 @@ const Header = () => {
               {menuOpen && (
                 <ul className="absolute z-10 flex flex-col left-0 w-40 bg-white rounded-lg shadow-md">
                   <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
-                    <Link to={"/profile"}> Profile </Link>
+                    <Link to={"/account"}> Profile </Link>
                   </li>
                   <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
-                    <Link to={"/orders"}> Orders </Link>
+                    <Link to={"/account/orders"}> Orders </Link>
                   </li>
                   <li
                     className="px-4 py-2 hover:bg-gray-100 cursor-pointer"

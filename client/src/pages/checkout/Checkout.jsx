@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { clearCart } from "../../store/cartSlice";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Checkout = () => {
   const [addresses, setAddresses] = useState([]);
@@ -57,7 +57,7 @@ const Checkout = () => {
       // console.log(res?.data?.data);
       dispatch(clearCart());
       alert("Order placed successfully");
-      navigate("/orders");
+      navigate("/account/orders");
     } catch (error) {
       console.error(error);
       alert("Failed to place order!");
@@ -74,7 +74,10 @@ const Checkout = () => {
         <h3 className="font-semibold text-2xl">Delivery Address</h3>
         {!selectedAddressData ? (
           <div className="mt-6 h-28 border border-gray-500 rounded-lg flex justify-center items-center ">
-            <p className="text-blue-500">+ Add Delivery address</p>
+            <Link to={"/account/addresses"}>
+              {" "}
+              <p className="text-blue-500">+ Add Delivery address</p>{" "}
+            </Link>
           </div>
         ) : (
           <div className=" mt-2">

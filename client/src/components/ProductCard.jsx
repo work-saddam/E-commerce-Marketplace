@@ -16,7 +16,7 @@ const ProductCard = ({ pro }) => {
         <div className="h-60 flex items-center justify-center">
           <img
             className="max-h-full max-w-full object-contain pt-4"
-            src={image.url}
+            src={image?.url}
             alt={title}
           />
         </div>

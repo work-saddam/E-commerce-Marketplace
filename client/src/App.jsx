@@ -28,11 +28,11 @@ function App() {
             <Route path="/register" element={<Register />} />
 
             <Route element={<ProtectedLayout />}>
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/editProfile" element={<EditProfile />} />
-              <Route path="/address" element={<Addresses />} />
+              <Route path="/account" element={<Profile />} />
+              <Route path="/account/editProfile" element={<EditProfile />} />
+              <Route path="/account/addresses" element={<Addresses />} />
               <Route path="/checkout" element={<Checkout />} />
-              <Route path="/orders" element={<Order />} />
+              <Route path="/account/orders" element={<Order />} />
             </Route>
 
             <Route path="*" element={<ErrorPage />} />

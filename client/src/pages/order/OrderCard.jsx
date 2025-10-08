@@ -22,19 +22,21 @@ const OrderCard = ({ order }) => {
             <div className="flex items-center gap-3">
               <div className="h-20 sm:h-28 w-30 sm:w-28 overflow-hidden flex items-center justify-center">
                 <img
-                  src={item.product.image.url}
-                  alt={item.product.title}
+                  src={item.product?.image?.url}
+                  alt={item.product?.title}
                   className="object-contain max-h-full max-w-full"
                 />
               </div>
               <div>
                 <p className="text-sm sm:text-lg line-clamp-2 sm:line-clamp-1 pr-4">
-                  {item.product.title}
+                  {item.product?.title}
                 </p>
                 <p className="mt-2">Quantity: {item.quantity}</p>
               </div>
             </div>
-            <p className="font-medium">₹{item.price * item.quantity}</p>
+            <p className="font-medium">
+              ₹{(item.price || 0) * (item.quantity || 0)}
+            </p>
           </div>
         ))}
       </div>
