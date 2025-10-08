@@ -85,9 +85,16 @@ const placeOrder = async (req, res) => {
   }
 };
 
-const getOrders = async (req, res) => {
+const getUserOrders = async (req, res) => {
   try {
-    const orders = await Order.find({ buyer: req.user.id });
+    const orders = await Order.find({ buyer: req.user.id }).populate({
+      path: "products",
+      populate: {
+        path: "product",
+        model: "Product",
+        select: "title image",
+      },
+    });
     res
       .status(200)
       .json({ message: "Order fetched successfully!", data: orders });
@@ -98,4 +105,4 @@ const getOrders = async (req, res) => {
   }
 };
 
-module.exports = { placeOrder, getOrders };
+module.exports = { placeOrder, getUserOrders };

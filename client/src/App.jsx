@@ -13,6 +13,7 @@ import ProductDetails from "./components/ProductDetails";
 import ErrorPage from "./components/ErrorPage";
 import Cart from "./pages/cart/Cart";
 import Checkout from "./pages/checkout/Checkout";
+import Order from "./pages/order/Order";
 
 function App() {
   return (
@@ -29,8 +30,9 @@ function App() {
             <Route element={<ProtectedLayout />}>
               <Route path="/profile" element={<Profile />} />
               <Route path="/editProfile" element={<EditProfile />} />
-              <Route path="/addresses" element={<Addresses />} />
+              <Route path="/address" element={<Addresses />} />
               <Route path="/checkout" element={<Checkout />} />
+              <Route path="/orders" element={<Order />} />
             </Route>
 
             <Route path="*" element={<ErrorPage />} />

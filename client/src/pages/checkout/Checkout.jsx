@@ -73,7 +73,9 @@ const Checkout = () => {
       <div className="bg-white p-4">
         <h3 className="font-semibold text-2xl">Delivery Address</h3>
         {!selectedAddressData ? (
-          <p className="text-gray-300">Add Delivery address</p>
+          <div className="mt-6 h-28 border border-gray-500 rounded-lg flex justify-center items-center ">
+            <p className="text-blue-500">+ Add Delivery address</p>
+          </div>
         ) : (
           <div className=" mt-2">
             <p className="font-medium">{selectedAddressData?.name} </p>

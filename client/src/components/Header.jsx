@@ -81,7 +81,7 @@ const Header = () => {
                     <Link to={"/profile"}> Profile </Link>
                   </li>
                   <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
-                    Orders
+                    <Link to={"/orders"}> Orders </Link>
                   </li>
                   <li
                     className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
