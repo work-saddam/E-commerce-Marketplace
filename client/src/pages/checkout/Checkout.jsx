@@ -54,13 +54,12 @@ const Checkout = () => {
         { cart, addressId: selectedAddress, paymentMethod },
         { withCredentials: true }
       );
-      // console.log(res?.data?.data);
       dispatch(clearCart());
       alert("Order placed successfully");
       navigate("/account/orders");
     } catch (error) {
-      console.error(error);
-      alert("Failed to place order!");
+      console.error(error?.response?.data);
+      alert(`Failed to place order! \n${error?.response?.data?.message}`);
     } finally {
       setloading(false);
     }

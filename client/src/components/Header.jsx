@@ -8,6 +8,7 @@ import { BASE_URL } from "../utils/constants";
 import { removeUser } from "../store/userSlice";
 import axios from "axios";
 import arrow from "../assets/down_arrow.svg";
+import { clearCart } from "../store/cartSlice";
 
 const Header = () => {
   const { user } = useSelector((store) => store.user);
@@ -26,6 +27,7 @@ const Header = () => {
         { withCredentials: true }
       );
       dispatch(removeUser());
+      dispatch(clearCart());
       navigate("/");
     } catch (error) {
       console.log(error);

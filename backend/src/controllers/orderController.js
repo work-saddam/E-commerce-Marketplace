@@ -1,29 +1,55 @@
 const MasterOrder = require("../models/masterOrder");
 const Order = require("../models/order");
 const Product = require("../models/product");
+const mongoose = require("mongoose");
 
 const placeOrder = async (req, res) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
   try {
     const { cart, addressId, paymentMethod } = req.body;
 
-    if (!cart || cart.length === 0) {
-      return res.status(400).json({ message: "Cart was empty!" });
+    if (cart.length === 0) {
+      await session.abortTransaction();
+      return res.status(400).json({ messsage: "Cart should not be empty!" });
     }
 
     if (!addressId) {
-      return res.status(400).json({ message: "Shipping address is required!" });
+      await session.abortTransaction();
+      return res.status(400).json({ message: "Address is required!" });
     }
+
+    for (const item of cart) {
+      item.quantity = Number(item.quantity);
+      if (isNaN(item.quantity) || item.quantity <= 0) {
+        await session.abortTransaction();
+        return res
+          .status(400)
+          .json({ message: `Invalid quantity for product ${item._id}` });
+      }
+    }
+
+    const productIds = cart.map((item) => item._id);
+    const products = await Product.find({ _id: { $in: productIds } }).session(
+      session
+    );
+    const productMap = new Map(
+      products.map((pro) => [pro._id.toString(), pro])
+    );
 
     const sellerMap = {};
     let totalAmount = 0;
 
-    for (const item of cart) {
-      const product = await Product.findById(item._id);
+    for (let item of cart) {
+      const product = productMap.get(item._id);
       if (!product) {
-        return res.status(404).json({ message: "Product not found!" });
+        await session.abortTransaction();
+        return res.status(404).json({ message: "Product not found" });
       }
 
       if (item.quantity > product.stock) {
+        await session.abortTransaction();
         return res
           .status(400)
           .json({ message: `Insufficient stock for ${product.title}` });
@@ -40,17 +66,36 @@ const placeOrder = async (req, res) => {
         price: product.price,
         quantity: item.quantity,
       });
-
-      product.stock -= item.quantity;
-      await product.save();
     }
 
-    const masterOrder = await MasterOrder.create({
-      buyer: req.user.id,
-      paymentMethod,
-      totalAmount,
-    });
+    const bulkOps = cart.map((item) => ({
+      updateOne: {
+        filter: { _id: item._id },
+        update: { $inc: { stock: -item.quantity } },
+      },
+    }));
 
+    const bulkResult = await Product.bulkWrite(bulkOps, { session });
+
+    if (bulkResult.modifiedCount !== cart.length) {
+      await session.abortTransaction();
+      return res
+        .status(400)
+        .json({ message: "Stock update failed. Please try again." });
+    }
+
+    const masterOrder = await MasterOrder.create(
+      [
+        {
+          buyer: req.user.id,
+          paymentMethod,
+          totalAmount,
+        },
+      ],
+      { session }
+    );
+
+    const masterOrderDoc = masterOrder[0];
     const orderIds = [];
 
     for (const sellerId in sellerMap) {
@@ -60,41 +105,53 @@ const placeOrder = async (req, res) => {
         0
       );
 
-      const subOrder = await Order.create({
-        masterOrder: masterOrder._id,
-        buyer: req.user.id,
-        seller: sellerId,
-        products: sellerProducts,
-        shippingAddress: addressId,
-        subTotal,
-      });
+      const subOrder = await Order.create(
+        [
+          {
+            masterOrder: masterOrderDoc._id,
+            buyer: req.user.id,
+            seller: sellerId,
+            products: sellerProducts,
+            shippingAddress: addressId,
+            subTotal,
+          },
+        ],
+        { session }
+      );
 
-      orderIds.push(subOrder._id);
+      orderIds.push(subOrder[0]._id);
     }
 
-    masterOrder.orders = orderIds;
-    await masterOrder.save();
+    masterOrderDoc.orders = orderIds;
+    await masterOrderDoc.save({ session });
+
+    await session.commitTransaction();
 
     res
       .status(201)
-      .json({ message: "Order placed successfully!", data: masterOrder });
+      .json({ message: "Order placed successfully!", data: masterOrderDoc });
   } catch (error) {
-    res
+    await session.abortTransaction();
+    return res
       .status(500)
-      .json({ message: "Order placement failed", error: error.message });
+      .json({ message: "Order placement failed!", error: error.message });
+  } finally {
+    session.endSession();
   }
 };
 
 const getUserOrders = async (req, res) => {
   try {
-    const orders = await Order.find({ buyer: req.user.id }).populate({
-      path: "products",
-      populate: {
-        path: "product",
-        model: "Product",
-        select: "title image",
-      },
-    });
+    const orders = await Order.find({ buyer: req.user.id })
+      .populate({
+        path: "products",
+        populate: {
+          path: "product",
+          model: "Product",
+          select: "title image",
+        },
+      })
+      .sort({ createdAt: -1 });
     res
       .status(200)
       .json({ message: "Order fetched successfully!", data: orders });
@@ -104,5 +161,8 @@ const getUserOrders = async (req, res) => {
       .json({ message: "Order fetch failed!", error: error.message });
   }
 };
+
+//Add getSellerOrder
+// Add updateOrderStatus
 
 module.exports = { placeOrder, getUserOrders };
