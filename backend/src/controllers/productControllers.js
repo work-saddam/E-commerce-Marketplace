@@ -208,6 +208,64 @@ const getProductbyIds = async (req, res) => {
   }
 };
 
+const searchProducts = async (req, res) => {
+  try {
+    const { q } = req.query;
+
+    if (!q || q.trim() === "") {
+      return res.status(400).json({ message: "Search query required!" });
+    }
+
+    const regex = new RegExp(q, "i");
+
+    // const products = await Product.find({
+    //   $or: [{ title: { $regex: regex } }, { description: { $regex: regex } }],
+    // });
+
+    const products = await Product.aggregate([
+      {
+        $lookup: {
+          from: "categories",
+          localField: "category",
+          foreignField: "_id",
+          as: "categoryData",
+        },
+      },
+
+      {
+        $match: {
+          $or: [
+            { title: { $regex: regex } },
+            { description: { $regex: regex } },
+            { "categoryData.name": { $regex: regex } },
+          ],
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          title: 1,
+          description: 1,
+          price: 1,
+          image: 1,
+          stock: 1,
+          slug: 1,
+          "category._id": "$categoryData._id",
+          "category.name": "$categoryData.name",
+        },
+      },
+    ]);
+
+    res
+      .status(200)
+      .json({ message: "Products search successfully!", data: products });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Search products failed!", error: error.message });
+  }
+};
+
 module.exports = {
   addProduct,
   getAllSellerProduct,
@@ -216,4 +274,5 @@ module.exports = {
   getAllProducts,
   getProductbyId,
   getProductbyIds,
+  searchProducts,
 };
