@@ -1,3 +1,4 @@
+const Address = require("../models/address");
 const MasterOrder = require("../models/masterOrder");
 const Order = require("../models/order");
 const Product = require("../models/product");
@@ -10,7 +11,7 @@ const placeOrder = async (req, res) => {
   try {
     const { cart, addressId, paymentMethod } = req.body;
 
-    if (cart.length === 0) {
+    if (!Array.isArray(cart) || cart.length === 0) {
       await session.abortTransaction();
       return res.status(400).json({ messsage: "Cart should not be empty!" });
     }
@@ -18,6 +19,14 @@ const placeOrder = async (req, res) => {
     if (!addressId) {
       await session.abortTransaction();
       return res.status(400).json({ message: "Address is required!" });
+    }
+
+    const isValidAddress = await Address.findOne({
+      _id: addressId,
+      user: req.user.id,
+    });
+    if (!isValidAddress) {
+      return res.status(404).json({ message: "Invalid address" });
     }
 
     for (const item of cart) {

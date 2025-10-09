@@ -25,7 +25,7 @@ const Cart = () => {
         { withCredentials: true }
       );
 
-      const products = res?.data?.data;
+      const products = res?.data?.data || [];
 
       const merged = products.map((product) => {
         const found = cart.find((item) => item._id === product._id);
