@@ -11,6 +11,9 @@ import Addresses from "./pages/profile/Address";
 import Main from "./components/Main";
 import ProductDetails from "./components/ProductDetails";
 import ErrorPage from "./components/ErrorPage";
+import Cart from "./pages/cart/Cart";
+import Checkout from "./pages/checkout/Checkout";
+import Order from "./pages/order/Order";
 
 function App() {
   return (
@@ -20,13 +23,16 @@ function App() {
           <Route path="/" element={<Body />}>
             <Route path="/" element={<Main />} />
             <Route path="/product/:slug" element={<ProductDetails />} />
+            <Route path="/cart" element={<Cart />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
 
             <Route element={<ProtectedLayout />}>
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/editProfile" element={<EditProfile />} />
-              <Route path="/addresses" element={<Addresses />} />
+              <Route path="/account" element={<Profile />} />
+              <Route path="/account/editProfile" element={<EditProfile />} />
+              <Route path="/account/addresses" element={<Addresses />} />
+              <Route path="/checkout" element={<Checkout />} />
+              <Route path="/account/orders" element={<Order />} />
             </Route>
 
             <Route path="*" element={<ErrorPage />} />
