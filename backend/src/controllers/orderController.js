@@ -24,8 +24,9 @@ const placeOrder = async (req, res) => {
     const isValidAddress = await Address.findOne({
       _id: addressId,
       user: req.user.id,
-    });
+    }).session(session);
     if (!isValidAddress) {
+      await session.abortTransaction();
       return res.status(404).json({ message: "Invalid address" });
     }
 

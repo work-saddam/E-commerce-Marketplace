@@ -10,6 +10,7 @@ const Cart = () => {
   const navigate = useNavigate();
   const cart = useSelector((store) => store.cart);
   const [cartProducts, setCartProducts] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const fetchCartProducts = async () => {
     if (cart.length === 0) {
@@ -18,6 +19,7 @@ const Cart = () => {
     }
 
     try {
+      setLoading(true);
       const ids = cart.map((item) => item._id);
       const res = await axios.post(
         `${BASE_URL}/api/products/bulk`,
@@ -35,6 +37,8 @@ const Cart = () => {
       setCartProducts(merged);
     } catch (error) {
       console.error(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -49,7 +53,8 @@ const Cart = () => {
 
   return (
     <div className="bg-gray-50 min-h-screen py-10 px-4 sm:px-8">
-      {cartProducts.length === 0 ? (
+      {loading && <div className="text-center py-10">Loading cart...</div>}
+      {!loading && cartProducts.length === 0 ? (
         <div className="flex flex-col items-center justify-center text-center mt-16 bg-white pb-8 rounded-xl">
           <img
             className="max-w-xs sm:max-w-sm mb-6"
