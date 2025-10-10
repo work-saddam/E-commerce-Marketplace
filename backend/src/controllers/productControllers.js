@@ -210,19 +210,22 @@ const getProductbyIds = async (req, res) => {
 
 const searchProducts = async (req, res) => {
   try {
-    const { q } = req.query;
+    const { q, sort = "newest", page = 1, limit = 10 } = req.query;
 
     if (!q || q.trim() === "") {
       return res.status(400).json({ message: "Search query required!" });
     }
 
     const regex = new RegExp(q, "i");
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+    const sortOptions = {
+      newest: { createdAt: -1 },
+      oldest: { createdAt: 1 },
+      price_low: { price: 1 },
+      price_high: { price: -1 },
+    };
 
-    // const products = await Product.find({
-    //   $or: [{ title: { $regex: regex } }, { description: { $regex: regex } }],
-    // });
-
-    const products = await Product.aggregate([
+    const pipeline = [
       {
         $lookup: {
           from: "categories",
@@ -236,7 +239,7 @@ const searchProducts = async (req, res) => {
         $match: {
           $or: [
             { title: { $regex: regex } },
-            { description: { $regex: regex } },
+            { desciption: { $regex: regex } },
             { "categoryData.name": { $regex: regex } },
           ],
         },
@@ -250,15 +253,37 @@ const searchProducts = async (req, res) => {
           image: 1,
           stock: 1,
           slug: 1,
+          isActive: 1,
+          createdAt: 1,
           "category._id": "$categoryData._id",
           "category.name": "$categoryData.name",
         },
       },
+      { $sort: sortOptions[sort] },
+      { $skip: skip },
+      { $limit: parseInt(limit) },
+    ];
+
+    const products = await Product.aggregate(pipeline);
+
+    const totalCount = await Product.aggregate([
+      pipeline[0],
+      pipeline[1],
+      { $count: "count" },
     ]);
 
-    res
-      .status(200)
-      .json({ message: "Products search successfully!", data: products });
+    const total = totalCount[0]?.count || 0;
+
+    res.status(200).json({
+      message: "Products search successfully!",
+      pagination: {
+        total,
+        page: parseInt(page),
+        limit: parseInt(limit),
+        totalPages: Math.ceil(total / limit),
+      },
+      data: products,
+    });
   } catch (error) {
     res
       .status(500)
