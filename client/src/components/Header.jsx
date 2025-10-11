@@ -9,6 +9,7 @@ import { removeUser } from "../store/userSlice";
 import axios from "axios";
 import arrow from "../assets/down_arrow.svg";
 import { clearCart } from "../store/cartSlice";
+import SearchBar from "./SearchBar";
 
 const Header = () => {
   const { user } = useSelector((store) => store.user);
@@ -16,7 +17,6 @@ const Header = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const [search, setSearch] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
 
   const handleLogout = async () => {
@@ -45,14 +45,8 @@ const Header = () => {
               className="w-36 sm:w-44 md:w-52 object-contain"
             />
           </Link>
-          <div className="flex-1 hidden sm:block">
-            <input
-              type="text"
-              placeholder="Search for product"
-              className="w-full px-4 py-2 bg-blue-100 rounded-lg outline-none "
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
+          <div className="hidden sm:block">
+            <SearchBar />
           </div>
         </div>
 
@@ -119,6 +113,10 @@ const Header = () => {
             <span className="font-medium hidden lg:block">Seller</span>
           </div>
         </div>
+      </div>
+
+      <div className="block sm:hidden px-12 py-2 border-t border-gray-200">
+        <SearchBar />
       </div>
     </header>
   );
