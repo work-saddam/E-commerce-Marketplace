@@ -4,7 +4,7 @@ import axios from "axios";
 import { BASE_URL } from "../utils/constants";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { addUser } from "../store/userSlice";
+import { addUser, removeUser, setLoading } from "../store/userSlice";
 
 const Body = () => {
   const dispatch = useDispatch();
@@ -12,7 +12,7 @@ const Body = () => {
 
   const fetchUser = async () => {
     if (user?._id) return;
-
+    dispatch(setLoading(true));
     try {
       const res = await axios.get(`${BASE_URL}/api/users/profile`, {
         withCredentials: true,
@@ -22,6 +22,7 @@ const Body = () => {
       }
     } catch (error) {
       // console.log("Failed to fetch user: ", error);
+      dispatch(removeUser());
     }
   };
 

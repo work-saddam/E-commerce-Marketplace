@@ -12,19 +12,19 @@ const Profile = () => {
       img: profilePhoto,
       title: "Profile Information",
       desc: "Edit your profile",
-      link: "/editProfile",
+      link: "/account/editProfile",
     },
     {
       img: addressLogo,
       title: "Manage Addresses",
       desc: "Edit addresses for orders",
-      link: "/addresses",
+      link: "/account/addresses",
     },
     {
       img: orderPhoto,
       title: "Your Orders",
       desc: "Track your orders",
-      link: "/orders",
+      link: "/account/orders",
     },
   ];
 

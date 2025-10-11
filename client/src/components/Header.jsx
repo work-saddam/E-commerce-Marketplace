@@ -8,13 +8,16 @@ import { BASE_URL } from "../utils/constants";
 import { removeUser } from "../store/userSlice";
 import axios from "axios";
 import arrow from "../assets/down_arrow.svg";
+import { clearCart } from "../store/cartSlice";
+import SearchBar from "./SearchBar";
+import { persistor } from "../store/appStore";
 
 const Header = () => {
   const { user } = useSelector((store) => store.user);
+  const cart = useSelector((store) => store.cart);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const [search, setSearch] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
 
   const handleLogout = async () => {
@@ -25,6 +28,8 @@ const Header = () => {
         { withCredentials: true }
       );
       dispatch(removeUser());
+      dispatch(clearCart());
+      await persistor.purge();
       navigate("/");
     } catch (error) {
       console.log(error);
@@ -42,14 +47,8 @@ const Header = () => {
               className="w-36 sm:w-44 md:w-52 object-contain"
             />
           </Link>
-          <div className="flex-1 hidden sm:block">
-            <input
-              type="text"
-              placeholder="Search for product"
-              className="w-full px-4 py-2 bg-blue-100 rounded-lg outline-none "
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
+          <div className="hidden sm:block">
+            <SearchBar />
           </div>
         </div>
 
@@ -75,12 +74,12 @@ const Header = () => {
                 }
               </button>
               {menuOpen && (
-                <ul className="absolute flex flex-col left-0 w-40 bg-white rounded-lg shadow-md">
+                <ul className="absolute z-10 flex flex-col left-0 w-40 bg-white rounded-lg shadow-md">
                   <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
-                    <Link to={"/profile"}> Profile </Link>
+                    <Link to={"/account"}> Profile </Link>
                   </li>
                   <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
-                    Orders
+                    <Link to={"/account/orders"}> Orders </Link>
                   </li>
                   <li
                     className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
@@ -99,15 +98,27 @@ const Header = () => {
             </Link>
           )}
 
-          <div className="flex items-center gap-2 cursor-pointer">
-            <img src={cartImage} alt="cart-image" className="w-6 shrink-0" />
-            <span className="font-medium hidden lg:block">Cart</span>
-          </div>
+          <Link to={"/cart"}>
+            <div className="relative flex items-center gap-2 cursor-pointer">
+              <img src={cartImage} alt="cart-image" className="w-6 shrink-0" />
+              {cart.length > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full shadow-md">
+                  {cart.length}
+                </span>
+              )}
+              <span className="font-medium hidden lg:block">Cart</span>
+            </div>
+          </Link>
+
           <div className="flex items-center gap-2 cursor-pointer">
             <img src={storeImage} alt="store-image" className="w-6 shrink-0" />
             <span className="font-medium hidden lg:block">Seller</span>
           </div>
         </div>
+      </div>
+
+      <div className="block sm:hidden px-12 py-2 border-t border-gray-200">
+        <SearchBar />
       </div>
     </header>
   );

@@ -42,9 +42,7 @@ const login = async (req, res) => {
   try {
     const { identifier, password } = req.body;
     if (!identifier || !password) {
-      return res
-        .status(400)
-        .json({ message: "Email/Phone & Password are required!" });
+      return res.status(400).json({ message: "All fields are required!" });
     }
 
     const user = await User.findOne({
@@ -69,9 +67,16 @@ const login = async (req, res) => {
       maxAge: 3 * 24 * 60 * 60 * 1000, // 3 days
     });
 
+    const userData = {
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+    };
+
     res
       .status(200)
-      .json({ message: "Login Successfully!", data: user, token: token });
+      .json({ message: "Login Successfully!", data: userData, token: token });
   } catch (error) {
     res.status(500).json({ message: "Login Failed!", error: error.message });
   }

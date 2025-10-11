@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { addToCart, decreaseQuantity } from "../store/cartSlice";
 
 const ProductCard = ({ pro }) => {
+  const { _id, title, slug, image, price } = pro;
   const dispatch = useDispatch();
   const cart = useSelector((store) => store.cart);
 
@@ -11,42 +12,44 @@ const ProductCard = ({ pro }) => {
 
   return (
     <div className="rounded-lg border bg-white shadow hover:shadow-lg overflow-hidden">
-      <Link to={`/product/${pro.slug}`}>
+      <Link to={`/product/${slug}`}>
         <div className="h-60 flex items-center justify-center">
           <img
-            className="max-h-full max-w-full object-contain"
-            src={pro.image.url}
-            alt={pro.title}
+            className="max-h-full max-w-full object-contain pt-4"
+            src={image?.url}
+            alt={title}
           />
         </div>
       </Link>
       <div className="p-4">
-        <h3 className="text-base font-medium line-clamp-1">{pro.title}</h3>
+        <h3 className="text-base font-medium line-clamp-1">{title}</h3>
 
         <div className="mt-3 flex justify-between items-center">
-          <p className=" text-lg font-bold text-gray-800">₹{pro.price}</p>
+          <p className=" text-lg font-bold text-gray-800">₹{price}</p>
 
           {quantity === 0 ? (
             <button
               onClick={() => {
-                dispatch(addToCart({ _id: pro._id }));
+                dispatch(addToCart({ _id }));
               }}
               className="px-4 py-2 bg-yellow-400 rounded-lg font-medium hover:bg-yellow-500 transition-colors cursor-pointer"
             >
               Add to cart
             </button>
           ) : (
-            <div className="flex items-center gap-2 ">
+            <div className="flex items-center bg-gray-100 rounded-full overflow-hidden shadow-inner">
               <button
-                className="px-3 py-1 bg-gray-200 rounded-lg hover:bg-gray-300 cursor-pointer"
-                onClick={() => dispatch(decreaseQuantity({ _id: pro._id }))}
+                onClick={() => dispatch(decreaseQuantity({ _id }))}
+                className="px-3 py-1 text-lg font-bold text-gray-700 hover:bg-gray-200 transition-colors"
               >
                 -
               </button>
-              <span className="font-medium">{quantity}</span>
+              <span className="px-4 py-1 text-lg text-gray-800 ">
+                {quantity}
+              </span>
               <button
-                className="px-3 py-1 bg-gray-200 rounded-lg hover:bg-gray-300 cursor-pointer"
-                onClick={() => dispatch(addToCart({ _id: pro._id }))}
+                onClick={() => dispatch(addToCart({ _id }))}
+                className="px-3 py-1 text-lg font-bold text-gray-700 hover:bg-gray-200 transition-colors"
               >
                 +
               </button>

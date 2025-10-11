@@ -156,11 +156,36 @@ const deleteProduct = async (req, res) => {
 
 const getAllProducts = async (req, res) => {
   try {
-    const products = await Product.find({});
+    let { sort = "newest", page = 1, limit } = req.query;
 
-    res
-      .status(200)
-      .json({ message: "Fetching products successfully!", data: products });
+    page = parseInt(page);
+    limit = Math.min(parseInt(limit), 20) || 10;
+    const skip = (page - 1) * limit;
+
+    const sortOptions = {
+      newest: { createdAt: -1 },
+      oldest: { createdAt: 1 },
+      price_low: { price: 1 },
+      price_high: { price: -1 },
+    };
+
+    const sortCriteria = sortOptions[sort] || sortOptions.newest;
+
+    const [products, total] = await Promise.all([
+      Product.find({}).sort(sortCriteria).skip(skip).limit(limit),
+      Product.countDocuments({}),
+    ]);
+
+    res.status(200).json({
+      message: "Fetching products successfully!",
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+      data: products,
+    });
   } catch (error) {
     res
       .status(500)
@@ -174,19 +199,126 @@ const getProductbyId = async (req, res) => {
     if (!product) {
       return res.status(404).json({ message: "Product not found!" });
     }
-    res
-      .status(200)
-      .json({
-        message: "Fetching product details successfully!",
-        data: product,
-      });
+    res.status(200).json({
+      message: "Fetching product details successfully!",
+      data: product,
+    });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message: "Fetching product details failed!",
-        error: error.message,
-      });
+    res.status(500).json({
+      message: "Fetching product details failed!",
+      error: error.message,
+    });
+  }
+};
+
+const getProductbyIds = async (req, res) => {
+  try {
+    const { ids } = req.body;
+    if (!ids || !Array.isArray(ids) || ids.length === 0) {
+      return res.status(400).json({ message: "No product IDs provided" });
+    }
+
+    const products = await Product.find({ _id: { $in: ids } }).select(
+      "title price image stock slug"
+    );
+    res.status(200).json({
+      message: "Successfully fetch product details!",
+      data: products,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to fetch products!",
+      error: error.message,
+    });
+  }
+};
+
+const searchProducts = async (req, res) => {
+  try {
+    let { q, sort = "newest", page = 1, limit = 10 } = req.query;
+
+    if (!q || !q.trim()) {
+      return res.status(400).json({ message: "Search query required!" });
+    }
+
+    page = parseInt(page);
+    limit = Math.min(parseInt(limit), 20) || 10;
+    const skip = (page - 1) * limit;
+
+    const regex = new RegExp(q.trim(), "i");
+
+    const sortOptions = {
+      newest: { createdAt: -1 },
+      oldest: { createdAt: 1 },
+      price_low: { price: 1 },
+      price_high: { price: -1 },
+    };
+    const sortCriteria = sortOptions[sort] || sortOptions.newest;
+
+    const result = await Product.aggregate([
+      {
+        $lookup: {
+          from: "categories",
+          localField: "category",
+          foreignField: "_id",
+          as: "categoryData",
+        },
+      },
+      { $unwind: { path: "$categoryData", preserveNullAndEmptyArrays: true } },
+      {
+        $match: {
+          $or: [
+            { title: { $regex: regex } },
+            { description: { $regex: regex } },
+            { "categoryData.name": { $regex: regex } },
+          ],
+        },
+      },
+      {
+        $facet: {
+          data: [
+            { $sort: sortCriteria },
+            { $skip: skip },
+            { $limit: limit },
+            {
+              $project: {
+                _id: 1,
+                title: 1,
+                description: 1,
+                price: 1,
+                image: 1,
+                stock: 1,
+                slug: 1,
+                isActive: 1,
+                createdAt: 1,
+                "category._id": "$categoryData._id",
+                "category.name": "$categoryData.name",
+              },
+            },
+          ],
+          totalCount: [{ $count: "count" }],
+        },
+      },
+    ]);
+
+    const products = result[0]?.data || [];
+    const total = result[0]?.totalCount[0]?.count || 0;
+
+    res.status(200).json({
+      message: "Products fetched successfully!",
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+      data: products,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Search failed!",
+      error: error.message,
+    });
   }
 };
 
@@ -197,4 +329,6 @@ module.exports = {
   deleteProduct,
   getAllProducts,
   getProductbyId,
+  getProductbyIds,
+  searchProducts,
 };

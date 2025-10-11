@@ -1,15 +1,16 @@
 import axios from "axios";
-import { BASE_URL } from "../utils/constants";
 import { useEffect, useState } from "react";
-import ProductCard from "./ProductCard";
 import { useSearchParams } from "react-router-dom";
+import { BASE_URL } from "../utils/constants";
+import ProductCard from "../components/ProductCard";
 
-const Main = () => {
+const SearchResults = () => {
   const [products, setProducts] = useState([]);
-  const [pagination, setPagination] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [pagination, setPagination] = useState(null);
 
   const [searchParams, setSearchParams] = useSearchParams();
+  const query = searchParams.get("q") || "";
   const sort = searchParams.get("sort") || "newest";
   const page = parseInt(searchParams.get("page")) || 1;
   const limit = parseInt(searchParams.get("limit")) || 10;
@@ -18,33 +19,31 @@ const Main = () => {
     try {
       setLoading(true);
       const res = await axios.get(
-        `${BASE_URL}/api/products?&sort=${sort}&page=${page}&limit=${limit}`,
-        {
-          withCredentials: true,
-        }
+        `${BASE_URL}/api/products/search?q=${query}&sort=${sort}&page=${page}&limit=${limit}`
       );
       setProducts(res?.data?.data || []);
       setPagination(res?.data?.pagination || null);
     } catch (error) {
-      console.log(error);
+      console.error(error);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
+    if (!query) return;
     fetchProducts();
-  }, [sort, page, limit]);
+  }, [query, sort, page, limit]);
 
   const handlePrev = () => {
     if (page > 1) {
-      setSearchParams({ sort: sort, page: page - 1, limit });
+      setSearchParams({ q: query, sort: sort, page: page - 1, limit });
     }
   };
 
   const handleNext = () => {
     if (pagination && page < pagination.totalPages)
-      setSearchParams({ sort, page: page + 1, limit });
+      setSearchParams({ q: query, sort, page: page + 1, limit });
   };
 
   if (loading)
@@ -57,17 +56,21 @@ const Main = () => {
   if (!products.length)
     return (
       <div className="p-6 text-center text-gray-500 text-xl">
-        No products found
+        No products found for “{query}”
       </div>
     );
 
   return (
     <div className="p-6">
       <div className="flex sm:flex-row justify-between items-center mb-6">
+        <h2 className="hidden sm:block text-2xl font-semibold text-gray-800">
+          Search results for <span className="text-blue-600">“{query}”</span>
+        </h2>
+
         <select
           value={sort}
           onChange={(e) =>
-            setSearchParams({ page: 1, limit, sort: e.target.value })
+            setSearchParams({ q: query, page: 1, limit, sort: e.target.value })
           }
           className="border border-gray-300 rounded-md p-2 text-sm"
         >
@@ -119,4 +122,4 @@ const Main = () => {
   );
 };
 
-export default Main;
+export default SearchResults;

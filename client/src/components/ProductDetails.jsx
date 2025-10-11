@@ -12,24 +12,29 @@ const ProductDetails = () => {
   const [product, setProduct] = useState({});
   const params = useParams();
   const id = params.slug.split("-").at(-1);
+  const [loading, setLoading] = useState(true);
 
   const fetchProductDetails = async () => {
     try {
+      setLoading(true);
       const res = await axios.get(`${BASE_URL}/api/products/${id}`);
-      console.log(res?.data?.data);
       setProduct(res?.data?.data);
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     fetchProductDetails();
-  }, []);
+  }, [id]);
 
   const itemInCart = cart.find((item) => item._id === product._id);
 
-  return !product._id ? (
+  return loading ? (
+    <div className="p-6 text-2xl text-gray-500">Loading...</div>
+  ) : !product._id ? (
     <div className="p-6 text-2xl text-gray-500">Product not found!</div>
   ) : (
     <div className="p-4 sm:p-8 lg:p-12 min-h-screen bg-gray-50">
@@ -70,7 +75,11 @@ const ProductDetails = () => {
             onClick={() => {
               itemInCart
                 ? navigate("/cart")
-                : dispatch(addToCart({ _id: product._id }));
+                : dispatch(
+                    addToCart({
+                      _id: product._id,
+                    })
+                  );
             }}
           >
             {itemInCart
