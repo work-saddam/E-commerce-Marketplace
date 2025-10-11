@@ -10,6 +10,7 @@ import axios from "axios";
 import arrow from "../assets/down_arrow.svg";
 import { clearCart } from "../store/cartSlice";
 import SearchBar from "./SearchBar";
+import { persistor } from "../store/appStore";
 
 const Header = () => {
   const { user } = useSelector((store) => store.user);
@@ -28,6 +29,7 @@ const Header = () => {
       );
       dispatch(removeUser());
       dispatch(clearCart());
+      await persistor.purge();
       navigate("/");
     } catch (error) {
       console.log(error);
