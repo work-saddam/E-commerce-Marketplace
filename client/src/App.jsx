@@ -14,6 +14,7 @@ import ErrorPage from "./components/ErrorPage";
 import Cart from "./pages/cart/Cart";
 import Checkout from "./pages/checkout/Checkout";
 import Order from "./pages/order/Order";
+import SearchResults from "./pages/searchResults";
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
             <Route path="/cart" element={<Cart />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/search" element={<SearchResults />} />
 
             <Route element={<ProtectedLayout />}>
               <Route path="/account" element={<Profile />} />
