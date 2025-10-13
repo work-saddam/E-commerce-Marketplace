@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { clearCart } from "../../store/cartSlice";
 import { Link, useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const Checkout = () => {
   const [addresses, setAddresses] = useState([]);
@@ -55,11 +56,10 @@ const Checkout = () => {
         { withCredentials: true }
       );
       dispatch(clearCart());
-      alert("Order placed successfully");
+      toast.success("Order placed");
       navigate("/account/orders");
     } catch (error) {
-      console.error(error?.response?.data);
-      alert(`Failed to place order! \n${error?.response?.data?.message}`);
+      toast.error(error?.response?.data?.message || "Failed to place order");
     } finally {
       setloading(false);
     }

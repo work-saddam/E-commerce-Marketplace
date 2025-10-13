@@ -16,12 +16,15 @@ import Checkout from "./pages/checkout/Checkout";
 import Order from "./pages/order/Order";
 import SearchResults from "./pages/searchResults";
 import { PersistGate } from "redux-persist/integration/react";
+import { Toaster } from "react-hot-toast";
 
 function App() {
   return (
     <Provider store={appStore}>
       <PersistGate loading={null} persistor={persistor}>
         <BrowserRouter>
+          <Toaster position="top-center" reverseOrder={false} />
+
           <Routes>
             <Route path="/" element={<Body />}>
               <Route path="/" element={<Main />} />
