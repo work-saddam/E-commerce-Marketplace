@@ -2,6 +2,7 @@ import axios from "axios";
 import { BASE_URL } from "../../utils/constants";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import confirmDelete from "../../utils/cofirmDelete";
 
 const Addresses = () => {
   const [addresses, setAddresses] = useState([]);
@@ -67,18 +68,8 @@ const Addresses = () => {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this address?"))
-      return;
-    try {
-      await axios.delete(`${BASE_URL}/api/users/address/${id}`, {
-        withCredentials: true,
-      });
-      toast.success("Address removed!");
-      fetchAddresses();
-    } catch (error) {
-      console.log(error);
-    }
+  const handleDelete = (id) => {
+    confirmDelete(id, fetchAddresses);
   };
 
   const handleEdit = (addr) => {
