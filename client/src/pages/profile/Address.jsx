@@ -2,7 +2,7 @@ import axios from "axios";
 import { BASE_URL } from "../../utils/constants";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import confirmDelete from "../../utils/cofirmDelete";
+import confirmDelete from "../../utils/confirmDelete";
 
 const Addresses = () => {
   const [addresses, setAddresses] = useState([]);

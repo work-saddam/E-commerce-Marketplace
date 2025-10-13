@@ -23,8 +23,8 @@ const confirmDelete = (id, fetchAddresses) => {
                 withCredentials: true,
               });
               toast.dismiss(t.id);
+              await fetchAddresses();
               toast.success("Address removed!");
-              fetchAddresses();
             } catch (error) {
               toast.dismiss(t.id);
               toast.error("Failed to delete address.");
