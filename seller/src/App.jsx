@@ -1,15 +1,16 @@
-import { Button } from "./components/ui/button";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import Login from "./pages/Login";
+import Body from "./components/Body";
 
 function App() {
   return (
-    <div className="flex min-h-svh flex-col items-center justify-center">
-      <p className="text-3xl font-bold text-black">
-        Setup: React + Tailwind + shadcn
-      </p>
-      <Button className={"m-4"} variant={"default"}>
-        Button
-      </Button>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path={"/"} element={<Body />}>
+          <Route path={"/login"} element={<Login />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
   );
 }
 
