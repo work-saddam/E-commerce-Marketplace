@@ -48,8 +48,6 @@ export function Signup() {
     }
   };
 
-  //TODO: check Signup
-
   return (
     <div className="min-h-screen flex justify-center items-center bg-gray-50 p-4">
       <Card className="w-full max-w-sm ">
@@ -150,18 +148,16 @@ export function Signup() {
             {error && (
               <p className="text-red-500 text-sm text-center pt-4">{error}</p>
             )}
+            <Button
+              type="submit"
+              className="w-full mt-4"
+              onClick={handleSubmit}
+              disabled={loading}
+            >
+              {loading ? "Sign Up..." : "Sign Up"}
+            </Button>
           </form>
         </CardContent>
-        <CardFooter className="flex-col gap-2">
-          <Button
-            type="submit"
-            className="w-full"
-            onClick={handleSubmit}
-            disabled={loading}
-          >
-            {loading ? "Sign Up..." : "Sign Up"}
-          </Button>
-        </CardFooter>
       </Card>
     </div>
   );

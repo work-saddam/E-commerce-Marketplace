@@ -79,6 +79,7 @@ export function Login() {
                 <Input
                   id="password"
                   type="password"
+                  placeholder="Enter strong password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -88,18 +89,16 @@ export function Login() {
             {error && (
               <p className="text-red-500 text-sm text-center pt-4">{error}</p>
             )}
+            <Button
+              type="submit"
+              className="w-full mt-4"
+              onClick={handleSubmit}
+              disabled={loading}
+            >
+              {loading ? "Logging in..." : "Login"}
+            </Button>
           </form>
         </CardContent>
-        <CardFooter className="flex-col gap-2">
-          <Button
-            type="submit"
-            className="w-full"
-            onClick={handleSubmit}
-            disabled={loading}
-          >
-            {loading ? "Logging in..." : "Login"}
-          </Button>
-        </CardFooter>
       </Card>
     </div>
   );
