@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { BASE_URL } from "@/utils/constant";
 import axios from "axios";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 export function Login() {
   const [identifier, setIdentifier] = useState("");
@@ -44,7 +45,7 @@ export function Login() {
   };
 
   return (
-    <div className="min-h-screen flex justify-center items-center bg-gray-50 px-4">
+    <div className="min-h-screen flex justify-center items-center bg-gray-50 p-4">
       <Card className="w-full max-w-sm ">
         <CardHeader>
           <CardTitle>Login to your account</CardTitle>
@@ -52,7 +53,9 @@ export function Login() {
             Enter your email or phone number below to login
           </CardDescription>
           <CardAction>
-            <Button variant="link">Sign Up</Button>
+            <Link to={"/signup"}>
+              <Button variant="link">Sign Up</Button>
+            </Link>
           </CardAction>
         </CardHeader>
         <CardContent>
@@ -83,7 +86,7 @@ export function Login() {
               </div>
             </div>
             {error && (
-              <p className="text-red-500 text-sm text-center pt-2">{error}</p>
+              <p className="text-red-500 text-sm text-center pt-4">{error}</p>
             )}
           </form>
         </CardContent>
