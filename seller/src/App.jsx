@@ -5,14 +5,18 @@ import { Signup } from "./pages/Signup";
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path={"/"} element={<Body />}>
-          <Route path={"/login"} element={<Login />} />
-          <Route path={"/signup"} element={<Signup />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+    <Provider store={appStore}>
+      <PersistGate loading={null} persistor={persistor}>
+        <BrowserRouter>
+          <Routes>
+            <Route path={"/"} element={<Body />}>
+              <Route path={"/login"} element={<Login />} />
+              <Route path={"/signup"} element={<Signup />} />
+            </Route>
+          </Routes>
+        </BrowserRouter>
+      </PersistGate>
+    </Provider>
   );
 }
 
