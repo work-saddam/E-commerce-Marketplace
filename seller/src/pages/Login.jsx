@@ -50,7 +50,7 @@ export function Login() {
         <CardHeader>
           <CardTitle>Login to your account</CardTitle>
           <CardDescription>
-            Enter your email or phone number below to login
+            Enter your credentials below to login
           </CardDescription>
           <CardAction>
             <Link to={"/signup"}>
