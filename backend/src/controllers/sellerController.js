@@ -85,9 +85,19 @@ const sellerLogin = async (req, res) => {
       maxAge: 3 * 24 * 60 * 60 * 1000, // 3 days
     });
 
+    const sellerData = {
+      _id: seller._id,
+      sellerName: seller.sellerName,
+      shopName: seller.shopName,
+      email: seller.email,
+      phone: seller.phone,
+      status: seller.status,
+      role: seller.role,
+    };
+
     res.status(200).json({
       message: "Login Successfully!",
-      data: seller,
+      data: sellerData,
       token: token,
     });
   } catch (error) {

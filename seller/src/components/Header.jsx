@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import logo from "../assets/logo2.png";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { removeUser } from "@/store/userSlice";
 import axios from "axios";
 import { BASE_URL } from "@/utils/constant";
@@ -13,6 +13,8 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  const { user } = useSelector((store) => store.user);
 
   const handleLogout = async () => {
     try {
@@ -55,9 +57,15 @@ export default function Header() {
           <Link to="/analytics" className="hover:text-primary">
             Analytics
           </Link>
-          <Button variant="outline" onClick={handleLogout}>
-            Logout
-          </Button>
+          {user ? (
+            <Button variant="outline" onClick={handleLogout}>
+              Logout
+            </Button>
+          ) : (
+            <Link to="/login">
+              <Button variant="outline">Login</Button>
+            </Link>
+          )}
         </div>
 
         {/* Mobile Menu Button */}
@@ -74,28 +82,28 @@ export default function Header() {
       {menuOpen && (
         <div className="md:hidden bg-white border-t shadow-md flex flex-col space-y-2 p-4">
           <Link
-            // to="/dashboard"
+            to="/dashboard"
             className="hover:text-primary"
             onClick={() => setMenuOpen(false)}
           >
             Dashboard
           </Link>
           <Link
-            // to="/orders"
+            to="/orders"
             className="hover:text-primary"
             onClick={() => setMenuOpen(false)}
           >
             Orders
           </Link>
           <Link
-            // to="/products"
+            to="/products"
             className="hover:text-primary"
             onClick={() => setMenuOpen(false)}
           >
             Products
           </Link>
           <Link
-            // to="/analytics"
+            to="/analytics"
             className="hover:text-primary"
             onClick={() => setMenuOpen(false)}
           >
