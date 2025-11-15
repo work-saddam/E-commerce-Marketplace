@@ -3,15 +3,30 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import logo from "../assets/logo2.png";
+import { useDispatch } from "react-redux";
+import { removeUser } from "@/store/userSlice";
+import axios from "axios";
+import { BASE_URL } from "@/utils/constant";
+import { persistor } from "@/store/appStore";
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  const handleLogout = () => {
-    //TODO:
-    // clear cookies / localstorage if needed
-    navigate("/login");
+  const handleLogout = async () => {
+    try {
+      await axios.post(
+        `${BASE_URL}/api/auth/logout`,
+        {},
+        { withCredentials: true }
+      );
+      dispatch(removeUser());
+      await persistor.purge();
+      navigate("/");
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
