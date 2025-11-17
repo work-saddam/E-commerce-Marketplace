@@ -3,6 +3,7 @@ const {
   sellerRegister,
   sellerLogin,
   getSellerProfile,
+  getOrders,
 } = require("../controllers/sellerController");
 const { userAuth } = require("../middlewares/authMiddleware");
 const {
@@ -19,6 +20,7 @@ router.post("/register", sellerRegister);
 router.post("/login", sellerLogin);
 router.get("/profile", userAuth, getSellerProfile);
 
+//product routes
 router.post(
   "/products",
   userAuth,
@@ -35,5 +37,8 @@ router.put(
   editProduct
 );
 router.delete("/products/:id", userAuth, checkSellerStatus, deleteProduct);
+
+//orders routes
+router.get("/getOrders", userAuth, getOrders);
 
 module.exports = router;

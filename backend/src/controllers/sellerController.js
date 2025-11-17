@@ -1,9 +1,10 @@
+const Order = require("../models/order");
 const Seller = require("../models/seller");
 const { validateSellerRegisterData } = require("../utils/validation");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
-const sellerRegister = async (req, res) => {
+exports.sellerRegister = async (req, res) => {
   try {
     const error = validateSellerRegisterData(req);
     if (error) {
@@ -53,7 +54,7 @@ const sellerRegister = async (req, res) => {
   }
 };
 
-const sellerLogin = async (req, res) => {
+exports.sellerLogin = async (req, res) => {
   try {
     const { identifier, password } = req.body;
 
@@ -105,7 +106,7 @@ const sellerLogin = async (req, res) => {
   }
 };
 
-const getSellerProfile = async (req, res) => {
+exports.getSellerProfile = async (req, res) => {
   try {
     const seller = await Seller.findById(req.user.id).select("-password");
     if (!seller) {
@@ -119,4 +120,30 @@ const getSellerProfile = async (req, res) => {
   }
 };
 
-module.exports = { sellerRegister, sellerLogin, getSellerProfile };
+exports.getOrders = async (req, res) => {
+  try {
+    let { page = 1, limit } = req.query;
+
+    page = parseInt(page);
+    limit = Math.min(parseInt(limit), 100) || 10;
+    const skip = (page - 1) * limit;
+
+    const [orders, total] = await Promise.all([
+      Order.find({ seller: req.user.id })
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
+      Order.countDocuments({ seller: req.user.id }),
+    ]);
+
+    res.status(200).json({
+      message: "Orders fetch successfully",
+      pagination: { total, page, limit, totalPages: Math.ceil(total / limit) },
+      data: orders,
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Failed to fetch orders", error: error.message });
+  }
+};

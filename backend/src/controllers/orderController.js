@@ -172,7 +172,4 @@ const getUserOrders = async (req, res) => {
   }
 };
 
-//Add getSellerOrder
-// Add updateOrderStatus
-
 module.exports = { placeOrder, getUserOrders };
