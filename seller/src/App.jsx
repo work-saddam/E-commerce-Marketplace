@@ -5,6 +5,8 @@ import { Signup } from "./pages/Signup";
 import { Provider } from "react-redux";
 import { appStore, persistor } from "./store/appStore";
 import { PersistGate } from "redux-persist/integration/react";
+import Orders from "./pages/Orders";
+import ProtectedLayout from "./layout/ProtectedLayout";
 
 function App() {
   return (
@@ -15,6 +17,10 @@ function App() {
             <Route path={"/"} element={<Body />}>
               <Route path={"/login"} element={<Login />} />
               <Route path={"/signup"} element={<Signup />} />
+
+              <Route element={<ProtectedLayout />}>
+                <Route path={"/orders"} element={<Orders />} />
+              </Route>
             </Route>
           </Routes>
         </BrowserRouter>
