@@ -1,8 +1,33 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import Header from "./Header";
+import { useSelector } from "react-redux";
+import axios from "axios";
+import { BASE_URL } from "@/utils/constant";
 
 const Body = () => {
+  const { user } = useSelector((store) => store.user);
+
+  const fetchUser = async () => {
+    if (user?._id) return;
+    dispatch(setLoading(true));
+    try {
+      const res = await axios.get(`${BASE_URL}/api/seller/profile`, {
+        withCredentials: true,
+      });
+      if (res?.data?.data) {
+        dispatch(addUser(res.data.data));
+      }
+    } catch (error) {
+      // console.log("Failed to fetch user: ", error);
+      dispatch(removeUser());
+    }
+  };
+
+  useEffect(() => {
+    fetchUser();
+  }, []);
+
   return (
     <div>
       <Header />
