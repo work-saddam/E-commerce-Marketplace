@@ -120,7 +120,7 @@ exports.getSellerProfile = async (req, res) => {
   }
 };
 
-exports.getOrders = async (req, res) => {
+exports.getSellerOrders = async (req, res) => {
   try {
     let { page = 1, limit } = req.query;
 

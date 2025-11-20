@@ -3,7 +3,7 @@ const {
   sellerRegister,
   sellerLogin,
   getSellerProfile,
-  getOrders,
+  getSellerOrders,
 } = require("../controllers/sellerController");
 const { userAuth } = require("../middlewares/authMiddleware");
 const {
@@ -39,6 +39,6 @@ router.put(
 router.delete("/products/:id", userAuth, checkSellerStatus, deleteProduct);
 
 //orders routes
-router.get("/getOrders", userAuth, getOrders);
+router.get("/getOrders", userAuth, getSellerOrders);
 
 module.exports = router;
