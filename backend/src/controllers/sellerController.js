@@ -132,7 +132,13 @@ exports.getSellerOrders = async (req, res) => {
       Order.find({ seller: req.user.id })
         .sort({ createdAt: -1 })
         .skip(skip)
-        .limit(limit),
+        .limit(limit)
+        .populate("buyer", "name email")
+        .populate({
+          path: "products.product",
+          model: "Product",
+          select: "title image.url",
+        }),
       Order.countDocuments({ seller: req.user.id }),
     ]);
 
