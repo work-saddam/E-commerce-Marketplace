@@ -36,7 +36,7 @@ export default function SellerOrders() {
       // { credentials: "include" }
       // );
       const res = await axios.get(
-        `${BASE_URL}/api/seller/orders/get?page=1&limit=10`,
+        `${BASE_URL}/api/seller/orders/get?page=${page}&limit=10&status=${statusFilter}&search=${searchQuery}`,
         { withCredentials: true }
       );
       setOrders(res?.data?.data || []);
@@ -110,23 +110,23 @@ export default function SellerOrders() {
                     </h2>
                     <p className="text-sm text-muted-foreground">
                       Placed on: {new Date(order.createdAt).toDateString()} •
-                      Buyer: {order.buyer.name}
+                      Buyer: {order.buyer[0].name}
                     </p>
 
                     <div className="space-y-3 mt-3">
                       {order.products.map((product) => (
                         <div
-                          key={product?.product?._id}
+                          key={product?._id}
                           className="flex items-center gap-3"
                         >
                           <img
-                            src={product.product?.image?.url}
+                            src={product.image?.url}
                             alt="product"
                             className="w-16 h-16 rounded-md object-cover"
                           />
                           <div>
                             <p className="text-base line-clamp-1">
-                              {product?.product?.title}
+                              {product?.title}
                             </p>
                             <p className="text-sm text-muted-foreground">
                               Qty: {product?.quantity}
