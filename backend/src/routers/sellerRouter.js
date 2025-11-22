@@ -4,6 +4,7 @@ const {
   sellerLogin,
   getSellerProfile,
   getSellerOrders,
+  updateOrderStatus,
 } = require("../controllers/sellerController");
 const { userAuth } = require("../middlewares/authMiddleware");
 const {
@@ -40,5 +41,6 @@ router.delete("/products/:id", userAuth, checkSellerStatus, deleteProduct);
 
 //orders routes
 router.get("/orders/get", userAuth, getSellerOrders);
+router.put("/order/:id/:status", userAuth, updateOrderStatus);
 
 module.exports = router;

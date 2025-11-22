@@ -15,6 +15,7 @@ import axios from "axios";
 
 const statusColors = {
   pending: "bg-yellow-500 text-white",
+  confirm: "bg-pink-500 text-white",
   shipped: "bg-blue-500 text-white",
   delivered: "bg-green-600 text-white",
   cancelled: "bg-red-600 text-white",
@@ -31,10 +32,6 @@ export default function SellerOrders() {
   const fetchOrders = async () => {
     try {
       setLoading(true);
-      // const res = await fetch(
-      // `${BASE_URL}/api/seller/orders?page=${page}&status=${statusFilter}&search=${searchQuery}`,
-      // { credentials: "include" }
-      // );
       const res = await axios.get(
         `${BASE_URL}/api/seller/orders/get?page=${page}&limit=10&status=${statusFilter}&search=${searchQuery}`,
         { withCredentials: true }
@@ -75,6 +72,7 @@ export default function SellerOrders() {
               <SelectContent>
                 <SelectItem value="all">All</SelectItem>
                 <SelectItem value="pending">Pending</SelectItem>
+                <SelectItem value="confirmed">Pending</SelectItem>
                 <SelectItem value="shipped">Shipped</SelectItem>
                 <SelectItem value="delivered">Delivered</SelectItem>
                 <SelectItem value="cancelled">Cancelled</SelectItem>

@@ -223,52 +223,38 @@ exports.getSellerOrders = async (req, res) => {
   }
 };
 
-// exports.getSellerOrders = async (req, res) => {
-//   try {
-//     let { page = 1, limit, status = "", search = "" } = req.query;
+exports.updateOrderStatus = async (req, res) => {
+  try {
+    const { id, status } = req.params;
 
-//     page = parseInt(page);
-//     limit = Math.min(parseInt(limit), 100) || 10;
-//     const skip = (page - 1) * limit;
+    const allowedStatus = [
+      "pending",
+      "confirmed",
+      "shipped",
+      "delivered",
+      "cancelled",
+    ];
 
-//     const regex = new RegExp(search.trim(), "i");
+    if (!allowedStatus.includes(status)) {
+      return res.status(400).json({ message: "Invalid status type" });
+    }
 
-//     const query = { seller: req.user.id };
-//     if (status !== "") query.orderStatus = status;
+    const order = await Order.findOneAndUpdate(
+      { _id: id, seller: req.user.id },
+      { orderStatus: status },
+      { new: true }
+    );
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
 
-//     if (search.trim() !== "") {
-//       const isId = mongoose.Types.ObjectId.isValid(search.trim());
-//       if (isId) {
-//         query._id = search.trim();
-//       } else {
-//         query.buyer.name = regex;
-//         //search by buyer not working
-//         //Error: Cannot set properties of undefined (setting 'name')
-//       }
-//     }
-
-//     const [orders, total] = await Promise.all([
-//       Order.find(query)
-//         .sort({ createdAt: -1 })
-//         .skip(skip)
-//         .limit(limit)
-//         .populate("buyer", "name email")
-//         .populate({
-//           path: "products.product",
-//           model: "Product",
-//           select: "title image.url",
-//         }),
-//       Order.countDocuments(query),
-//     ]);
-
-//     res.status(200).json({
-//       message: "Orders fetch successfully",
-//       pagination: { total, page, limit, totalPages: Math.ceil(total / limit) },
-//       data: orders,
-//     });
-//   } catch (error) {
-//     res
-//       .status(500)
-//       .json({ message: "Failed to fetch orders", error: error.message });
-//   }
-// };
+    res.status(200).json({
+      message: "Successfully update the order status!",
+      data: order,
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Order status updation failed!", error: error });
+  }
+};
