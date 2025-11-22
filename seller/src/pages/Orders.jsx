@@ -36,10 +36,9 @@ export default function SellerOrders() {
       // { credentials: "include" }
       // );
       const res = await axios.get(
-        `${BASE_URL}/api/seller/getOrders?page=1&limit=10`,
+        `${BASE_URL}/api/seller/orders/get?page=1&limit=10`,
         { withCredentials: true }
       );
-      console.log(res?.data);
       setOrders(res?.data?.data || []);
       setTotalPages(res?.data?.pagination.totalPages || 1);
     } catch (err) {
@@ -55,7 +54,7 @@ export default function SellerOrders() {
 
   return (
     <div className="flex min-h-screen">
-      <div className="flex-1 p-6 space-y-6">
+      <div className="flex-1 py-6 px-10 space-y-6">
         <h1 className="text-3xl font-semibold">Orders</h1>
 
         {/* Filters */}
@@ -102,7 +101,7 @@ export default function SellerOrders() {
             <p>No orders found.</p>
           ) : (
             orders.map((order) => (
-              <Card key={order._id} className="shadow-sm p-4">
+              <Card key={order._id} className="shadow-sm py-4 px-6">
                 <div className="flex flex-col md:flex-row justify-between gap-4">
                   {/* Left */}
                   <div className="space-y-2 w-full md:w-2/3">
@@ -111,23 +110,23 @@ export default function SellerOrders() {
                     </h2>
                     <p className="text-sm text-muted-foreground">
                       Placed on: {new Date(order.createdAt).toDateString()} •
-                      Buyer: {order.buyerName}
+                      Buyer: {order.buyer.name}
                     </p>
 
                     <div className="space-y-3 mt-3">
                       {order.products.map((product) => (
                         <div
-                          key={product._id}
+                          key={product?.product?._id}
                           className="flex items-center gap-3"
                         >
                           <img
-                            src={product?.productImage}
+                            src={product.product?.image?.url}
                             alt="product"
                             className="w-16 h-16 rounded-md object-cover"
                           />
                           <div>
-                            <p className="font-medium">
-                              {product?.productName}
+                            <p className="text-base line-clamp-1">
+                              {product?.product?.title}
                             </p>
                             <p className="text-sm text-muted-foreground">
                               Qty: {product?.quantity}

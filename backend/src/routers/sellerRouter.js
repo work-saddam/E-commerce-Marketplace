@@ -39,6 +39,6 @@ router.put(
 router.delete("/products/:id", userAuth, checkSellerStatus, deleteProduct);
 
 //orders routes
-router.get("/getOrders", userAuth, getSellerOrders);
+router.get("/orders/get", userAuth, getSellerOrders);
 
 module.exports = router;
