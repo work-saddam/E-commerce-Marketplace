@@ -14,8 +14,8 @@ import { BASE_URL } from "@/utils/constant";
 import axios from "axios";
 
 const statusColors = {
-  pending: "bg-yellow-500 text-white",
-  confirm: "bg-pink-500 text-white",
+  pending: "bg-orange-500 text-white",
+  confirmed: "bg-indigo-500 text-white",
   shipped: "bg-blue-500 text-white",
   delivered: "bg-green-600 text-white",
   cancelled: "bg-red-600 text-white",
@@ -49,6 +49,24 @@ export default function SellerOrders() {
     fetchOrders();
   }, [page]);
 
+  const updateOrderStatus = async (orderId, newStatus) => {
+    try {
+      await axios.put(
+        `${BASE_URL}/api/seller/order/${orderId}/${newStatus}`,
+        {},
+        { withCredentials: true }
+      );
+
+      setOrders((prev) =>
+        prev.map((o) =>
+          o._id === orderId ? { ...o, orderStatus: newStatus } : o
+        )
+      );
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   return (
     <div className="flex min-h-screen">
       <div className="flex-1 py-6 px-10 space-y-6">
@@ -72,7 +90,7 @@ export default function SellerOrders() {
               <SelectContent>
                 <SelectItem value="all">All</SelectItem>
                 <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="confirmed">Pending</SelectItem>
+                <SelectItem value="confirmed">Confirmed</SelectItem>
                 <SelectItem value="shipped">Shipped</SelectItem>
                 <SelectItem value="delivered">Delivered</SelectItem>
                 <SelectItem value="cancelled">Cancelled</SelectItem>
@@ -144,9 +162,25 @@ export default function SellerOrders() {
                       {order.orderStatus.toUpperCase()}
                     </Badge>
 
-                    <div className="flex justify-end gap-2">
+                    <div className="flex flex-col items-end gap-2">
+                      <Select
+                        defaultValue={order.orderStatus}
+                        onValueChange={(v) => updateOrderStatus(order._id, v)}
+                      >
+                        <SelectTrigger className="w-[140px]">
+                          <SelectValue placeholder={order.orderStatus} />
+                        </SelectTrigger>
+
+                        <SelectContent>
+                          <SelectItem value="pending">Pending</SelectItem>
+                          <SelectItem value="confirmed">Confirmed</SelectItem>
+                          <SelectItem value="shipped">Shipped</SelectItem>
+                          <SelectItem value="delivered">Delivered</SelectItem>
+                          <SelectItem value="cancelled">Cancelled</SelectItem>
+                        </SelectContent>
+                      </Select>
+
                       <Button variant="outline">View</Button>
-                      <Button>Update Status</Button>
                     </div>
                   </div>
                 </div>
