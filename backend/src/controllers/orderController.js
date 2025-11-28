@@ -21,11 +21,13 @@ const placeOrder = async (req, res) => {
       return res.status(400).json({ message: "Address is required!" });
     }
 
-    const isValidAddress = await Address.findOne({
+    const userAddress = await Address.findOne({
       _id: addressId,
       user: req.user.id,
-    }).session(session);
-    if (!isValidAddress) {
+    })
+      .select("-isDefault -createdAt -updatedAt -__v -_id")
+      .session(session);
+    if (!userAddress) {
       await session.abortTransaction();
       return res.status(404).json({ message: "Invalid address" });
     }
@@ -122,7 +124,7 @@ const placeOrder = async (req, res) => {
             buyer: req.user.id,
             seller: sellerId,
             products: sellerProducts,
-            shippingAddress: addressId,
+            shippingAddress: userAddress,
             subTotal,
           },
         ],
