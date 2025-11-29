@@ -7,6 +7,7 @@ import { appStore, persistor } from "./store/appStore";
 import { PersistGate } from "redux-persist/integration/react";
 import Orders from "./pages/Orders";
 import ProtectedLayout from "./layout/ProtectedLayout";
+import OrderDetails from "./pages/OrderDetails";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
 
               <Route element={<ProtectedLayout />}>
                 <Route path={"/orders"} element={<Orders />} />
+                <Route path={"/order/:id"} element={<OrderDetails />} />
               </Route>
             </Route>
           </Routes>

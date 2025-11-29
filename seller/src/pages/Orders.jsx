@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/select";
 import { BASE_URL } from "@/utils/constant";
 import axios from "axios";
+import { Link } from "react-router-dom";
 
 const statusColors = {
   pending: "bg-orange-500 text-white",
@@ -180,7 +181,9 @@ export default function SellerOrders() {
                         </SelectContent>
                       </Select>
 
-                      <Button variant="outline">View</Button>
+                      <Link to={`/order/${order._id}`}>
+                        <Button variant="outline">View</Button>
+                      </Link>
                     </div>
                   </div>
                 </div>
