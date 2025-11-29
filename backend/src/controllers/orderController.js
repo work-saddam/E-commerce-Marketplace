@@ -174,4 +174,31 @@ const getUserOrders = async (req, res) => {
   }
 };
 
-module.exports = { placeOrder, getUserOrders };
+const getOrderbyId = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    const userId = String(req.user.id);
+    const isBuyer = userId === String(order.buyer);
+    const isSeller = userId === String(order.seller);
+    const isAdmin = req.user.role === "admin";
+
+    if (!isBuyer && !isSeller && !isAdmin) {
+      return res.status(403).json({ message: "Unauthorized access" });
+    }
+
+    return res
+      .status(200)
+      .json({ message: "Order fetched successfully", data: order });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Failed to fetch the order", error: error.message });
+  }
+};
+
+module.exports = { placeOrder, getUserOrders, getOrderbyId };

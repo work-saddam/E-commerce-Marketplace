@@ -39,11 +39,6 @@ const orderSchema = new mongoose.Schema(
       type: Object,
       required: true,
     },
-    // shippingAddress: {
-    //   type: mongoose.Schema.Types.ObjectId,
-    //   ref: "Address",
-    //   required: true,
-    // },
     orderStatus: {
       type: String,
       enum: ["pending", "confirmed", "shipped", "delivered", "cancelled"],
