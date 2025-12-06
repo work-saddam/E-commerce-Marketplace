@@ -11,7 +11,6 @@ const orderSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
-      index: true,
     },
     seller: {
       type: mongoose.Schema.Types.ObjectId,
@@ -37,8 +36,7 @@ const orderSchema = new mongoose.Schema(
       },
     ],
     shippingAddress: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Address",
+      type: Object,
       required: true,
     },
     orderStatus: {
@@ -53,6 +51,9 @@ const orderSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+orderSchema.index({ seller: 1, createdAt: -1 });
+orderSchema.index({ buyer: 1, createdAt: -1 });
 
 const Order = mongoose.model("Order", orderSchema);
 module.exports = Order;

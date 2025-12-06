@@ -109,9 +109,15 @@ export default function Header() {
           >
             Analytics
           </Link>
-          <Button variant="outline" onClick={handleLogout}>
-            Logout
-          </Button>
+          {user ? (
+            <Button variant="outline" onClick={handleLogout}>
+              Logout
+            </Button>
+          ) : (
+            <Link to="/login">
+              <Button variant="outline">Login</Button>
+            </Link>
+          )}
         </div>
       )}
     </nav>
