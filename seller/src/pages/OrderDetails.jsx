@@ -96,7 +96,7 @@ export default function OrderDetails() {
           <Card>
             <CardHeader className="flex flex-row flex-wrap justify-between items-start gap-4">
               <div>
-                <CardTitle className="text-xl">Order #{order._id}</CardTitle>
+                <CardTitle className="text-2xl">Order #{order._id}</CardTitle>
                 <CardDescription>
                   Placed on {new Date(order.createdAt).toDateString()}
                 </CardDescription>
@@ -131,8 +131,8 @@ export default function OrderDetails() {
                           className="w-16 h-16 rounded-md object-cover"
                         />
                       </TableCell>
-                      <TableCell className="font-medium px-2 align-middle">
-                        <div className="line-clamp-2">{p.product.title}</div>
+                      <TableCell className="font-medium px-2 align-middle whitespace-normal">
+                        <p className="line-clamp-2">{p.product.title}</p>
                       </TableCell>
                       <TableCell className="text-center px-2 align-middle">
                         x{p.quantity}
