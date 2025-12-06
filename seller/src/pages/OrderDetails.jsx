@@ -96,7 +96,7 @@ export default function OrderDetails() {
           <Card>
             <CardHeader className="flex flex-row flex-wrap justify-between items-start gap-4">
               <div>
-                <CardTitle className="text-2xl">Order #{order._id}</CardTitle>
+                <CardTitle className="text-xl">Order #{order._id}</CardTitle>
                 <CardDescription>
                   Placed on {new Date(order.createdAt).toDateString()}
                 </CardDescription>
@@ -110,30 +110,34 @@ export default function OrderDetails() {
               </Badge>
             </CardHeader>
             <CardContent>
-              <Table>
+              <Table className="table-fixed">
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-[80px] hidden sm:table-cell"></TableHead>
-                    <TableHead>Product</TableHead>
-                    <TableHead>Quantity</TableHead>
-                    <TableHead className="text-right">Price</TableHead>
+                    <TableHead className="w-20 px-2"></TableHead>
+                    <TableHead className="px-2">Product</TableHead>
+                    <TableHead className="w-16 text-center px-2">Qty</TableHead>
+                    <TableHead className="w-24 text-right px-2">
+                      Price
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {order.products.map((p) => (
                     <TableRow key={p._id}>
-                      <TableCell className="hidden sm:table-cell">
+                      <TableCell className="px-2 align-middle">
                         <img
                           src={p.product.image?.url}
                           alt="product"
                           className="w-16 h-16 rounded-md object-cover"
                         />
                       </TableCell>
-                      <TableCell className="font-medium">
-                        {p.product.title}
+                      <TableCell className="font-medium px-2 align-middle">
+                        <div className="line-clamp-2">{p.product.title}</div>
                       </TableCell>
-                      <TableCell>x{p.quantity}</TableCell>
-                      <TableCell className="text-right font-medium">
+                      <TableCell className="text-center px-2 align-middle">
+                        x{p.quantity}
+                      </TableCell>
+                      <TableCell className="text-right font-medium px-2 align-middle">
                         ₹ {p.price}
                       </TableCell>
                     </TableRow>
