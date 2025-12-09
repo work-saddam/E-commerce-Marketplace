@@ -186,7 +186,7 @@ const getOrderbyId = async (req, res) => {
     }
 
     const userId = String(req.user.id);
-    const isBuyer = userId === String(order.buyer);
+    const isBuyer = userId === String(order.buyer._id);
     const isSeller = userId === String(order.seller);
     const isAdmin = req.user.role === "admin";
 

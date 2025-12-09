@@ -73,7 +73,7 @@ export default function OrderDetails() {
 
   useEffect(() => {
     fetchOrderDetails();
-  }, []);
+  }, [id]);
 
   if (loading || !order) return <p className="p-10">Loading...</p>;
 

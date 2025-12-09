@@ -139,7 +139,7 @@ exports.getSellerOrders = async (req, res) => {
       if (isId) {
         searchQuery._id = new mongoose.Types.ObjectId(search.trim());
       } else {
-        searchQuery["buyer.name"] = regex;
+        searchQuery["buyer.0.name"] = regex;
       }
     }
 
