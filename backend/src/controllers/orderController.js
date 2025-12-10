@@ -21,11 +21,13 @@ const placeOrder = async (req, res) => {
       return res.status(400).json({ message: "Address is required!" });
     }
 
-    const isValidAddress = await Address.findOne({
+    const userAddress = await Address.findOne({
       _id: addressId,
       user: req.user.id,
-    }).session(session);
-    if (!isValidAddress) {
+    })
+      .select("-isDefault -createdAt -updatedAt -__v -_id")
+      .session(session);
+    if (!userAddress) {
       await session.abortTransaction();
       return res.status(404).json({ message: "Invalid address" });
     }
@@ -122,7 +124,7 @@ const placeOrder = async (req, res) => {
             buyer: req.user.id,
             seller: sellerId,
             products: sellerProducts,
-            shippingAddress: addressId,
+            shippingAddress: userAddress,
             subTotal,
           },
         ],
@@ -172,7 +174,34 @@ const getUserOrders = async (req, res) => {
   }
 };
 
-//Add getSellerOrder
-// Add updateOrderStatus
+const getOrderbyId = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id).populate({
+      path: "buyer products.product",
+      select: "name email phone title image.url",
+    });
 
-module.exports = { placeOrder, getUserOrders };
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    const userId = String(req.user.id);
+    const isBuyer = userId === String(order.buyer._id);
+    const isSeller = userId === String(order.seller);
+    const isAdmin = req.user.role === "admin";
+
+    if (!isBuyer && !isSeller && !isAdmin) {
+      return res.status(403).json({ message: "Unauthorized access" });
+    }
+
+    return res
+      .status(200)
+      .json({ message: "Order fetched successfully", data: order });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Failed to fetch the order", error: error.message });
+  }
+};
+
+module.exports = { placeOrder, getUserOrders, getOrderbyId };

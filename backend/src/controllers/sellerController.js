@@ -1,9 +1,11 @@
+const Order = require("../models/order");
 const Seller = require("../models/seller");
 const { validateSellerRegisterData } = require("../utils/validation");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const mongoose = require("mongoose");
 
-const sellerRegister = async (req, res) => {
+exports.sellerRegister = async (req, res) => {
   try {
     const error = validateSellerRegisterData(req);
     if (error) {
@@ -53,7 +55,7 @@ const sellerRegister = async (req, res) => {
   }
 };
 
-const sellerLogin = async (req, res) => {
+exports.sellerLogin = async (req, res) => {
   try {
     const { identifier, password } = req.body;
 
@@ -105,7 +107,7 @@ const sellerLogin = async (req, res) => {
   }
 };
 
-const getSellerProfile = async (req, res) => {
+exports.getSellerProfile = async (req, res) => {
   try {
     const seller = await Seller.findById(req.user.id).select("-password");
     if (!seller) {
@@ -119,4 +121,140 @@ const getSellerProfile = async (req, res) => {
   }
 };
 
-module.exports = { sellerRegister, sellerLogin, getSellerProfile };
+exports.getSellerOrders = async (req, res) => {
+  try {
+    let { page = 1, limit, status = "", search = "" } = req.query;
+
+    page = parseInt(page);
+    limit = Math.min(parseInt(limit), 100) || 10;
+    const skip = (page - 1) * limit;
+
+    const regex = new RegExp(search.trim(), "i");
+
+    const searchQuery = {};
+    if (status !== "") searchQuery.orderStatus = status;
+
+    if (search.trim() !== "") {
+      const isId = mongoose.Types.ObjectId.isValid(search.trim());
+      if (isId) {
+        searchQuery._id = new mongoose.Types.ObjectId(search.trim());
+      } else {
+        searchQuery["buyer.0.name"] = regex;
+      }
+    }
+
+    const result = await Order.aggregate([
+      { $match: { seller: new mongoose.Types.ObjectId(req.user.id) } },
+      {
+        $lookup: {
+          from: "products",
+          localField: "products.product",
+          foreignField: "_id",
+          as: "productsDetail",
+          pipeline: [{ $project: { title: 1, "image.url": 1 } }],
+        },
+      },
+      // MERGE LOGIC
+      {
+        $set: {
+          products: {
+            $map: {
+              input: "$products",
+              as: "item",
+              in: {
+                $mergeObjects: [
+                  "$$item",
+                  {
+                    $arrayElemAt: [
+                      {
+                        $filter: {
+                          input: "$productsDetail",
+                          as: "detail",
+                          cond: { $eq: ["$$detail._id", "$$item.product"] },
+                        },
+                      },
+                      0,
+                    ],
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+
+      // remove extra field
+      { $project: { productsDetail: 0 } },
+
+      {
+        $lookup: {
+          from: "users",
+          localField: "buyer",
+          foreignField: "_id",
+          as: "buyer",
+          pipeline: [{ $project: { name: 1, email: 1 } }],
+        },
+      },
+      { $match: searchQuery },
+      {
+        $facet: {
+          orders: [
+            { $sort: { createdAt: -1 } },
+            { $skip: skip },
+            { $limit: limit },
+          ],
+          totalCount: [{ $count: "count" }],
+        },
+      },
+    ]);
+
+    const orders = result[0]?.orders || [];
+    const total = result[0]?.totalCount[0]?.count || 0;
+
+    res.status(200).json({
+      message: "Orders fetch successfully",
+      pagination: { total, page, limit, totalPages: Math.ceil(total / limit) },
+      data: orders,
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Failed to fetch orders", error: error.message });
+  }
+};
+
+exports.updateOrderStatus = async (req, res) => {
+  try {
+    const { id, status } = req.params;
+
+    const allowedStatus = [
+      "pending",
+      "confirmed",
+      "shipped",
+      "delivered",
+      "cancelled",
+    ];
+
+    if (!allowedStatus.includes(status)) {
+      return res.status(400).json({ message: "Invalid status type" });
+    }
+
+    const order = await Order.findOneAndUpdate(
+      { _id: id, seller: req.user.id },
+      { orderStatus: status },
+      { new: true }
+    );
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    res.status(200).json({
+      message: "Successfully update the order status!",
+      data: order,
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Order status updation failed!", error: error });
+  }
+};
