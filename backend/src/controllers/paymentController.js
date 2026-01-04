@@ -1,25 +1,41 @@
-const instance = require("../utils/razorpay");
+const payment = require("../models/payment");
+const razorpayInstance = require("../utils/razorpay");
 
 exports.createPayment = async (req, res) => {
+  const { masterOrder } = req.body;
+
   try {
-    instance.orders.create({
-      amount: 50000,
+    const razorpayOrder = await razorpayInstance.orders.create({
+      amount: masterOrder.totalAmount * 100,
       currency: "INR",
-      receipt: "receipt#1",
+      receipt: `receipt#${masterOrder._id}`,
       partial_payment: false,
       notes: {
-        key1: "value3",
-        key2: "value2",
+        masterOrderId: masterOrder._id.toString(),
+        buyerId: masterOrder.buyer.toString(),
+        orderCount: masterOrder.orders.length,
       },
     });
+
+    const paymentDetails = await payment.create({
+      masterOrder: masterOrder._id,
+      buyer: masterOrder.buyer.toString(),
+      razorpayOrderId: razorpayOrder.id,
+      amount: razorpayOrder.amount,
+      currency: razorpayOrder.currency,
+      status: "created",
+      notes: razorpayOrder.notes,
+    });
+
     res.status(201).json({
-      success: true,
       message: "Payment created successfully",
+      ...paymentDetails.toJSON(),
+      keyId: process.env.RAZORPAY_KEY_ID,
     });
   } catch (error) {
     res.status(500).json({
-      success: false,
       message: "Failed to create payment",
+      error: error.message,
     });
   }
 };

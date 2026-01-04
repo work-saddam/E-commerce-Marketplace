@@ -22,8 +22,8 @@ const masterOrderSchema = new mongoose.Schema(
       enum: ["pending", "paid", "failed", "refunded"],
       default: "pending",
     },
-    razorpayOrderId: { type: String },
-    razorpayPaymentId: { type: String },
+    // razorpayOrderId: { type: String },
+    // razorpayPaymentId: { type: String },
   },
   { timestamps: true }
 );
