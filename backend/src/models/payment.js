@@ -21,6 +21,7 @@ const paymentSchema = new mongoose.Schema(
     amount: {
       type: Number,
       required: true,
+      min: [0.01, "Amount must be greater than zero"],
     },
     currency: {
       type: String,
@@ -29,7 +30,16 @@ const paymentSchema = new mongoose.Schema(
 
     status: {
       type: String,
-      enum: ["created", "success", "failed"],
+      enum: [
+        "created",
+        "authorized",
+        "captured",
+        "refunded",
+        "failed",
+        "attempted",
+        "paid",
+        "success",
+      ],
       default: "created",
     },
 

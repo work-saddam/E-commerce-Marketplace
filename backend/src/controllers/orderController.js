@@ -80,6 +80,11 @@ const placeOrder = async (req, res) => {
       });
     }
 
+    if (!totalAmount || totalAmount <= 0) {
+      await session.abortTransaction();
+      return res.status(400).json({ message: "Invalid order total amount" });
+    }
+
     const bulkOps = cart.map((item) => ({
       updateOne: {
         filter: { _id: item._id },
@@ -139,9 +144,10 @@ const placeOrder = async (req, res) => {
 
     await session.commitTransaction();
 
-    res
-      .status(201)
-      .json({ message: "Order placed successfully!", data: masterOrderDoc });
+    res.status(201).json({
+      message: "Order placed successfully!",
+      masterOrderId: masterOrderDoc._id,
+    });
   } catch (error) {
     await session.abortTransaction();
     return res
