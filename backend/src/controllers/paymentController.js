@@ -1,5 +1,5 @@
 const MasterOrder = require("../models/masterOrder");
-const Payment = require("../models/payment"); // Renamed 'payment' to 'Payment' for consistency with model naming conventions
+const Payment = require("../models/payment");
 const razorpayInstance = require("../utils/razorpay");
 
 exports.createPayment = async (req, res) => {
@@ -25,10 +25,9 @@ exports.createPayment = async (req, res) => {
 
     // IDEMPOTENCY CHECK   //TODO: later we can also add the idempotency key
 
-    const existingPayment = await Payment.findOne({ // Use Payment instead of payment
+    const existingPayment = await Payment.findOne({
       masterOrder: masterOrder._id,
-    })
-      .sort({ createdAt: -1 });
+    }).sort({ createdAt: -1 });
 
     if (existingPayment) {
       if (["paid", "success", "captured"].includes(existingPayment.status)) {
@@ -66,7 +65,6 @@ exports.createPayment = async (req, res) => {
     });
 
     await Payment.create({
-      // Use Payment instead of payment
       masterOrder: masterOrder._id,
       buyer: masterOrder.buyer,
       razorpayOrderId: razorpayOrder.id,
@@ -82,16 +80,15 @@ exports.createPayment = async (req, res) => {
       keyId: process.env.RAZORPAY_KEY_ID,
     });
   } catch (error) {
-    console.error("Create Payment Error:", error);
+    console.error("Create Payment Error:", {
+      message: error.message,
+      masterOrderId: req.body.masterOrderId,
+    });
     res.status(500).json({
       message: "Something went wrong while creating payment",
     });
   }
 };
 
-// 1. check PR
-// 2. Add idempotency check to prevent duplicate payment creation.
-// 3. payment status ["created","authorized","captured","refunded","failed"],
-
-// 4. add verify payment webhook handler
-// 5. Final : Refactor to Inventory Reservation concept
+// 1. add verify payment webhook handler & also in build frontend.
+// 2. Final : Refactor to Inventory Reservation concept
