@@ -45,7 +45,6 @@ const paymentSchema = new mongoose.Schema(
 
     method: String, // card, upi, netbanking
     notes: Object,
-
     webhookPayload: Object, // RAW webhook data
   },
   { timestamps: true }

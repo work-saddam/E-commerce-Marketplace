@@ -39,25 +39,53 @@ const Checkout = () => {
 
   const handlePlaceOrder = async () => {
     if (cart.length === 0) {
-      alert("Your cart was empty");
+      toast.error("Your cart was empty");
       return;
     }
 
     if (!selectedAddress) {
-      alert("Please select a delivery address");
+      toast.error("Please select a delivery address");
       return;
     }
 
     try {
       setloading(true);
-      const res = await axios.post(
+      const orderRes = await axios.post(
         `${BASE_URL}/api/users/checkout`,
         { cart, addressId: selectedAddress, paymentMethod },
         { withCredentials: true }
       );
-      dispatch(clearCart());
-      toast.success("Order placed");
-      navigate("/account/orders");
+      if (paymentMethod === "COD") {
+        toast.success("Order placed");
+        navigate("/account/orders");
+        dispatch(clearCart());
+      } else if (paymentMethod === "Razorpay") {
+        const paymentRes = await axios.post(
+          `${BASE_URL}/api/payment/create`,
+          { masterOrderId: orderRes?.data?.masterOrderId },
+          { withCredentials: true }
+        );
+        const { order, keyId, user } = paymentRes?.data || {};
+        const options = {
+          key: keyId,
+          amount: order.amount,
+          currency: order.currency,
+          name: "TrustKart Store",
+          description: "Order Transaction",
+          order_id: order.id,
+          prefill: {
+            name: user.name,
+            email: user.email,
+            contact: user.phone,
+          },
+          theme: {
+            color: "#F37254",
+          },
+          // handler: verifyPayment, //create the handler
+        };
+        const rzp = new window.Razorpay(options);
+        rzp.open();
+      }
     } catch (error) {
       toast.error(error?.response?.data?.message || "Failed to place order");
     } finally {
@@ -147,7 +175,6 @@ const Checkout = () => {
               value="Razorpay"
               checked={paymentMethod === "Razorpay"}
               onChange={(e) => setPaymentMethod(e.target.value)}
-              disabled
             />
             Razorpay
           </label>

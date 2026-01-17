@@ -1,5 +1,9 @@
+const {
+  validateWebhookSignature,
+} = require("razorpay/dist/utils/razorpay-utils");
 const MasterOrder = require("../models/masterOrder");
 const Payment = require("../models/payment");
+const User = require("../models/user");
 const razorpayInstance = require("../utils/razorpay");
 
 exports.createPayment = async (req, res) => {
@@ -64,9 +68,11 @@ exports.createPayment = async (req, res) => {
       },
     });
 
+    const user = await User.findById(req.user.id).select("name email phone");
+
     await Payment.create({
       masterOrder: masterOrder._id,
-      buyer: masterOrder.buyer,
+      buyer: user,
       razorpayOrderId: razorpayOrder.id,
       amount: razorpayOrder.amount,
       currency: razorpayOrder.currency,
@@ -78,6 +84,7 @@ exports.createPayment = async (req, res) => {
       message: "Payment created successfully",
       order: razorpayOrder,
       keyId: process.env.RAZORPAY_KEY_ID,
+      user,
     });
   } catch (error) {
     console.error("Create Payment Error:", {
@@ -90,5 +97,70 @@ exports.createPayment = async (req, res) => {
   }
 };
 
-// 1. add verify payment webhook handler & also in build frontend.
+exports.verifyPaymentWebhook = async (req, res) => {
+  try {
+    const webhookSignature = req.header("X-Razorpay-Signature");
+    const isWebhookValid = validateWebhookSignature(
+      JSON.stringify(req.body),
+      webhookSignature,
+      process.env.RAZORPAY_WEBHOOK_SECRET
+    );
+
+    if (!isWebhookValid) {
+      return res.status(400).json({ message: "Webhook signature is invalid!" });
+    }
+
+    const event = req.body.event;
+    const payload = req.body.payload.payment.entity;
+    console.log(`Received Razorpay webhook event: ${event}`);
+
+    let paymentRecord, masterOrderRecord;
+
+    paymentRecord = await Payment.findOne({
+      razorpayOrderId: payload.order_id,
+    });
+    if (!paymentRecord) {
+      console.error(
+        `Payment record not found for Razorpay Order ID: ${payload.order_id}`
+      );
+      return res.status(404).json({ message: "Payment record not found" });
+    }
+
+    masterOrderRecord = await MasterOrder.findById(paymentRecord.masterOrder);
+    if (!masterOrderRecord) {
+      console.error(
+        `MasterOrder record not found for Payment ID: ${paymentRecord._id}`
+      );
+      return res.status(404).json({ message: "Master order not found" });
+    }
+
+    // Update Payment record
+    paymentRecord.razorpayPaymentId = payload.id;
+    paymentRecord.razorpaySignature = webhookSignature;
+    paymentRecord.method = payload.method;
+    paymentRecord.webhookPayload = req.body;
+
+    if (event === "payment.captured") {
+      paymentRecord.status = "captured";
+      masterOrderRecord.paymentStatus = "paid";
+      console.log(`Payment captured for MasterOrder: ${masterOrderRecord._id}`);
+    } else if (event === "payment.failed") {
+      paymentRecord.status = "failed";
+      masterOrderRecord.paymentStatus = "failed";
+      console.log(`Payment failed for MasterOrder: ${masterOrderRecord._id}`);
+    }
+    await paymentRecord.save();
+    await masterOrderRecord.save();
+
+    res.status(200).json({ received: true });
+  } catch (error) {
+    console.error("Razorpay Webhook Error:", error);
+    // Razorpay retries if it doesn't receive a 2xx response.
+    res.status(200).json({ received: true, error: "Internal Server Error" });
+  }
+};
+
+exports.verifyPayment = async (req, res) => {};
+
+// 1. add verify payment
 // 2. Final : Refactor to Inventory Reservation concept
