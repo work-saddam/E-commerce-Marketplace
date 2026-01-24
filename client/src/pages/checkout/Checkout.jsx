@@ -29,13 +29,42 @@ const Checkout = () => {
       setAddresses(all);
       setSelectedAddress(defaultAdd?._id || null);
     } catch (error) {
-      console.error(error);
+      toast.error(
+        error?.response?.data?.message || "Failed to fetch addresses",
+      );
     }
   };
 
   useEffect(() => {
     fetchAddresses();
   }, []);
+
+  const verifyPayment = async (response) => {
+    try {
+      setloading(true);
+      const res = await axios.post(
+        `${BASE_URL}/api/payment/verify`,
+        {
+          razorpay_payment_id: response.razorpay_payment_id,
+          razorpay_order_id: response.razorpay_order_id,
+          razorpay_signature: response.razorpay_signature,
+        },
+        { withCredentials: true },
+      );
+
+      if (res?.data?.success) {
+        toast.success(res?.data?.message || "Payment verified successfully");
+        navigate("/account/orders");
+        dispatch(clearCart());
+      } else {
+        toast.error("Payment verification failed.");
+      }
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Failed to verify payment");
+    } finally {
+      setloading(false);
+    }
+  };
 
   const handlePlaceOrder = async () => {
     if (cart.length === 0) {
@@ -53,7 +82,7 @@ const Checkout = () => {
       const orderRes = await axios.post(
         `${BASE_URL}/api/users/checkout`,
         { cart, addressId: selectedAddress, paymentMethod },
-        { withCredentials: true }
+        { withCredentials: true },
       );
       if (paymentMethod === "COD") {
         toast.success("Order placed");
@@ -63,7 +92,7 @@ const Checkout = () => {
         const paymentRes = await axios.post(
           `${BASE_URL}/api/payment/create`,
           { masterOrderId: orderRes?.data?.masterOrderId },
-          { withCredentials: true }
+          { withCredentials: true },
         );
         const { order, keyId, user } = paymentRes?.data || {};
         const options = {
@@ -81,7 +110,7 @@ const Checkout = () => {
           theme: {
             color: "#F37254",
           },
-          // handler: verifyPayment, //create the handler
+          handler: verifyPayment,
         };
         const rzp = new window.Razorpay(options);
         rzp.open();

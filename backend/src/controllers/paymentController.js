@@ -5,6 +5,7 @@ const MasterOrder = require("../models/masterOrder");
 const Payment = require("../models/payment");
 const User = require("../models/user");
 const razorpayInstance = require("../utils/razorpay");
+const e = require("express");
 
 exports.createPayment = async (req, res) => {
   try {
@@ -103,7 +104,7 @@ exports.verifyPaymentWebhook = async (req, res) => {
     const isWebhookValid = validateWebhookSignature(
       JSON.stringify(req.body),
       webhookSignature,
-      process.env.RAZORPAY_WEBHOOK_SECRET
+      process.env.RAZORPAY_WEBHOOK_SECRET,
     );
 
     if (!isWebhookValid) {
@@ -121,7 +122,7 @@ exports.verifyPaymentWebhook = async (req, res) => {
     });
     if (!paymentRecord) {
       console.error(
-        `Payment record not found for Razorpay Order ID: ${payload.order_id}`
+        `Payment record not found for Razorpay Order ID: ${payload.order_id}`,
       );
       return res.status(404).json({ message: "Payment record not found" });
     }
@@ -129,7 +130,7 @@ exports.verifyPaymentWebhook = async (req, res) => {
     masterOrderRecord = await MasterOrder.findById(paymentRecord.masterOrder);
     if (!masterOrderRecord) {
       console.error(
-        `MasterOrder record not found for Payment ID: ${paymentRecord._id}`
+        `MasterOrder record not found for Payment ID: ${paymentRecord._id}`,
       );
       return res.status(404).json({ message: "Master order not found" });
     }
@@ -160,7 +161,90 @@ exports.verifyPaymentWebhook = async (req, res) => {
   }
 };
 
-exports.verifyPayment = async (req, res) => {};
+exports.verifyPayment = async (req, res) => {
+  try {
+    const { razorpay_payment_id, razorpay_order_id, razorpay_signature } =
+      req.body;
 
-// 1. add verify payment
-// 2. Final : Refactor to Inventory Reservation concept
+    if (!razorpay_payment_id || !razorpay_order_id || !razorpay_signature) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing payment verification details",
+      });
+    }
+
+    const paymentRecord = await Payment.findOne({
+      razorpayOrderId: razorpay_order_id,
+    });
+
+    if (!paymentRecord) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Payment record not found" });
+    }
+
+    if (
+      paymentRecord.status === "captured" ||
+      paymentRecord.status === "paid"
+    ) {
+      return res.status(200).json({
+        success: true,
+        message: "Payment already verified and order placed!",
+      });
+    }
+
+    const masterOrderRecord = await MasterOrder.findById(
+      paymentRecord.masterOrder,
+    );
+
+    if (!masterOrderRecord) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Master order not found" });
+    }
+
+    const isPaymentValid = validateWebhookSignature(
+      `${razorpay_order_id}|${razorpay_payment_id}`,
+      razorpay_signature,
+      process.env.RAZORPAY_KEY_SECRET,
+    );
+
+    if (isPaymentValid) {
+      paymentRecord.razorpayPaymentId = razorpay_payment_id;
+      paymentRecord.razorpaySignature = razorpay_signature;
+      paymentRecord.status = "authorized";
+      paymentRecord.method = "Razorpay";
+
+      await paymentRecord.save();
+      // IMPORTANT: DO NOT update masterOrderRecord.paymentStatus to "paid" here.
+      // This is left for the webhook to confirm definitively.
+      res.status(200).json({
+        success: true,
+        message:
+          "Payment successfully authorized and awaiting final confirmation.",
+      });
+    } else {
+      if (
+        paymentRecord.status !== "captured" &&
+        paymentRecord.status !== "paid"
+      ) {
+        paymentRecord.status = "failed";
+        masterOrderRecord.paymentStatus = "failed";
+        await paymentRecord.save();
+        await masterOrderRecord.save();
+      }
+      res
+        .status(400)
+        .json({ success: false, message: "Payment verification failed" });
+    }
+  } catch (error) {
+    console.error("Verify Payment Error:", {
+      message: error.message,
+      body: req.body,
+    });
+    res.status(500).json({
+      success: false,
+      message: "Something went wrong while verifying payment",
+    });
+  }
+};
