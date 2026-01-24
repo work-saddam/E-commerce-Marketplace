@@ -5,7 +5,7 @@ import { Provider } from "react-redux";
 import { appStore, persistor } from "./store/appStore";
 import Register from "./components/Register";
 import Profile from "./pages/profile/Profile";
-import EditProfile from "./pages/profile/editProfile";
+import EditProfile from "./pages/profile/EditProfile";
 import ProtectedLayout from "./layout/ProtectedLayout";
 import Addresses from "./pages/profile/Address";
 import Main from "./components/Main";
@@ -14,7 +14,7 @@ import ErrorPage from "./components/ErrorPage";
 import Cart from "./pages/cart/Cart";
 import Checkout from "./pages/checkout/Checkout";
 import Order from "./pages/order/Order";
-import SearchResults from "./pages/searchResults";
+import SearchResults from "./pages/SearchResults";
 import { PersistGate } from "redux-persist/integration/react";
 import { Toaster } from "react-hot-toast";
 
