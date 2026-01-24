@@ -29,7 +29,9 @@ const Checkout = () => {
       setAddresses(all);
       setSelectedAddress(defaultAdd?._id || null);
     } catch (error) {
-      console.error(error);
+      toast.error(
+        error?.response?.data?.message || "Failed to fetch addresses",
+      );
     }
   };
 
@@ -37,27 +39,82 @@ const Checkout = () => {
     fetchAddresses();
   }, []);
 
+  const verifyPayment = async (response) => {
+    try {
+      setloading(true);
+      const res = await axios.post(
+        `${BASE_URL}/api/payment/verify`,
+        {
+          razorpay_payment_id: response.razorpay_payment_id,
+          razorpay_order_id: response.razorpay_order_id,
+          razorpay_signature: response.razorpay_signature,
+        },
+        { withCredentials: true },
+      );
+
+      if (res?.data?.success) {
+        toast.success(res?.data?.message || "Payment verified successfully");
+        navigate("/account/orders");
+        dispatch(clearCart());
+      } else {
+        toast.error("Payment verification failed.");
+      }
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Failed to verify payment");
+    } finally {
+      setloading(false);
+    }
+  };
+
   const handlePlaceOrder = async () => {
     if (cart.length === 0) {
-      alert("Your cart was empty");
+      toast.error("Your cart was empty");
       return;
     }
 
     if (!selectedAddress) {
-      alert("Please select a delivery address");
+      toast.error("Please select a delivery address");
       return;
     }
 
     try {
       setloading(true);
-      const res = await axios.post(
+      const orderRes = await axios.post(
         `${BASE_URL}/api/users/checkout`,
         { cart, addressId: selectedAddress, paymentMethod },
-        { withCredentials: true }
+        { withCredentials: true },
       );
-      dispatch(clearCart());
-      toast.success("Order placed");
-      navigate("/account/orders");
+      if (paymentMethod === "COD") {
+        toast.success("Order placed");
+        navigate("/account/orders");
+        dispatch(clearCart());
+      } else if (paymentMethod === "Razorpay") {
+        const paymentRes = await axios.post(
+          `${BASE_URL}/api/payment/create`,
+          { masterOrderId: orderRes?.data?.masterOrderId },
+          { withCredentials: true },
+        );
+        const { order, keyId, user } = paymentRes?.data || {};
+        const options = {
+          key: keyId,
+          amount: order.amount,
+          currency: order.currency,
+          name: "TrustKart Store",
+          description: "Order Transaction",
+          order_id: order.id,
+          prefill: {
+            name: user.name,
+            email: user.email,
+            contact: user.phone,
+          },
+          theme: {
+            color: "#F37254",
+          },
+          handler: verifyPayment,
+        };
+        const rzp = new window.Razorpay(options);
+        rzp.open();
+      }
     } catch (error) {
       toast.error(error?.response?.data?.message || "Failed to place order");
     } finally {
@@ -147,7 +204,6 @@ const Checkout = () => {
               value="Razorpay"
               checked={paymentMethod === "Razorpay"}
               onChange={(e) => setPaymentMethod(e.target.value)}
-              disabled
             />
             Razorpay
           </label>
