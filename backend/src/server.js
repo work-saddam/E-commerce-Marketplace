@@ -13,7 +13,11 @@ const paymentRoutes = require("./routers/paymentRouter");
 
 app.use(
   cors({
-    origin: ["http://localhost:5173", "http://localhost:5174"],
+    origin: [
+      "http://localhost:5173",
+      "http://localhost:5174",
+      "https://trustkart-lemon.vercel.app",
+    ],
     credentials: true,
   }),
 );
