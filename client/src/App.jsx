@@ -4,7 +4,7 @@ import Login from "./components/Login";
 import { Provider } from "react-redux";
 import { appStore, persistor } from "./store/appStore";
 import Register from "./components/Register";
-import Profile from "./pages/Profile/profile";
+import Profile from "./pages/profile/Profile";
 import EditProfile from "./pages/profile/editProfile";
 import ProtectedLayout from "./layout/ProtectedLayout";
 import Addresses from "./pages/profile/Address";

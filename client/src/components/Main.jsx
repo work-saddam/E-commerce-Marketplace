@@ -21,7 +21,7 @@ const Main = () => {
         `${BASE_URL}/api/products?&sort=${sort}&page=${page}&limit=${limit}`,
         {
           withCredentials: true,
-        }
+        },
       );
       setProducts(res?.data?.data || []);
       setPagination(res?.data?.pagination || null);
