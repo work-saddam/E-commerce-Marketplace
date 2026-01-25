@@ -145,10 +145,33 @@ exports.verifyPaymentWebhook = async (req, res) => {
       paymentRecord.status = "captured";
       masterOrderRecord.paymentStatus = "paid";
       console.log(`Payment captured for MasterOrder: ${masterOrderRecord._id}`);
+
+      const ordersToUpdate = await Order.find({
+        masterOrder: masterOrderRecord._id,
+      });
+      for (let order of ordersToUpdate) {
+        if (order.orderStatus === "PENDING") {
+          order.orderStatus = "CONFIRMED";
+          await order.save();
+        }
+      }
     } else if (event === "payment.failed") {
       paymentRecord.status = "failed";
       masterOrderRecord.paymentStatus = "failed";
       console.log(`Payment failed for MasterOrder: ${masterOrderRecord._id}`);
+
+      const ordersToUpdate = await Order.find({
+        masterOrder: masterOrderRecord._id,
+      });
+      for (const order of ordersToUpdate) {
+        if (
+          order.orderStatus === "PENDING" ||
+          order.orderStatus === "CONFIRMED"
+        ) {
+          order.orderStatus = "FAILED";
+          await order.save();
+        }
+      }
     }
     await paymentRecord.save();
     await masterOrderRecord.save();

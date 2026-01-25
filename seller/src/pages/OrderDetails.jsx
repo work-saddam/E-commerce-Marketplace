@@ -30,11 +30,16 @@ import axios from "axios";
 import { ArrowLeft } from "lucide-react";
 
 const statusColors = {
-  pending: "bg-orange-500 text-white",
-  confirmed: "bg-indigo-500 text-white",
-  shipped: "bg-blue-500 text-white",
-  delivered: "bg-green-600 text-white",
-  cancelled: "bg-red-600 text-white",
+  PENDING: "bg-gray-500 text-white",
+  CONFIRMED: "bg-indigo-500 text-white",
+  PROCESSING: "bg-orange-500 text-white",
+  SHIPPED: "bg-blue-500 text-white",
+  DELIVERED: "bg-green-600 text-white",
+  CANCELLED: "bg-red-600 text-white",
+  FAILED: "bg-purple-600 text-white",
+  ON_HOLD: "bg-yellow-500 text-white",
+  RETURNED: "bg-pink-500 text-white",
+  REFUNDED: "bg-teal-500 text-white",
 };
 
 export default function OrderDetails() {
@@ -63,7 +68,7 @@ export default function OrderDetails() {
       await axios.put(
         `${BASE_URL}/api/seller/order/${id}/${status}`,
         {},
-        { withCredentials: true }
+        { withCredentials: true },
       );
       fetchOrderDetails();
     } catch (err) {
@@ -175,11 +180,10 @@ export default function OrderDetails() {
                   </SelectTrigger>
 
                   <SelectContent>
-                    <SelectItem value="pending">Pending</SelectItem>
-                    <SelectItem value="confirmed">Confirmed</SelectItem>
-                    <SelectItem value="shipped">Shipped</SelectItem>
-                    <SelectItem value="delivered">Delivered</SelectItem>
-                    <SelectItem value="cancelled">Cancelled</SelectItem>
+                    <SelectItem value="PROCESSING">Processing</SelectItem>
+                    <SelectItem value="SHIPPED">Shipped</SelectItem>
+                    <SelectItem value="DELIVERED">Delivered</SelectItem>
+                    <SelectItem value="CANCELLED">Cancelled</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

@@ -15,11 +15,16 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 
 const statusColors = {
-  pending: "bg-orange-500 text-white",
-  confirmed: "bg-indigo-500 text-white",
-  shipped: "bg-blue-500 text-white",
-  delivered: "bg-green-600 text-white",
-  cancelled: "bg-red-600 text-white",
+  PENDING: "bg-gray-500 text-white",
+  CONFIRMED: "bg-indigo-500 text-white",
+  PROCESSING: "bg-orange-500 text-white",
+  SHIPPED: "bg-blue-500 text-white",
+  DELIVERED: "bg-green-600 text-white",
+  CANCELLED: "bg-red-600 text-white",
+  FAILED: "bg-purple-600 text-white",
+  ON_HOLD: "bg-yellow-500 text-white",
+  RETURNED: "bg-pink-500 text-white",
+  REFUNDED: "bg-teal-500 text-white",
 };
 
 export default function SellerOrders() {
@@ -35,7 +40,7 @@ export default function SellerOrders() {
       setLoading(true);
       const res = await axios.get(
         `${BASE_URL}/api/seller/orders/get?page=${page}&limit=10&status=${statusFilter}&search=${searchQuery}`,
-        { withCredentials: true }
+        { withCredentials: true },
       );
       setOrders(res?.data?.data || []);
       setTotalPages(res?.data?.pagination.totalPages || 1);
@@ -55,13 +60,13 @@ export default function SellerOrders() {
       await axios.put(
         `${BASE_URL}/api/seller/order/${orderId}/${newStatus}`,
         {},
-        { withCredentials: true }
+        { withCredentials: true },
       );
 
       setOrders((prev) =>
         prev.map((o) =>
-          o._id === orderId ? { ...o, orderStatus: newStatus } : o
-        )
+          o._id === orderId ? { ...o, orderStatus: newStatus } : o,
+        ),
       );
     } catch (err) {
       console.error(err);
@@ -90,11 +95,13 @@ export default function SellerOrders() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="confirmed">Confirmed</SelectItem>
-                <SelectItem value="shipped">Shipped</SelectItem>
-                <SelectItem value="delivered">Delivered</SelectItem>
-                <SelectItem value="cancelled">Cancelled</SelectItem>
+                <SelectItem value="CONFIRMED">Confirmed</SelectItem>
+                <SelectItem value="PROCESSING">Processing</SelectItem>
+                <SelectItem value="SHIPPED">Shipped</SelectItem>
+                <SelectItem value="DELIVERED">Delivered</SelectItem>
+                <SelectItem value="CANCELLED">Cancelled</SelectItem>
+                <SelectItem value="PENDING">Pending</SelectItem>
+                <SelectItem value="FAILED">Failed</SelectItem>
               </SelectContent>
             </Select>
 
@@ -173,11 +180,10 @@ export default function SellerOrders() {
                         </SelectTrigger>
 
                         <SelectContent>
-                          <SelectItem value="pending">Pending</SelectItem>
-                          <SelectItem value="confirmed">Confirmed</SelectItem>
-                          <SelectItem value="shipped">Shipped</SelectItem>
-                          <SelectItem value="delivered">Delivered</SelectItem>
-                          <SelectItem value="cancelled">Cancelled</SelectItem>
+                          <SelectItem value="PROCESSING">Processing</SelectItem>
+                          <SelectItem value="SHIPPED">Shipped</SelectItem>
+                          <SelectItem value="DELIVERED">Delivered</SelectItem>
+                          <SelectItem value="CANCELLED">Cancelled</SelectItem>
                         </SelectContent>
                       </Select>
 

@@ -78,7 +78,7 @@ exports.sellerLogin = async (req, res) => {
     const token = await jwt.sign(
       { id: seller._id, role: seller.role },
       process.env.JWT_SECRET,
-      { expiresIn: "3d" }
+      { expiresIn: "3d" },
     );
 
     res.cookie("token", token, {
@@ -227,13 +227,7 @@ exports.updateOrderStatus = async (req, res) => {
   try {
     const { id, status } = req.params;
 
-    const allowedStatus = [
-      "pending",
-      "confirmed",
-      "shipped",
-      "delivered",
-      "cancelled",
-    ];
+    const allowedStatus = ["PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"];
 
     if (!allowedStatus.includes(status)) {
       return res.status(400).json({ message: "Invalid status type" });
@@ -242,7 +236,7 @@ exports.updateOrderStatus = async (req, res) => {
     const order = await Order.findOneAndUpdate(
       { _id: id, seller: req.user.id },
       { orderStatus: status },
-      { new: true }
+      { new: true },
     );
     if (!order) {
       return res.status(404).json({ message: "Order not found" });

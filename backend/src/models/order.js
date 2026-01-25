@@ -41,15 +41,26 @@ const orderSchema = new mongoose.Schema(
     },
     orderStatus: {
       type: String,
-      enum: ["pending", "confirmed", "shipped", "delivered", "cancelled"],
-      default: "pending",
+      enum: [
+        "PENDING",
+        "CONFIRMED",
+        "PROCESSING",
+        "SHIPPED",
+        "DELIVERED",
+        "CANCELLED",
+        "ON_HOLD",
+        "RETURNED",
+        "REFUNDED",
+        "FAILED",
+      ],
+      default: "PENDING",
     },
     subTotal: {
       type: Number,
       required: true,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 orderSchema.index({ seller: 1, createdAt: -1 });
