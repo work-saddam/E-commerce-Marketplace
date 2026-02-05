@@ -44,10 +44,10 @@ const placeOrder = async (req, res) => {
 
     const productIds = cart.map((item) => item._id);
     const products = await Product.find({ _id: { $in: productIds } }).session(
-      session
+      session,
     );
     const productMap = new Map(
-      products.map((pro) => [pro._id.toString(), pro])
+      products.map((pro) => [pro._id.toString(), pro]),
     );
 
     const sellerMap = {};
@@ -109,7 +109,7 @@ const placeOrder = async (req, res) => {
           totalAmount,
         },
       ],
-      { session }
+      { session },
     );
 
     const masterOrderDoc = masterOrder[0];
@@ -119,7 +119,7 @@ const placeOrder = async (req, res) => {
       const sellerProducts = sellerMap[sellerId];
       const subTotal = sellerProducts.reduce(
         (sum, p) => sum + p.price * p.quantity,
-        0
+        0,
       );
 
       const subOrder = await Order.create(
@@ -133,7 +133,7 @@ const placeOrder = async (req, res) => {
             subTotal,
           },
         ],
-        { session }
+        { session },
       );
 
       orderIds.push(subOrder[0]._id);
