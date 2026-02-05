@@ -32,6 +32,10 @@ const productSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    reservedStock: {
+      type: Number,
+      default: 0,
+    },
     image: {
       url: { type: String },
       public_id: { type: String },
@@ -41,7 +45,7 @@ const productSchema = new mongoose.Schema(
       default: true,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 productSchema.pre("save", function (next) {
