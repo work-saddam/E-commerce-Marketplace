@@ -7,96 +7,96 @@ const User = require("../models/user");
 const razorpayInstance = require("../utils/razorpay");
 const Order = require("../models/order");
 
-exports.createPayment = async (req, res) => {
-  try {
-    const { masterOrderId } = req.body;
+// exports.createPayment = async (req, res) => {
+//   try {
+//     const { masterOrderId } = req.body;
 
-    const masterOrder = await MasterOrder.findById(masterOrderId);
-    if (!masterOrder) {
-      return res.status(404).json({ message: "Master order not found" });
-    }
+//     const masterOrder = await MasterOrder.findById(masterOrderId);
+//     if (!masterOrder) {
+//       return res.status(404).json({ message: "Master order not found" });
+//     }
 
-    if (masterOrder.buyer.toString() !== req.user.id) {
-      return res.status(403).json({ message: "Unauthorized: Not your order" });
-    }
+//     if (masterOrder.buyer.toString() !== req.user.id) {
+//       return res.status(403).json({ message: "Unauthorized: Not your order" });
+//     }
 
-    if (masterOrder.paymentStatus === "paid") {
-      return res.status(400).json({ message: "Order already paid" });
-    }
+//     if (masterOrder.paymentStatus === "paid") {
+//       return res.status(400).json({ message: "Order already paid" });
+//     }
 
-    if (!masterOrder.totalAmount || masterOrder.totalAmount <= 0) {
-      return res.status(400).json({ message: "Invalid order amount" });
-    }
+//     if (!masterOrder.totalAmount || masterOrder.totalAmount <= 0) {
+//       return res.status(400).json({ message: "Invalid order amount" });
+//     }
 
-    // IDEMPOTENCY CHECK   //TODO: later we can also add the idempotency key
+//     // IDEMPOTENCY CHECK   //TODO: later we can also add the idempotency key
 
-    const existingPayment = await Payment.findOne({
-      masterOrder: masterOrder._id,
-    }).sort({ createdAt: -1 });
+//     const existingPayment = await Payment.findOne({
+//       masterOrder: masterOrder._id,
+//     }).sort({ createdAt: -1 });
 
-    if (existingPayment) {
-      if (["paid", "success", "captured"].includes(existingPayment.status)) {
-        return res
-          .status(400)
-          .json({ message: "Payment already completed for this order" });
-      }
-      if (
-        ["created", "attempted", "authorized"].includes(existingPayment.status)
-      ) {
-        return res.status(200).json({
-          message: "Payment already initialized",
-          order: {
-            id: existingPayment.razorpayOrderId,
-            amount: existingPayment.amount,
-            currency: existingPayment.currency,
-            notes: existingPayment.notes,
-          },
-          keyId: process.env.RAZORPAY_KEY_ID,
-        });
-      }
+//     if (existingPayment) {
+//       if (["paid", "success", "captured"].includes(existingPayment.status)) {
+//         return res
+//           .status(400)
+//           .json({ message: "Payment already completed for this order" });
+//       }
+//       if (
+//         ["created", "attempted", "authorized"].includes(existingPayment.status)
+//       ) {
+//         return res.status(200).json({
+//           message: "Payment already initialized",
+//           order: {
+//             id: existingPayment.razorpayOrderId,
+//             amount: existingPayment.amount,
+//             currency: existingPayment.currency,
+//             notes: existingPayment.notes,
+//           },
+//           keyId: process.env.RAZORPAY_KEY_ID,
+//         });
+//       }
 
-      // If failed / cancelled / expired → allow retry by creating new Razorpay order
-    }
+//       // If failed / cancelled / expired → allow retry by creating new Razorpay order
+//     }
 
-    const razorpayOrder = await razorpayInstance.orders.create({
-      amount: Math.round(masterOrder.totalAmount * 100),
-      currency: "INR",
-      receipt: `receipt#${masterOrder._id}`,
-      notes: {
-        masterOrderId: masterOrder._id.toString(),
-        buyerId: masterOrder.buyer.toString(),
-        orderIds: masterOrder.orders,
-      },
-    });
+//     const razorpayOrder = await razorpayInstance.orders.create({
+//       amount: Math.round(masterOrder.totalAmount * 100),
+//       currency: "INR",
+//       receipt: `receipt#${masterOrder._id}`,
+//       notes: {
+//         masterOrderId: masterOrder._id.toString(),
+//         buyerId: masterOrder.buyer.toString(),
+//         orderIds: masterOrder.orders,
+//       },
+//     });
 
-    const user = await User.findById(req.user.id).select("name email phone");
+//     const user = await User.findById(req.user.id).select("name email phone");
 
-    await Payment.create({
-      masterOrder: masterOrder._id,
-      buyer: user,
-      razorpayOrderId: razorpayOrder.id,
-      amount: razorpayOrder.amount,
-      currency: razorpayOrder.currency,
-      status: "created",
-      notes: razorpayOrder.notes,
-    });
+//     await Payment.create({
+//       masterOrder: masterOrder._id,
+//       buyer: user,
+//       razorpayOrderId: razorpayOrder.id,
+//       amount: razorpayOrder.amount,
+//       currency: razorpayOrder.currency,
+//       status: "created",
+//       notes: razorpayOrder.notes,
+//     });
 
-    res.status(201).json({
-      message: "Payment created successfully",
-      order: razorpayOrder,
-      keyId: process.env.RAZORPAY_KEY_ID,
-      user,
-    });
-  } catch (error) {
-    console.error("Create Payment Error:", {
-      message: error.message,
-      masterOrderId: req.body.masterOrderId,
-    });
-    res.status(500).json({
-      message: "Something went wrong while creating payment",
-    });
-  }
-};
+//     res.status(201).json({
+//       message: "Payment created successfully",
+//       order: razorpayOrder,
+//       keyId: process.env.RAZORPAY_KEY_ID,
+//       user,
+//     });
+//   } catch (error) {
+//     console.error("Create Payment Error:", {
+//       message: error.message,
+//       masterOrderId: req.body.masterOrderId,
+//     });
+//     res.status(500).json({
+//       message: "Something went wrong while creating payment",
+//     });
+//   }
+// };
 
 exports.verifyPaymentWebhook = async (req, res) => {
   try {

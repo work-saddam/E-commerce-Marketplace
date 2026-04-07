@@ -13,12 +13,12 @@ exports.createOrder = async ({
 }) => {
   if (!Array.isArray(cart) || cart.length === 0) {
     await session.abortTransaction();
-    return res.status(400).json({ messsage: "Cart should not be empty!" });
+    throw new Error("Cart should not be empty");
   }
 
   if (!addressId) {
     await session.abortTransaction();
-    return res.status(400).json({ message: "Address is required!" });
+    throw new Error("Address is required");
   }
 
   const userAddress = await Address.findOne({
@@ -29,16 +29,14 @@ exports.createOrder = async ({
     .session(session);
   if (!userAddress) {
     await session.abortTransaction();
-    return res.status(404).json({ message: "Invalid address" });
+    throw new Error("Invalid address");
   }
 
   for (const item of cart) {
     item.quantity = Number(item.quantity);
     if (isNaN(item.quantity) || item.quantity <= 0) {
       await session.abortTransaction();
-      return res
-        .status(400)
-        .json({ message: `Invalid quantity for product ${item._id}` });
+      throw new Error(`Invalid quantity for product ${item._id}`);
     }
   }
 
@@ -55,15 +53,11 @@ exports.createOrder = async ({
     const product = productMap.get(item._id);
     if (!product) {
       await session.abortTransaction();
-      //   return res.status(404).json({ message: "Product not found" });
       throw new Error(`Product not found: ${item._id}`);
     }
 
     if (item.quantity > product.stock) {
       await session.abortTransaction();
-      //   return res
-      //     .status(400)
-      //     .json({ message: `Insufficient stock for ${product.title}` });
       throw new Error(`Insufficient stock for product ${product.title}`);
     }
 
@@ -82,7 +76,6 @@ exports.createOrder = async ({
 
   if (!totalAmount || totalAmount <= 0) {
     await session.abortTransaction();
-    // return res.status(400).json({ message: "Invalid order total amount" });
     throw new Error("Invalid order total amount");
   }
 
