@@ -153,7 +153,10 @@ exports.verifyPaymentWebhook = async (req, res) => {
   } catch (error) {
     console.error("Razorpay Webhook Error:", error);
     // Razorpay retries if it doesn't receive a 2xx response.
-    res.status(200).json({ received: true, error: "Internal Server Error" });
+    res.status(200).json({
+      received: true,
+      error: `Internal Server Error || ${error.message}`,
+    });
   }
 };
 
