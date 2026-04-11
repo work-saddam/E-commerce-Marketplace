@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 
 const InventoryService = require("../services/inventory.service");
 const OrderService = require("../services/order.service");
+const { validateCart } = require("../validations/cartValidator");
 
 exports.checkout = async (req, res) => {
   const session = await mongoose.startSession();
@@ -9,6 +10,18 @@ exports.checkout = async (req, res) => {
   try {
     const { cart, addressId, paymentMethod } = req.body;
 
+    const error = validateCart(cart);
+    if (error) {
+      return res.status(400).json({ message: error });
+    }
+
+    if (!addressId) {
+      return res.status(400).json({ message: "Address is required" });
+    }
+
+    if (!paymentMethod) {
+      return res.status(400).json({ message: "Payment method is required" });
+    }
     // 1. Reserve inventory
     await InventoryService.reserveInventory(cart, session);
 
@@ -21,13 +34,13 @@ exports.checkout = async (req, res) => {
       session,
     });
 
-    await session.commitTransaction();
-
     // 3. COD shortcut
     if (paymentMethod === "COD") {
       await InventoryService.confirmInventory(masterOrder._id, session);
       return res.json({ success: true, masterOrderId: masterOrder._id });
     }
+
+    await session.commitTransaction();
 
     // 4. Razorpay continues separately
     res.json({ success: true, masterOrderId: masterOrder._id });
