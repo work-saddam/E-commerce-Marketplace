@@ -31,10 +31,12 @@ const productSchema = new mongoose.Schema(
     stock: {
       type: Number,
       default: 0,
+      min: 0,
     },
     reservedStock: {
       type: Number,
       default: 0,
+      min: 0,
     },
     image: {
       url: { type: String },
