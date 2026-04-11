@@ -2,6 +2,11 @@ const Order = require("../models/order");
 const Product = require("../models/product");
 
 exports.reserveInventory = async (cart, session) => {
+  if (!Array.isArray(cart) || cart.length === 0) {
+    await session.abortTransaction();
+    throw new Error("Invalid cart");
+  }
+
   for (const item of cart) {
     const result = await Product.updateOne(
       {
@@ -47,7 +52,16 @@ exports.confirmInventory = async (masterOrderId, session) => {
   }
 
   if (bulkOps.length) {
-    await Product.bulkWrite(bulkOps, { session });
+    const result = await Product.bulkWrite(bulkOps, { session });
+    if (
+      result.matchedCount !== bulkOps.length ||
+      result.modifiedCount !== bulkOps.length
+    ) {
+      throw new Error(
+        `Inventory confirmation failed for masterOrder ${masterOrderId}. ` +
+          `Expected ${bulkOps.length}, matched ${result.matchedCount}, modified ${result.modifiedCount}`,
+      );
+    }
   }
 };
 
@@ -75,6 +89,15 @@ exports.releaseInventory = async (masterOrderId, session) => {
   }
 
   if (bulkOps.length) {
-    await Product.bulkWrite(bulkOps, { session });
+    const result = await Product.bulkWrite(bulkOps, { session });
+    if (
+      result.matchedCount !== bulkOps.length ||
+      result.modifiedCount !== bulkOps.length
+    ) {
+      throw new Error(
+        `Inventory confirmation failed for masterOrder ${masterOrderId}. ` +
+          `Expected ${bulkOps.length}, matched ${result.matchedCount}, modified ${result.modifiedCount}`,
+      );
+    }
   }
 };
