@@ -7,7 +7,8 @@ const {
   deleteAddress,
   editAddress,
 } = require("../controllers/addressController");
-const { placeOrder, getUserOrders } = require("../controllers/orderController");
+const { getUserOrders } = require("../controllers/orderController");
+const { checkout } = require("../controllers/checkoutController");
 const router = express.Router();
 
 router.get("/profile", userAuth, getProfile);
@@ -17,7 +18,7 @@ router.post("/address", userAuth, addAddress);
 router.put("/address/:id", userAuth, editAddress);
 router.delete("/address/:id", userAuth, deleteAddress);
 
-router.post("/checkout", userAuth, placeOrder);
+router.post("/checkout", userAuth, checkout);
 router.get("/orders", userAuth, getUserOrders);
 
 module.exports = router;
