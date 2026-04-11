@@ -1,3 +1,4 @@
+const Order = require("../models/order");
 const Product = require("../models/product");
 
 exports.reserveInventory = async (cart, session) => {
@@ -8,37 +9,72 @@ exports.reserveInventory = async (cart, session) => {
         stock: { $gte: item.quantity },
       },
       {
-        $inc: { reservedStock: item.quantity },
+        $inc: { stock: -item.quantity, reservedStock: item.quantity },
       },
       { session },
     );
 
-    if (result.modifiedCount !== cart.length) {
+    if (result.modifiedCount !== 1) {
       await session.abortTransaction();
       throw new Error(`Insufficient stock for product ${item._id}`);
     }
   }
 };
 
-exports.confirmInventory = async (cart) => {
-  for (const item of cart) {
-    await Product.updateOne(
-      { _id: item._id },
-      {
-        $inc: {
-          stock: -item.quantity,
-          reservedStock: -item.quantity,
+exports.confirmInventory = async (masterOrderId, session) => {
+  const orders = await Order.find({ masterOrder: masterOrderId }).session(
+    session,
+  );
+
+  const bulkOps = [];
+
+  for (const order of orders) {
+    for (const item of order.products) {
+      bulkOps.push({
+        updateOne: {
+          filter: {
+            _id: item.product,
+            reservedStock: { $gte: item.quantity },
+          },
+          update: {
+            $inc: {
+              reservedStock: -item.quantity,
+            },
+          },
         },
-      },
-    );
+      });
+    }
+  }
+
+  if (bulkOps.length) {
+    await Product.bulkWrite(bulkOps, { session });
   }
 };
 
-exports.releaseInventory = async (cart) => {
-  for (const item of cart) {
-    await Product.updateOne(
-      { _id: item._id },
-      { $inc: { reservedStock: -item.quantity } },
-    );
+exports.releaseInventory = async (masterOrderId, session) => {
+  const orders = await Order.find({ masterOrder: masterOrderId }).session(
+    session,
+  );
+
+  const bulkOps = [];
+
+  for (const order of orders) {
+    for (const item of order.products) {
+      bulkOps.push({
+        updateOne: {
+          filter: { _id: item.product, reservedStock: { $gte: item.quantity } },
+          update: {
+            $inc: {
+              stock: item.quantity,
+              reservedStock: -item.quantity,
+            },
+          },
+        },
+      });
+    }
+  }
+
+  if (bulkOps.length) {
+    await Product.bulkWrite(bulkOps, { session });
   }
 };

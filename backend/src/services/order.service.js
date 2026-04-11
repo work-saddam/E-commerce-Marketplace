@@ -121,3 +121,31 @@ exports.createOrder = async ({
 
   return masterOrder;
 };
+
+exports.confirmOrders = async (masterOrderId, session) => {
+  await Order.updateMany(
+    { masterOrder: masterOrderId, orderStatus: "PENDING" },
+    { $set: { orderStatus: "CONFIRMED" } },
+    { session },
+  );
+
+  await MasterOrder.findByIdAndUpdate(
+    masterOrderId,
+    { paymentStatus: "paid" },
+    { session },
+  );
+};
+
+exports.failOrders = async (masterOrderId, session) => {
+  await Order.updateMany(
+    { masterOrder: masterOrderId },
+    { $set: { orderStatus: "FAILED" } },
+    { session },
+  );
+
+  await MasterOrder.findByIdAndUpdate(
+    masterOrderId,
+    { paymentStatus: "failed" },
+    { session },
+  );
+};
