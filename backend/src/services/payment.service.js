@@ -1,6 +1,7 @@
 const {
   validateWebhookSignature,
 } = require("razorpay/dist/utils/razorpay-utils");
+const mongoose = require("mongoose");
 const Payment = require("../models/payment");
 const razorpayInstance = require("../utils/razorpay");
 const User = require("../models/user");
@@ -75,7 +76,7 @@ exports.createPayment = async (req, res) => {
 
     await Payment.create({
       masterOrder: masterOrder._id,
-      buyer: user,
+      buyer: userId,
       razorpayOrderId: razorpayOrder.id,
       amount: razorpayOrder.amount,
       currency: razorpayOrder.currency,
@@ -248,7 +249,7 @@ exports.markFailed = async (paymentRecord, data = {}, session = null) => {
 
   // Store context safely
   paymentRecord.failureReason =
-    data.reason || data.failureReason || "payment_failed";
+    data.reason || data.failureReason || "unknown_failure";
 
   if (data.webhookPayload) {
     paymentRecord.webhookPayload = data.webhookPayload;

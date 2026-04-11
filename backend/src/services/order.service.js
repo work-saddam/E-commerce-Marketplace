@@ -56,11 +56,6 @@ exports.createOrder = async ({
       throw new Error(`Product not found: ${item._id}`);
     }
 
-    if (item.quantity > product.stock) {
-      await session.abortTransaction();
-      throw new Error(`Insufficient stock for product ${product.title}`);
-    }
-
     const subTotal = product.price * item.quantity;
     totalAmount += subTotal;
 

@@ -43,11 +43,12 @@ const paymentSchema = new mongoose.Schema(
       default: "created",
     },
 
+    failureReason: String,
     method: String, // card, upi, netbanking
     notes: Object,
     webhookPayload: Object, // RAW webhook data
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 paymentSchema.index({ masterOrder: 1, createdAt: -1 });
