@@ -31,6 +31,12 @@ const productSchema = new mongoose.Schema(
     stock: {
       type: Number,
       default: 0,
+      min: 0,
+    },
+    reservedStock: {
+      type: Number,
+      default: 0,
+      min: 0,
     },
     image: {
       url: { type: String },
@@ -41,7 +47,7 @@ const productSchema = new mongoose.Schema(
       default: true,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 productSchema.pre("save", function (next) {
