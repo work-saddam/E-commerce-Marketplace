@@ -22,6 +22,10 @@ const masterOrderSchema = new mongoose.Schema(
       enum: ["pending", "paid", "failed", "refunded"],
       default: "pending",
     },
+    reservationExpiresAt: {
+      type: Date,
+      default: null,
+    },
   },
   { timestamps: true }
 );

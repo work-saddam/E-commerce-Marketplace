@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 
 const InventoryService = require("../services/inventory.service");
 const OrderService = require("../services/order.service");
+const { addReleaseInventoryJob } = require("../jobs/inventory/releaseInventory");
 const { validateCart } = require("../validations/cartValidator");
 
 exports.checkout = async (req, res) => {
@@ -12,14 +13,17 @@ exports.checkout = async (req, res) => {
 
     const error = validateCart(cart);
     if (error) {
+      await session.abortTransaction();
       return res.status(400).json({ message: error });
     }
 
     if (!addressId) {
+      await session.abortTransaction();
       return res.status(400).json({ message: "Address is required" });
     }
 
     if (!paymentMethod) {
+      await session.abortTransaction();
       return res.status(400).json({ message: "Payment method is required" });
     }
     // 1. Reserve inventory
@@ -37,10 +41,22 @@ exports.checkout = async (req, res) => {
     // 3. COD shortcut
     if (paymentMethod === "COD") {
       await InventoryService.confirmInventory(masterOrder._id, session);
+      await OrderService.confirmOrders(masterOrder._id, session);
+      await session.commitTransaction();
+
       return res.json({ success: true, masterOrderId: masterOrder._id });
     }
 
     await session.commitTransaction();
+
+    try {
+      await addReleaseInventoryJob(masterOrder._id.toString());
+    } catch (jobError) {
+      console.error("Release inventory job scheduling failed:", {
+        masterOrderId: masterOrder._id,
+        message: jobError.message,
+      });
+    }
 
     // 4. Razorpay continues separately
     res.json({ success: true, masterOrderId: masterOrder._id });
