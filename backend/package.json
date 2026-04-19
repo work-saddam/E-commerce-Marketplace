@@ -17,6 +17,9 @@
     "dev": "nodemon src/server.js"
   },
   "dependencies": {
+    "@bull-board/api": "^7.0.0",
+    "@bull-board/express": "^7.0.0",
+    "@bull-board/ui": "^7.0.0",
     "bcrypt": "^6.0.0",
     "bullmq": "^5.73.5",
     "cloudinary": "^2.7.0",

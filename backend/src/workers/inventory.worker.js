@@ -1,5 +1,5 @@
 const { Worker } = require("bullmq");
-const redis = require("../config/redis");
+const createRedisConnection = require("../config/redis");
 const { INVENTORY_QUEUE } = require("../queues/queueNames");
 const MasterOrder = require("../models/masterOrder");
 const Payment = require("../models/payment");
@@ -73,8 +73,7 @@ const startInventoryWorker = () => {
       }
     },
     {
-      connection: redis,
-      concurrency: 5,
+      connection: createRedisConnection(),
     },
   );
 
