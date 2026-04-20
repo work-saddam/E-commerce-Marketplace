@@ -2,7 +2,9 @@ const mongoose = require("mongoose");
 
 const InventoryService = require("../services/inventory.service");
 const OrderService = require("../services/order.service");
-const { addReleaseInventoryJob } = require("../jobs/inventory/releaseInventory");
+const {
+  addReleaseInventoryJob,
+} = require("../jobs/inventory/releaseInventory");
 const { validateCart } = require("../validations/cartValidator");
 
 exports.checkout = async (req, res) => {
@@ -41,13 +43,15 @@ exports.checkout = async (req, res) => {
     // 3. COD shortcut
     if (paymentMethod === "COD") {
       await InventoryService.confirmInventory(masterOrder._id, session);
-      await OrderService.confirmOrders(masterOrder._id, session);
+      const confirmResult = await OrderService.confirmOrders(masterOrder._id, session);
+      if (!confirmResult) {
+        await session.abortTransaction();
+        throw createHttpError(409, "Order confirmation failed: status changed");
+      }
       await session.commitTransaction();
 
       return res.json({ success: true, masterOrderId: masterOrder._id });
     }
-
-    await session.commitTransaction();
 
     try {
       await addReleaseInventoryJob(masterOrder._id.toString());
@@ -56,7 +60,10 @@ exports.checkout = async (req, res) => {
         masterOrderId: masterOrder._id,
         message: jobError.message,
       });
+      throw new Error("Unable to schedule inventory release job");
     }
+
+    await session.commitTransaction();
 
     // 4. Razorpay continues separately
     res.json({ success: true, masterOrderId: masterOrder._id });

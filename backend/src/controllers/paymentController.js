@@ -4,6 +4,7 @@ const {
 const MasterOrder = require("../models/masterOrder");
 const Payment = require("../models/payment");
 const PaymentService = require("../services/payment.service");
+const { isReservationExpired } = require("../config/orderReservation");
 
 exports.verifyPayment = async (req, res) => {
   try {
@@ -50,7 +51,10 @@ exports.verifyPayment = async (req, res) => {
       });
     }
 
-    if (masterOrder.paymentStatus === "failed") {
+    if (
+      masterOrder.paymentStatus === "failed" ||
+      isReservationExpired(masterOrder.reservationExpiresAt)
+    ) {
       return res.status(409).json({
         success: false,
         message: "Payment window expired for this order",

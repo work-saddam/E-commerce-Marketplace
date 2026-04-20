@@ -43,7 +43,10 @@ exports.createPayment = async (req, res) => {
     }
 
     if (masterOrder.paymentMethod !== "Razorpay") {
-      throw createHttpError(400, "Online payment is not available for this order");
+      throw createHttpError(
+        400,
+        "Online payment is not available for this order",
+      );
     }
 
     if (masterOrder.paymentStatus === "paid") {
@@ -168,7 +171,9 @@ exports.verifyPaymentWebhook = async (req, res) => {
       return res.status(404).json({ message: "Payment record not found" });
     }
 
-    const masterOrderRecord = await MasterOrder.findById(paymentRecord.masterOrder);
+    const masterOrderRecord = await MasterOrder.findById(
+      paymentRecord.masterOrder,
+    );
     if (!masterOrderRecord) {
       console.error(
         `MasterOrder record not found for Payment ID: ${paymentRecord._id}`,
@@ -176,7 +181,10 @@ exports.verifyPaymentWebhook = async (req, res) => {
       return res.status(404).json({ message: "Master order not found" });
     }
 
-    if (event === "payment.captured" && SUCCESS_PAYMENT_STATUSES.includes(paymentRecord.status)) {
+    if (
+      event === "payment.captured" &&
+      SUCCESS_PAYMENT_STATUSES.includes(paymentRecord.status)
+    ) {
       return res.status(200).json({ received: true });
     }
 
@@ -235,7 +243,15 @@ exports.handlePaymentCaptured = async ({ paymentRecord, payload }) => {
 
       await InventoryService.confirmInventory(masterOrder._id, session);
 
-      await OrderService.confirmOrders(masterOrder._id, session);
+      const confirmResult = await OrderService.confirmOrders(
+        masterOrder._id,
+        session,
+      );
+      if (!confirmResult) {
+        throw new Error(
+          "Failed to confirm orders: master order status changed",
+        );
+      }
 
       await session.commitTransaction();
       shouldRemoveReleaseJob = true;
@@ -252,7 +268,10 @@ exports.handlePaymentCaptured = async ({ paymentRecord, payload }) => {
   }
 
   if (lateCaptureContext) {
-    console.error("Captured payment received after reservation expiry", lateCaptureContext);
+    console.error(
+      "Captured payment received after reservation expiry",
+      lateCaptureContext,
+    );
   }
 };
 
@@ -368,16 +387,26 @@ exports.extendReservation = async (
   }
 
   const nextExpiry = getReservationExpiryDate(new Date(), delayMs);
-  const currentExpiry = masterOrder.reservationExpiresAt
-    ? new Date(masterOrder.reservationExpiresAt)
-    : null;
 
-  if (currentExpiry && currentExpiry.getTime() >= nextExpiry.getTime()) {
+  const updateResult = await MasterOrder.findOneAndUpdate(
+    {
+      _id: masterOrder._id,
+      paymentStatus: "pending",
+      $or: [
+        { reservationExpiresAt: null },
+        { reservationExpiresAt: { $lt: nextExpiry } },
+      ],
+    },
+    {
+      $set: { reservationExpiresAt: nextExpiry },
+    },
+    { new: true },
+  );
+
+  if (!updateResult) {
+    // Update failed: order no longer pending or expiry already >= nextExpiry
     return;
   }
-
-  masterOrder.reservationExpiresAt = nextExpiry;
-  await masterOrder.save();
 
   try {
     await addReleaseInventoryJob(masterOrder._id.toString(), delayMs);

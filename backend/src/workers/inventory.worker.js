@@ -50,9 +50,11 @@ const startInventoryWorker = () => {
           }
 
           await InventoryService.releaseInventory(masterOrderId, session);
-          await OrderService.failOrders(masterOrderId, session);
+          const failResult = await OrderService.failOrders(masterOrderId, session);
 
-          didRelease = true;
+          if (failResult) {
+            didRelease = true;
+          }
         });
 
         if (didRelease) {

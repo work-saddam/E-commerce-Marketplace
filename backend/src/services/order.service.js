@@ -121,35 +121,47 @@ exports.createOrder = async ({
 };
 
 exports.confirmOrders = async (masterOrderId, session) => {
+  const updatedMasterOrder = await MasterOrder.findOneAndUpdate(
+    { _id: masterOrderId, paymentStatus: "pending" },
+    {
+      paymentStatus: "paid",
+      reservationExpiresAt: null,
+    },
+    { session, new: true },
+  );
+
+  if (!updatedMasterOrder) {
+    return false;
+  }
+
   await Order.updateMany(
     { masterOrder: masterOrderId, orderStatus: "PENDING" },
     { $set: { orderStatus: "CONFIRMED" } },
     { session },
   );
 
-  await MasterOrder.findByIdAndUpdate(
-    masterOrderId,
-    {
-      paymentStatus: "paid",
-      reservationExpiresAt: null,
-    },
-    { session },
-  );
+  return updatedMasterOrder;
 };
 
 exports.failOrders = async (masterOrderId, session) => {
+  const updatedMasterOrder = await MasterOrder.findOneAndUpdate(
+    { _id: masterOrderId, paymentStatus: "pending" },
+    {
+      paymentStatus: "failed",
+      reservationExpiresAt: null,
+    },
+    { session, new: true },
+  );
+
+  if (!updatedMasterOrder) {
+    return false;
+  }
+
   await Order.updateMany(
     { masterOrder: masterOrderId, orderStatus: "PENDING" },
     { $set: { orderStatus: "FAILED" } },
     { session },
   );
 
-  await MasterOrder.findOneAndUpdate(
-    { _id: masterOrderId, paymentStatus: "pending" },
-    {
-      paymentStatus: "failed",
-      reservationExpiresAt: null,
-    },
-    { session },
-  );
+  return updatedMasterOrder;
 };

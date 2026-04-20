@@ -27,8 +27,10 @@ const masterOrderSchema = new mongoose.Schema(
       default: null,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
+
+masterOrderSchema.index({ reservationExpiresAt: 1 });
 
 const MasterOrder = mongoose.model("MasterOrder", masterOrderSchema);
 module.exports = MasterOrder;
