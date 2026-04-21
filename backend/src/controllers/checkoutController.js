@@ -7,6 +7,43 @@ const {
 } = require("../jobs/inventory/releaseInventory");
 const { validateCart } = require("../validations/cartValidator");
 
+const createHttpError = (statusCode, message) => {
+  const error = new Error(message);
+  error.statusCode = statusCode;
+
+  return error;
+};
+
+const abortTransactionIfNeeded = async (session) => {
+  if (session?.inTransaction()) {
+    await session.abortTransaction();
+  }
+};
+
+const rollbackPendingCheckout = async (masterOrderId) => {
+  const cleanupSession = await mongoose.startSession();
+
+  try {
+    await cleanupSession.withTransaction(async () => {
+      await InventoryService.releaseInventory(masterOrderId, cleanupSession);
+
+      const failResult = await OrderService.failOrders(
+        masterOrderId,
+        cleanupSession,
+      );
+
+      if (!failResult) {
+        throw createHttpError(
+          409,
+          "Order cleanup failed: status changed before rollback",
+        );
+      }
+    });
+  } finally {
+    cleanupSession.endSession();
+  }
+};
+
 exports.checkout = async (req, res) => {
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -43,15 +80,19 @@ exports.checkout = async (req, res) => {
     // 3. COD shortcut
     if (paymentMethod === "COD") {
       await InventoryService.confirmInventory(masterOrder._id, session);
-      const confirmResult = await OrderService.confirmOrders(masterOrder._id, session);
+      const confirmResult = await OrderService.confirmOrders(
+        masterOrder._id,
+        session,
+      );
       if (!confirmResult) {
-        await session.abortTransaction();
         throw createHttpError(409, "Order confirmation failed: status changed");
       }
       await session.commitTransaction();
 
       return res.json({ success: true, masterOrderId: masterOrder._id });
     }
+
+    await session.commitTransaction();
 
     try {
       await addReleaseInventoryJob(masterOrder._id.toString());
@@ -60,17 +101,34 @@ exports.checkout = async (req, res) => {
         masterOrderId: masterOrder._id,
         message: jobError.message,
       });
-      throw new Error("Unable to schedule inventory release job");
-    }
 
-    await session.commitTransaction();
+      try {
+        await rollbackPendingCheckout(masterOrder._id);
+      } catch (cleanupError) {
+        console.error("Rollback after scheduling failure also failed:", {
+          masterOrderId: masterOrder._id,
+          message: cleanupError.message,
+        });
+        throw createHttpError(
+          500,
+          "Unable to schedule inventory release job and rollback reservation",
+        );
+      }
+
+      throw createHttpError(
+        503,
+        "Unable to schedule inventory release job. Reservation has been released.",
+      );
+    }
 
     // 4. Razorpay continues separately
     res.json({ success: true, masterOrderId: masterOrder._id });
   } catch (error) {
-    await session.abortTransaction();
+    await abortTransactionIfNeeded(session);
     console.error("Checkout Error:", error);
-    res.status(500).json({ success: false, message: error.message });
+    res
+      .status(error.statusCode || 500)
+      .json({ success: false, message: error.message });
   } finally {
     session.endSession();
   }

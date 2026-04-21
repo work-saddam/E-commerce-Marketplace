@@ -264,7 +264,14 @@ exports.handlePaymentCaptured = async ({ paymentRecord, payload }) => {
   }
 
   if (shouldRemoveReleaseJob) {
-    await removeReleaseInventoryJob(paymentRecord.masterOrder.toString());
+    try {
+      await removeReleaseInventoryJob(paymentRecord.masterOrder.toString());
+    } catch (jobError) {
+      console.error("Failed to remove release inventory job after capture:", {
+        masterOrderId: paymentRecord.masterOrder,
+        message: jobError.message,
+      });
+    }
   }
 
   if (lateCaptureContext) {

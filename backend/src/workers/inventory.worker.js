@@ -50,11 +50,18 @@ const startInventoryWorker = () => {
           }
 
           await InventoryService.releaseInventory(masterOrderId, session);
-          const failResult = await OrderService.failOrders(masterOrderId, session);
+          const failResult = await OrderService.failOrders(
+            masterOrderId,
+            session,
+          );
 
-          if (failResult) {
-            didRelease = true;
+          if (!failResult) {
+            throw new Error(
+              "Failed to mark expired master order as failed after releasing inventory",
+            );
           }
+
+          didRelease = true;
         });
 
         if (didRelease) {
