@@ -6,8 +6,27 @@ const Payment = require("../models/payment");
 const razorpayInstance = require("../utils/razorpay");
 const User = require("../models/user");
 const MasterOrder = require("../models/masterOrder");
+const {
+  AUTHORIZED_PAYMENT_GRACE_MS,
+  getReservationExpiryDate,
+  isReservationExpired,
+} = require("../config/orderReservation");
+const {
+  addReleaseInventoryJob,
+  removeReleaseInventoryJob,
+} = require("../jobs/inventory/releaseInventory");
 const InventoryService = require("./inventory.service");
 const OrderService = require("./order.service");
+
+const SUCCESS_PAYMENT_STATUSES = ["captured", "paid", "success"];
+const ACTIVE_PAYMENT_STATUSES = ["created", "attempted", "authorized"];
+
+const createHttpError = (statusCode, message) => {
+  const error = new Error(message);
+  error.statusCode = statusCode;
+
+  return error;
+};
 
 exports.createPayment = async (req, res) => {
   try {
@@ -16,19 +35,43 @@ exports.createPayment = async (req, res) => {
 
     const masterOrder = await MasterOrder.findById(masterOrderId);
     if (!masterOrder) {
-      throw new Error("Master order not found");
+      throw createHttpError(404, "Master order not found");
     }
 
     if (masterOrder.buyer.toString() !== userId) {
-      throw new Error("Unauthorized: Not your order");
+      throw createHttpError(403, "Unauthorized: Not your order");
+    }
+
+    if (masterOrder.paymentMethod !== "Razorpay") {
+      throw createHttpError(
+        400,
+        "Online payment is not available for this order",
+      );
     }
 
     if (masterOrder.paymentStatus === "paid") {
-      throw new Error("Order already paid");
+      throw createHttpError(409, "Order already paid");
+    }
+
+    if (masterOrder.paymentStatus === "failed") {
+      throw createHttpError(409, "Payment window expired for this order");
+    }
+
+    if (isReservationExpired(masterOrder.reservationExpiresAt)) {
+      try {
+        await addReleaseInventoryJob(masterOrder._id.toString(), 0);
+      } catch (jobError) {
+        console.error("Failed to enqueue immediate reservation cleanup:", {
+          masterOrderId,
+          message: jobError.message,
+        });
+      }
+
+      throw createHttpError(409, "Payment window expired for this order");
     }
 
     if (!masterOrder.totalAmount || masterOrder.totalAmount <= 0) {
-      throw new Error("Invalid order amount");
+      throw createHttpError(400, "Invalid order amount");
     }
 
     // IDEMPOTENCY CHECK   //TODO: later we can also add the idempotency key
@@ -38,14 +81,13 @@ exports.createPayment = async (req, res) => {
     }).sort({ createdAt: -1 });
 
     if (existingPayment) {
-      if (["paid", "success", "captured"].includes(existingPayment.status)) {
+      if (SUCCESS_PAYMENT_STATUSES.includes(existingPayment.status)) {
         return res
-          .status(400)
+          .status(409)
           .json({ message: "Payment already completed for this order" });
       }
-      if (
-        ["created", "attempted", "authorized"].includes(existingPayment.status)
-      ) {
+
+      if (ACTIVE_PAYMENT_STATUSES.includes(existingPayment.status)) {
         return res.status(200).json({
           message: "Payment already initialized",
           order: {
@@ -95,8 +137,8 @@ exports.createPayment = async (req, res) => {
       message: error.message,
       masterOrderId: req.body.masterOrderId,
     });
-    res.status(500).json({
-      message: "Something went wrong while creating payment",
+    res.status(error.statusCode || 500).json({
+      message: error.message || "Something went wrong while creating payment",
     });
   }
 };
@@ -104,8 +146,9 @@ exports.createPayment = async (req, res) => {
 exports.verifyPaymentWebhook = async (req, res) => {
   try {
     const webhookSignature = req.header("X-Razorpay-Signature");
+    const webhookBody = req.rawBody || JSON.stringify(req.body);
     const isWebhookValid = validateWebhookSignature(
-      JSON.stringify(req.body),
+      webhookBody,
       webhookSignature,
       process.env.RAZORPAY_WEBHOOK_SECRET,
     );
@@ -118,9 +161,7 @@ exports.verifyPaymentWebhook = async (req, res) => {
     const payload = req.body.payload.payment.entity;
     console.log(`Received Razorpay webhook event: ${event}`);
 
-    let paymentRecord, masterOrderRecord;
-
-    paymentRecord = await Payment.findOne({
+    const paymentRecord = await Payment.findOne({
       razorpayOrderId: payload.order_id,
     });
     if (!paymentRecord) {
@@ -130,7 +171,9 @@ exports.verifyPaymentWebhook = async (req, res) => {
       return res.status(404).json({ message: "Payment record not found" });
     }
 
-    masterOrderRecord = await MasterOrder.findById(paymentRecord.masterOrder);
+    const masterOrderRecord = await MasterOrder.findById(
+      paymentRecord.masterOrder,
+    );
     if (!masterOrderRecord) {
       console.error(
         `MasterOrder record not found for Payment ID: ${paymentRecord._id}`,
@@ -138,7 +181,14 @@ exports.verifyPaymentWebhook = async (req, res) => {
       return res.status(404).json({ message: "Master order not found" });
     }
 
-    if (["captured", "failed"].includes(paymentRecord.status)) {
+    if (
+      event === "payment.captured" &&
+      SUCCESS_PAYMENT_STATUSES.includes(paymentRecord.status)
+    ) {
+      return res.status(200).json({ received: true });
+    }
+
+    if (event === "payment.failed" && paymentRecord.status === "failed") {
       return res.status(200).json({ received: true });
     }
 
@@ -153,9 +203,8 @@ exports.verifyPaymentWebhook = async (req, res) => {
     res.status(200).json({ received: true });
   } catch (error) {
     console.error("Razorpay Webhook Error:", error);
-    // Razorpay retries if it doesn't receive a 2xx response.
-    res.status(200).json({
-      received: true,
+    res.status(500).json({
+      received: false,
       error: `Internal Server Error || ${error.message}`,
     });
   }
@@ -163,6 +212,8 @@ exports.verifyPaymentWebhook = async (req, res) => {
 
 exports.handlePaymentCaptured = async ({ paymentRecord, payload }) => {
   const session = await mongoose.startSession();
+  let shouldRemoveReleaseJob = false;
+  let lateCaptureContext = null;
 
   try {
     session.startTransaction();
@@ -170,19 +221,64 @@ exports.handlePaymentCaptured = async ({ paymentRecord, payload }) => {
     const masterOrder = await MasterOrder.findById(
       paymentRecord.masterOrder,
     ).session(session);
+    if (!masterOrder) {
+      throw createHttpError(404, "Master order not found");
+    }
 
-    await this.markSuccess(paymentRecord, payload, session);
+    if (masterOrder.paymentStatus === "paid") {
+      await this.markSuccess(paymentRecord, payload, session);
+      await session.commitTransaction();
+      shouldRemoveReleaseJob = true;
+    } else if (masterOrder.paymentStatus === "failed") {
+      await this.markSuccess(paymentRecord, payload, session);
+      await session.commitTransaction();
 
-    await InventoryService.confirmInventory(masterOrder._id, session);
+      lateCaptureContext = {
+        masterOrderId: masterOrder._id,
+        paymentId: paymentRecord._id,
+        razorpayPaymentId: payload.id,
+      };
+    } else {
+      await this.markSuccess(paymentRecord, payload, session);
 
-    await OrderService.confirmOrders(masterOrder._id, session);
+      await InventoryService.confirmInventory(masterOrder._id, session);
 
-    await session.commitTransaction();
+      const confirmResult = await OrderService.confirmOrders(
+        masterOrder._id,
+        session,
+      );
+      if (!confirmResult) {
+        throw new Error(
+          "Failed to confirm orders: master order status changed",
+        );
+      }
+
+      await session.commitTransaction();
+      shouldRemoveReleaseJob = true;
+    }
   } catch (err) {
     await session.abortTransaction();
     throw err;
   } finally {
     session.endSession();
+  }
+
+  if (shouldRemoveReleaseJob) {
+    try {
+      await removeReleaseInventoryJob(paymentRecord.masterOrder.toString());
+    } catch (jobError) {
+      console.error("Failed to remove release inventory job after capture:", {
+        masterOrderId: paymentRecord.masterOrder,
+        message: jobError.message,
+      });
+    }
+  }
+
+  if (lateCaptureContext) {
+    console.error(
+      "Captured payment received after reservation expiry",
+      lateCaptureContext,
+    );
   }
 };
 
@@ -195,7 +291,17 @@ exports.handlePaymentFailed = async ({ paymentRecord, payload }) => {
     const masterOrder = await MasterOrder.findById(
       paymentRecord.masterOrder,
     ).session(session);
+    if (!masterOrder) {
+      throw createHttpError(404, "Master order not found");
+    }
 
+    if (masterOrder.paymentStatus === "paid") {
+      await session.commitTransaction();
+      return;
+    }
+
+    // A failed Razorpay payment attempt should not release stock immediately.
+    // The order remains pending until the reservation expires or a later attempt succeeds.
     await this.markFailed(
       paymentRecord,
       {
@@ -207,10 +313,6 @@ exports.handlePaymentFailed = async ({ paymentRecord, payload }) => {
       session,
     );
 
-    await InventoryService.releaseInventory(masterOrder._id, session);
-
-    await OrderService.failOrders(masterOrder._id, session);
-
     await session.commitTransaction();
   } catch (err) {
     await session.abortTransaction();
@@ -221,6 +323,10 @@ exports.handlePaymentFailed = async ({ paymentRecord, payload }) => {
 };
 
 exports.markSuccess = async (paymentRecord, payload, session) => {
+  if (SUCCESS_PAYMENT_STATUSES.includes(paymentRecord.status)) {
+    return;
+  }
+
   paymentRecord.status = "captured";
   paymentRecord.razorpayPaymentId = payload.id;
   paymentRecord.method = payload.method;
@@ -234,6 +340,10 @@ const withSession = (session) => (session ? { session } : {});
 exports.markFailed = async (paymentRecord, data = {}, session = null) => {
   // IDEMPOTENCY GUARD
   if (paymentRecord.status === "failed") {
+    return;
+  }
+
+  if (SUCCESS_PAYMENT_STATUSES.includes(paymentRecord.status)) {
     return;
   }
 
@@ -259,10 +369,58 @@ exports.markFailed = async (paymentRecord, data = {}, session = null) => {
 };
 
 exports.markAuthorized = async (payment, data) => {
+  if (SUCCESS_PAYMENT_STATUSES.includes(payment.status)) {
+    return;
+  }
+
+  if (payment.status === "failed") {
+    return;
+  }
+
   payment.status = "authorized";
   payment.razorpayPaymentId = data.razorpay_payment_id;
   payment.razorpaySignature = data.razorpay_signature;
   payment.method = data.method;
 
   await payment.save();
+};
+
+exports.extendReservation = async (
+  masterOrder,
+  delayMs = AUTHORIZED_PAYMENT_GRACE_MS,
+) => {
+  if (!masterOrder || masterOrder.paymentStatus !== "pending") {
+    return;
+  }
+
+  const nextExpiry = getReservationExpiryDate(new Date(), delayMs);
+
+  const updateResult = await MasterOrder.findOneAndUpdate(
+    {
+      _id: masterOrder._id,
+      paymentStatus: "pending",
+      $or: [
+        { reservationExpiresAt: null },
+        { reservationExpiresAt: { $lt: nextExpiry } },
+      ],
+    },
+    {
+      $set: { reservationExpiresAt: nextExpiry },
+    },
+    { new: true },
+  );
+
+  if (!updateResult) {
+    // Update failed: order no longer pending or expiry already >= nextExpiry
+    return;
+  }
+
+  try {
+    await addReleaseInventoryJob(masterOrder._id.toString(), delayMs);
+  } catch (jobError) {
+    console.error("Failed to extend reservation release job:", {
+      masterOrderId: masterOrder._id,
+      message: jobError.message,
+    });
+  }
 };

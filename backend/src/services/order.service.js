@@ -3,6 +3,7 @@ const Address = require("../models/address");
 const MasterOrder = require("../models/masterOrder");
 const Order = require("../models/order");
 const Product = require("../models/product");
+const { getReservationExpiryDate } = require("../config/orderReservation");
 
 exports.createOrder = async ({
   buyerId,
@@ -80,6 +81,8 @@ exports.createOrder = async ({
         buyer: buyerId,
         paymentMethod,
         totalAmount,
+        reservationExpiresAt:
+          paymentMethod === "Razorpay" ? getReservationExpiryDate() : null,
       },
     ],
     { session },
@@ -118,29 +121,47 @@ exports.createOrder = async ({
 };
 
 exports.confirmOrders = async (masterOrderId, session) => {
+  const updatedMasterOrder = await MasterOrder.findOneAndUpdate(
+    { _id: masterOrderId, paymentStatus: "pending" },
+    {
+      paymentStatus: "paid",
+      reservationExpiresAt: null,
+    },
+    { session, new: true },
+  );
+
+  if (!updatedMasterOrder) {
+    return false;
+  }
+
   await Order.updateMany(
     { masterOrder: masterOrderId, orderStatus: "PENDING" },
     { $set: { orderStatus: "CONFIRMED" } },
     { session },
   );
 
-  await MasterOrder.findByIdAndUpdate(
-    masterOrderId,
-    { paymentStatus: "paid" },
-    { session },
-  );
+  return updatedMasterOrder;
 };
 
 exports.failOrders = async (masterOrderId, session) => {
+  const updatedMasterOrder = await MasterOrder.findOneAndUpdate(
+    { _id: masterOrderId, paymentStatus: "pending" },
+    {
+      paymentStatus: "failed",
+      reservationExpiresAt: null,
+    },
+    { session, new: true },
+  );
+
+  if (!updatedMasterOrder) {
+    return false;
+  }
+
   await Order.updateMany(
-    { masterOrder: masterOrderId },
+    { masterOrder: masterOrderId, orderStatus: "PENDING" },
     { $set: { orderStatus: "FAILED" } },
     { session },
   );
 
-  await MasterOrder.findByIdAndUpdate(
-    masterOrderId,
-    { paymentStatus: "failed" },
-    { session },
-  );
+  return updatedMasterOrder;
 };

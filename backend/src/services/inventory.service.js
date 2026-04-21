@@ -27,9 +27,10 @@ exports.reserveInventory = async (cart, session) => {
 };
 
 exports.confirmInventory = async (masterOrderId, session) => {
-  const orders = await Order.find({ masterOrder: masterOrderId }).session(
-    session,
-  );
+  const orders = await Order.find({
+    masterOrder: masterOrderId,
+    orderStatus: "PENDING",
+  }).session(session);
 
   const bulkOps = [];
 
@@ -66,9 +67,10 @@ exports.confirmInventory = async (masterOrderId, session) => {
 };
 
 exports.releaseInventory = async (masterOrderId, session) => {
-  const orders = await Order.find({ masterOrder: masterOrderId }).session(
-    session,
-  );
+  const orders = await Order.find({
+    masterOrder: masterOrderId,
+    orderStatus: "PENDING",
+  }).session(session);
 
   const bulkOps = [];
 
@@ -95,7 +97,7 @@ exports.releaseInventory = async (masterOrderId, session) => {
       result.modifiedCount !== bulkOps.length
     ) {
       throw new Error(
-        `Inventory confirmation failed for masterOrder ${masterOrderId}. ` +
+        `Inventory release failed for masterOrder ${masterOrderId}. ` +
           `Expected ${bulkOps.length}, matched ${result.matchedCount}, modified ${result.modifiedCount}`,
       );
     }

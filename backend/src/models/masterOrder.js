@@ -22,9 +22,15 @@ const masterOrderSchema = new mongoose.Schema(
       enum: ["pending", "paid", "failed", "refunded"],
       default: "pending",
     },
+    reservationExpiresAt: {
+      type: Date,
+      default: null,
+    },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
+
+masterOrderSchema.index({ reservationExpiresAt: 1 });
 
 const MasterOrder = mongoose.model("MasterOrder", masterOrderSchema);
 module.exports = MasterOrder;
