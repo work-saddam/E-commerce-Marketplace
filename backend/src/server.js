@@ -19,6 +19,7 @@ app.use(
       "http://localhost:5173",
       "http://localhost:5174",
       "https://trustkart-lemon.vercel.app",
+      "https://trustkart-seller.vercel.app",
     ],
     credentials: true,
   }),
