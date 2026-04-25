@@ -1,4 +1,5 @@
 const Seller = require("../models/seller");
+const TransactionalMailService = require("../services/transactionalMail.service");
 
 const getAllSellers = async (req, res) => {
   try {
@@ -22,21 +23,48 @@ const updateSellerStatus = async (req, res) => {
       return res.status(400).json({ message: "Invalid status type" });
     }
 
-    const seller = await Seller.findByIdAndUpdate(
-      id,
-      { status },
-      { new: true, select: "-password" }
-    );
+    const seller = await Seller.findById(id);
 
     if (!seller) {
       return res.status(404).json({ message: "Seller not found!" });
+    }
+
+    const sellerData = () => {
+      const data = seller.toObject();
+      delete data.password;
+      return data;
+    };
+
+    if (seller.status === status) {
+      return res.status(200).json({
+        message: `Seller status is already ${status}`,
+        data: sellerData(),
+      });
+    }
+
+    seller.status = status;
+    await seller.save();
+
+    if (["approved", "rejected"].includes(status)) {
+      try {
+        await TransactionalMailService.queueSellerStatusEmail({
+          sellerId: seller._id.toString(),
+          status,
+        });
+      } catch (mailError) {
+        console.error("Failed to enqueue seller status email", {
+          sellerId: seller._id,
+          status,
+          message: mailError.message,
+        });
+      }
     }
 
     res
       .status(200)
       .json({
         message: `Seller status updated to ${status} successfully!`,
-        data: seller,
+        data: sellerData(),
       });
   } catch (error) {
     return res.status(500).json({
