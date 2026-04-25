@@ -90,7 +90,7 @@ const queueSellerStatusEmail = async ({ sellerId, status }) => {
       subject: template.subject,
       html: template.html,
       text: template.text,
-      idempotencyKey: `seller-status-${seller._id}-${status}`,
+      idempotencyKey: `seller-status-${seller._id}-${status}-${new Date(seller.updatedAt).getTime()}`,
       tags: [
         { name: "template", value: `seller-${status}` },
         { name: "seller_id", value: seller._id.toString() },
@@ -277,7 +277,7 @@ const queueBuyerOrderStatusUpdatedEmail = async ({ orderId, status }) => {
       subject: template.subject,
       html: template.html,
       text: template.text,
-      idempotencyKey: `buyer-order-status-updated-${order._id}-${effectiveStatus}`,
+      idempotencyKey: `buyer-order-status-updated-${order._id}-${effectiveStatus}-${new Date(order.updatedAt).getTime()}`,
       tags: [
         { name: "template", value: "buyer-order-status-updated" },
         { name: "order_id", value: order._id.toString() },

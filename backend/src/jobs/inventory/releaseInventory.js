@@ -62,7 +62,10 @@ exports.addReleaseInventoryJob = async (masterOrderId, delayMs) => {
         age: 3600, // keep for 1 hour
         count: 50, // max 50 jobs
       },
-      removeOnFail: false,
+      removeOnFail: {
+        age: 7 * 24 * 3600, // keep failed jobs for 7 days for debugging
+        count: 1000,
+      },
     },
   );
 };

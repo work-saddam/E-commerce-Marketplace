@@ -23,7 +23,7 @@ const updateSellerStatus = async (req, res) => {
       return res.status(400).json({ message: "Invalid status type" });
     }
 
-    const seller = await Seller.findById(id);
+    const seller = await Seller.findById(id).select("-password");
 
     if (!seller) {
       return res.status(404).json({ message: "Seller not found!" });
@@ -60,12 +60,10 @@ const updateSellerStatus = async (req, res) => {
       }
     }
 
-    res
-      .status(200)
-      .json({
-        message: `Seller status updated to ${status} successfully!`,
-        data: sellerData(),
-      });
+    res.status(200).json({
+      message: `Seller status updated to ${status} successfully!`,
+      data: sellerData(),
+    });
   } catch (error) {
     return res.status(500).json({
       message: "Seller Status Updation failed!!",
