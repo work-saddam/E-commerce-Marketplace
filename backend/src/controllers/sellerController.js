@@ -4,6 +4,7 @@ const { validateSellerRegisterData } = require("../utils/validation");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
+const TransactionalMailService = require("../services/transactionalMail.service");
 
 exports.sellerRegister = async (req, res) => {
   try {
@@ -233,13 +234,33 @@ exports.updateOrderStatus = async (req, res) => {
       return res.status(400).json({ message: "Invalid status type" });
     }
 
-    const order = await Order.findOneAndUpdate(
-      { _id: id, seller: req.user.id },
-      { orderStatus: status },
-      { new: true },
-    );
+    const order = await Order.findOne({ _id: id, seller: req.user.id });
+
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
+    }
+
+    if (order.orderStatus === status) {
+      return res.status(200).json({
+        message: `Order status is already ${status}`,
+        data: order,
+      });
+    }
+
+    order.orderStatus = status;
+    await order.save();
+
+    try {
+      await TransactionalMailService.queueBuyerOrderStatusUpdatedEmail({
+        orderId: order._id.toString(),
+        status,
+      });
+    } catch (mailError) {
+      console.error("Failed to enqueue buyer order status email", {
+        orderId: order._id,
+        status,
+        message: mailError.message,
+      });
     }
 
     res.status(200).json({
