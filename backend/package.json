@@ -14,7 +14,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node src/server.js",
-    "dev": "nodemon src/server.js"
+    "dev": "nodemon src/server.js",
+    "worker": "node src/worker.js",
+    "dev:worker": "nodemon src/worker.js"
   },
   "dependencies": {
     "@bull-board/api": "^7.0.0",
@@ -32,6 +34,7 @@
     "mongoose": "^8.18.0",
     "multer": "^2.0.2",
     "razorpay": "^2.9.6",
+    "resend": "^6.12.2",
     "slugify": "^1.6.6",
     "validator": "^13.15.15"
   }

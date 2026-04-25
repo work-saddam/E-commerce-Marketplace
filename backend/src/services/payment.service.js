@@ -17,6 +17,7 @@ const {
 } = require("../jobs/inventory/releaseInventory");
 const InventoryService = require("./inventory.service");
 const OrderService = require("./order.service");
+const TransactionalMailService = require("./transactionalMail.service");
 
 const SUCCESS_PAYMENT_STATUSES = ["captured", "paid", "success"];
 const ACTIVE_PAYMENT_STATUSES = ["created", "attempted", "authorized"];
@@ -213,6 +214,7 @@ exports.verifyPaymentWebhook = async (req, res) => {
 exports.handlePaymentCaptured = async ({ paymentRecord, payload }) => {
   const session = await mongoose.startSession();
   let shouldRemoveReleaseJob = false;
+  let shouldQueueOrderConfirmationEmail = false;
   let lateCaptureContext = null;
 
   try {
@@ -255,6 +257,7 @@ exports.handlePaymentCaptured = async ({ paymentRecord, payload }) => {
 
       await session.commitTransaction();
       shouldRemoveReleaseJob = true;
+      shouldQueueOrderConfirmationEmail = true;
     }
   } catch (err) {
     await session.abortTransaction();
@@ -274,6 +277,23 @@ exports.handlePaymentCaptured = async ({ paymentRecord, payload }) => {
     }
   }
 
+  if (shouldQueueOrderConfirmationEmail) {
+    try {
+      await TransactionalMailService.queueBuyerOrderConfirmedEmail({
+        masterOrderId: paymentRecord.masterOrder.toString(),
+      });
+    } catch (mailError) {
+      console.error(
+        "Failed to enqueue Razorpay order confirmation email after capture:",
+        {
+          masterOrderId: paymentRecord.masterOrder,
+          paymentId: paymentRecord._id,
+          message: mailError.message,
+        },
+      );
+    }
+  }
+
   if (lateCaptureContext) {
     console.error(
       "Captured payment received after reservation expiry",
@@ -284,6 +304,8 @@ exports.handlePaymentCaptured = async ({ paymentRecord, payload }) => {
 
 exports.handlePaymentFailed = async ({ paymentRecord, payload }) => {
   const session = await mongoose.startSession();
+  let shouldQueuePaymentFailedEmail = false;
+  let failureReason = payload?.error_description || "payment_failed";
 
   try {
     session.startTransaction();
@@ -308,17 +330,34 @@ exports.handlePaymentFailed = async ({ paymentRecord, payload }) => {
         razorpayPaymentId: payload?.id,
         method: payload?.method,
         webhookPayload: payload,
-        reason: payload.error_description || "payment_failed",
+        reason: failureReason,
       },
       session,
     );
 
     await session.commitTransaction();
+    shouldQueuePaymentFailedEmail = true;
   } catch (err) {
     await session.abortTransaction();
     throw err;
   } finally {
     session.endSession();
+  }
+
+  if (shouldQueuePaymentFailedEmail) {
+    try {
+      await TransactionalMailService.queueBuyerPaymentFailedEmail({
+        masterOrderId: paymentRecord.masterOrder.toString(),
+        paymentId: paymentRecord._id.toString(),
+        failureReason,
+      });
+    } catch (mailError) {
+      console.error("Failed to enqueue payment failed email after webhook:", {
+        masterOrderId: paymentRecord.masterOrder,
+        paymentId: paymentRecord._id,
+        message: mailError.message,
+      });
+    }
   }
 };
 

@@ -58,8 +58,14 @@ exports.addReleaseInventoryJob = async (masterOrderId, delayMs) => {
         type: "exponential",
         delay: 5000,
       },
-      removeOnComplete: true,
-      removeOnFail: false,
+      removeOnComplete: {
+        age: 3600, // keep for 1 hour
+        count: 50, // max 50 jobs
+      },
+      removeOnFail: {
+        age: 7 * 24 * 3600, // keep failed jobs for 7 days for debugging
+        count: 1000,
+      },
     },
   );
 };
@@ -75,10 +81,13 @@ exports.removeReleaseInventoryJob = async (masterOrderId) => {
   const state = await existingJob.getState();
 
   if (state === "active") {
-    console.warn("Release inventory job is already active and cannot be removed", {
-      masterOrderId,
-      jobId,
-    });
+    console.warn(
+      "Release inventory job is already active and cannot be removed",
+      {
+        masterOrderId,
+        jobId,
+      },
+    );
     return false;
   }
 

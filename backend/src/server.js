@@ -11,7 +11,6 @@ const adminRoutes = require("./routers/adminRouter");
 const bullBoardRouter = require("./routers/bullBoardRouter");
 const productRoutes = require("./routers/productRouter");
 const paymentRoutes = require("./routers/paymentRouter");
-const { startInventoryWorker } = require("./workers/inventory.worker");
 
 app.use(
   cors({
@@ -45,7 +44,6 @@ app.use("/api/payment", paymentRoutes);
 
 const startServer = async () => {
   await connectDB();
-  startInventoryWorker();
 
   app.listen(process.env.PORT, () => {
     console.log(`Server is listening on port ${process.env.PORT}`);

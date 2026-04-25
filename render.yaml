@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: e-commerce-trustkart-backend
+    runtime: node
+    rootDir: backend
+    buildCommand: npm ci
+    startCommand: npm start
+    autoDeployTrigger: commit
+    envVars:
+      - fromGroup: trustkart-backend-shared
+
+  - type: worker
+    name: e-commerce-trustkart-worker
+    runtime: node
+    rootDir: backend
+    buildCommand: npm ci
+    startCommand: npm run worker
+    autoDeployTrigger: commit
+    envVars:
+      - fromGroup: trustkart-backend-shared

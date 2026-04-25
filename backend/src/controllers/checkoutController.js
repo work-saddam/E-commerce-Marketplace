@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 
 const InventoryService = require("../services/inventory.service");
 const OrderService = require("../services/order.service");
+const TransactionalMailService = require("../services/transactionalMail.service");
 const {
   addReleaseInventoryJob,
 } = require("../jobs/inventory/releaseInventory");
@@ -88,6 +89,17 @@ exports.checkout = async (req, res) => {
         throw createHttpError(409, "Order confirmation failed: status changed");
       }
       await session.commitTransaction();
+
+      try {
+        await TransactionalMailService.queueBuyerOrderConfirmedEmail({
+          masterOrderId: masterOrder._id.toString(),
+        });
+      } catch (mailError) {
+        console.error("Failed to enqueue COD order confirmation email:", {
+          masterOrderId: masterOrder._id,
+          message: mailError.message,
+        });
+      }
 
       return res.json({ success: true, masterOrderId: masterOrder._id });
     }
