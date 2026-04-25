@@ -15,10 +15,21 @@ const getResendClient = () => {
   return resendClient;
 };
 
+const normalizeIdempotencyKey = (idempotencyKey) => {
+  if (!idempotencyKey) {
+    return undefined;
+  }
+
+  return String(idempotencyKey)
+    .replace(/[^A-Za-z0-9_-]/g, "-")
+    .slice(0, 255);
+};
+
 const sendMail = async (payload) => {
   const client = getResendClient();
   const { mailFrom, mailReplyTo } = getMailWorkerConfig();
   const replyTo = payload.replyTo || mailReplyTo;
+  const resendIdempotencyKey = normalizeIdempotencyKey(payload.idempotencyKey);
 
   const { data, error } = await client.emails.send(
     {
@@ -31,7 +42,7 @@ const sendMail = async (payload) => {
       tags: payload.tags,
     },
     {
-      idempotencyKey: payload.idempotencyKey,
+      idempotencyKey: resendIdempotencyKey,
     },
   );
 

@@ -17,6 +17,7 @@ const {
 } = require("../jobs/inventory/releaseInventory");
 const InventoryService = require("./inventory.service");
 const OrderService = require("./order.service");
+const TransactionalMailService = require("./transactionalMail.service");
 
 const SUCCESS_PAYMENT_STATUSES = ["captured", "paid", "success"];
 const ACTIVE_PAYMENT_STATUSES = ["created", "attempted", "authorized"];
@@ -213,6 +214,7 @@ exports.verifyPaymentWebhook = async (req, res) => {
 exports.handlePaymentCaptured = async ({ paymentRecord, payload }) => {
   const session = await mongoose.startSession();
   let shouldRemoveReleaseJob = false;
+  let shouldQueueOrderConfirmationEmail = false;
   let lateCaptureContext = null;
 
   try {
@@ -255,6 +257,7 @@ exports.handlePaymentCaptured = async ({ paymentRecord, payload }) => {
 
       await session.commitTransaction();
       shouldRemoveReleaseJob = true;
+      shouldQueueOrderConfirmationEmail = true;
     }
   } catch (err) {
     await session.abortTransaction();
@@ -271,6 +274,23 @@ exports.handlePaymentCaptured = async ({ paymentRecord, payload }) => {
         masterOrderId: paymentRecord.masterOrder,
         message: jobError.message,
       });
+    }
+  }
+
+  if (shouldQueueOrderConfirmationEmail) {
+    try {
+      await TransactionalMailService.queueBuyerOrderConfirmedEmail({
+        masterOrderId: paymentRecord.masterOrder.toString(),
+      });
+    } catch (mailError) {
+      console.error(
+        "Failed to enqueue Razorpay order confirmation email after capture:",
+        {
+          masterOrderId: paymentRecord.masterOrder,
+          paymentId: paymentRecord._id,
+          message: mailError.message,
+        },
+      );
     }
   }
 
