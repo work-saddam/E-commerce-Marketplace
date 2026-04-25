@@ -24,10 +24,20 @@ const assertPayload = (payload) => {
   }
 };
 
+const normalizeJobId = (idempotencyKey) => {
+  if (!idempotencyKey) {
+    return undefined;
+  }
+
+  return String(idempotencyKey)
+    .replace(/[^A-Za-z0-9_-]/g, "-")
+    .slice(0, 255);
+};
+
 const enqueueMailJob = async (payload) => {
   assertPayload(payload);
 
-  const jobId = payload.idempotencyKey;
+  const jobId = normalizeJobId(payload.idempotencyKey);
   const existingJob = await mailQueue.getJob(jobId);
 
   if (existingJob) {
