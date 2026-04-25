@@ -304,6 +304,8 @@ exports.handlePaymentCaptured = async ({ paymentRecord, payload }) => {
 
 exports.handlePaymentFailed = async ({ paymentRecord, payload }) => {
   const session = await mongoose.startSession();
+  let shouldQueuePaymentFailedEmail = false;
+  let failureReason = payload?.error_description || "payment_failed";
 
   try {
     session.startTransaction();
@@ -328,17 +330,34 @@ exports.handlePaymentFailed = async ({ paymentRecord, payload }) => {
         razorpayPaymentId: payload?.id,
         method: payload?.method,
         webhookPayload: payload,
-        reason: payload.error_description || "payment_failed",
+        reason: failureReason,
       },
       session,
     );
 
     await session.commitTransaction();
+    shouldQueuePaymentFailedEmail = true;
   } catch (err) {
     await session.abortTransaction();
     throw err;
   } finally {
     session.endSession();
+  }
+
+  if (shouldQueuePaymentFailedEmail) {
+    try {
+      await TransactionalMailService.queueBuyerPaymentFailedEmail({
+        masterOrderId: paymentRecord.masterOrder.toString(),
+        paymentId: paymentRecord._id.toString(),
+        failureReason,
+      });
+    } catch (mailError) {
+      console.error("Failed to enqueue payment failed email after webhook:", {
+        masterOrderId: paymentRecord.masterOrder,
+        paymentId: paymentRecord._id,
+        message: mailError.message,
+      });
+    }
   }
 };
 

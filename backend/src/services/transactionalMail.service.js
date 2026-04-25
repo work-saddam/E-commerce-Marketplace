@@ -5,6 +5,7 @@ const { buildAppUrl, getMailTemplateConfig } = require("../config/mail");
 const { enqueueMailJob } = require("../jobs/mail/sendMail");
 const {
   buildBuyerOrderConfirmedTemplate,
+  buildBuyerPaymentFailedTemplate,
   buildBuyerOrderStatusUpdatedTemplate,
   buildSellerApprovedTemplate,
   buildSellerRejectedTemplate,
@@ -170,6 +171,67 @@ const queueBuyerOrderConfirmedEmail = async ({ masterOrderId }) => {
   );
 };
 
+const queueBuyerPaymentFailedEmail = async ({
+  masterOrderId,
+  paymentId,
+  failureReason,
+}) => {
+  const masterOrder = await MasterOrder.findById(masterOrderId)
+    .select(
+      "_id buyer totalAmount paymentMethod reservationExpiresAt createdAt",
+    )
+    .populate({
+      path: "buyer",
+      select: "name email",
+    })
+    .lean();
+
+  if (!masterOrder) {
+    throw new Error(
+      "Master order not found while preparing payment failed email",
+    );
+  }
+
+  if (!masterOrder.buyer?.email) {
+    throw new Error("Buyer email is missing");
+  }
+
+  const { clientAppUrl, mailReplyTo } = getMailTemplateConfig();
+  const orderUrl = buildAppUrl(clientAppUrl, "/account/orders");
+  const template = buildBuyerPaymentFailedTemplate({
+    buyerName: masterOrder.buyer.name || "Customer",
+    masterOrderId: masterOrder._id.toString(),
+    totalAmount: masterOrder.totalAmount,
+    paymentMethod: masterOrder.paymentMethod,
+    failureReason,
+    retryUntil: masterOrder.reservationExpiresAt,
+    orderUrl,
+  });
+
+  return enqueueMailJob(
+    createMailPayload({
+      templateKey: "buyer-payment-failed",
+      to: masterOrder.buyer.email,
+      subject: template.subject,
+      html: template.html,
+      text: template.text,
+      idempotencyKey: `buyer-payment-failed-${paymentId}`,
+      tags: [
+        { name: "template", value: "buyer-payment-failed" },
+        { name: "master_order_id", value: masterOrder._id.toString() },
+        { name: "payment_id", value: String(paymentId) },
+      ],
+      meta: {
+        masterOrderId: masterOrder._id.toString(),
+        buyerId: masterOrder.buyer._id.toString(),
+        paymentId: String(paymentId),
+        failureReason,
+      },
+      replyTo: mailReplyTo,
+    }),
+  );
+};
+
 const queueBuyerOrderStatusUpdatedEmail = async ({ orderId, status }) => {
   const order = await Order.findById(orderId)
     .select("_id buyer seller products orderStatus updatedAt")
@@ -233,6 +295,7 @@ const queueBuyerOrderStatusUpdatedEmail = async ({ orderId, status }) => {
 
 module.exports = {
   queueBuyerOrderConfirmedEmail,
+  queueBuyerPaymentFailedEmail,
   queueBuyerOrderStatusUpdatedEmail,
   queueSellerStatusEmail,
 };

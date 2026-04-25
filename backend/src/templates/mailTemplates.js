@@ -249,6 +249,57 @@ const buildBuyerOrderConfirmedTemplate = ({
   };
 };
 
+const buildBuyerPaymentFailedTemplate = ({
+  buyerName,
+  masterOrderId,
+  totalAmount,
+  paymentMethod,
+  failureReason,
+  retryUntil,
+  orderUrl,
+}) => {
+  const subject = `Payment failed for order #${getShortId(masterOrderId)}`;
+  const intro = `Hi ${buyerName}, your payment attempt was not completed.`;
+  const retryText = retryUntil
+    ? `You can retry this payment before ${formatDate(retryUntil)}.`
+    : "You can open your orders and try the payment again if the reservation is still active.";
+  const safeReason = failureReason || "payment_failed";
+  const detailsHtml = `
+    <p style="margin: 0 0 12px;"><strong>Order:</strong> #${escapeHtml(getShortId(masterOrderId))}</p>
+    <p style="margin: 0 0 12px;"><strong>Payment method:</strong> ${escapeHtml(paymentMethod)}</p>
+    <p style="margin: 0 0 12px;"><strong>Order amount:</strong> ${escapeHtml(formatCurrency(totalAmount))}</p>
+    <p style="margin: 0 0 12px;"><strong>Reason:</strong> ${escapeHtml(safeReason)}</p>
+    <p style="margin: 0;">${escapeHtml(retryText)}</p>
+  `;
+  const detailsText = [
+    `Order: #${getShortId(masterOrderId)}`,
+    `Payment method: ${paymentMethod}`,
+    `Order amount: ${formatCurrency(totalAmount)}`,
+    `Reason: ${safeReason}`,
+    retryText,
+  ].join("\n");
+
+  return {
+    subject,
+    html: renderEmailShell({
+      title: "Payment attempt failed",
+      intro,
+      detailsHtml,
+      actionLabel: "View your orders",
+      actionUrl: orderUrl,
+      footerText: "If you still want the order, please retry payment before the reservation expires.",
+    }),
+    text: renderTextShell({
+      title: "Payment attempt failed",
+      intro,
+      detailsText,
+      actionLabel: "View your orders",
+      actionUrl: orderUrl,
+      footerText: "If you still want the order, please retry payment before the reservation expires.",
+    }),
+  };
+};
+
 const ORDER_STATUS_COPY = {
   PROCESSING: {
     title: "Your order is being prepared",
@@ -326,6 +377,7 @@ const buildBuyerOrderStatusUpdatedTemplate = ({
 
 module.exports = {
   buildBuyerOrderConfirmedTemplate,
+  buildBuyerPaymentFailedTemplate,
   buildBuyerOrderStatusUpdatedTemplate,
   buildSellerApprovedTemplate,
   buildSellerRejectedTemplate,
