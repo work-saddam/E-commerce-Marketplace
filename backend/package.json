@@ -14,9 +14,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node src/server.js",
-    "dev": "nodemon src/server.js",
-    "worker": "node src/worker.js",
-    "dev:worker": "nodemon src/worker.js"
+    "dev": "nodemon src/server.js"
   },
   "dependencies": {
     "@bull-board/api": "^7.0.0",
