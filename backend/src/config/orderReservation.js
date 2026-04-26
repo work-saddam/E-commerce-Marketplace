@@ -1,3 +1,5 @@
+const { DateTime } = require("luxon");
+
 const parseDelayMin = (value, fallback) => {
   const minutes = Number(value);
   return Number.isFinite(minutes) && minutes > 0 ? minutes : fallback;
@@ -22,9 +24,17 @@ const isReservationExpired = (reservationExpiresAt, now = new Date()) => {
   return new Date(reservationExpiresAt).getTime() <= now.getTime();
 };
 
+const formatToIST = (date) => {
+  if (!date) return "N/A";
+  return DateTime.fromJSDate(new Date(date))
+    .setZone("Asia/Kolkata")
+    .toFormat("dd MMM yyyy, hh:mm a 'IST'");
+};
+
 module.exports = {
   AUTHORIZED_PAYMENT_GRACE_MS,
   ORDER_RESERVATION_DELAY_MS,
   getReservationExpiryDate,
   isReservationExpired,
+  formatToIST,
 };

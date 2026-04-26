@@ -2,6 +2,7 @@ const MasterOrder = require("../models/masterOrder");
 const Order = require("../models/order");
 const Seller = require("../models/seller");
 const { buildAppUrl, getMailTemplateConfig } = require("../config/mail");
+const { formatToIST } = require("../config/orderReservation");
 const { enqueueMailJob } = require("../jobs/mail/sendMail");
 const {
   buildBuyerOrderConfirmedTemplate,
@@ -204,7 +205,7 @@ const queueBuyerPaymentFailedEmail = async ({
     totalAmount: masterOrder.totalAmount,
     paymentMethod: masterOrder.paymentMethod,
     failureReason,
-    retryUntil: masterOrder.reservationExpiresAt,
+    retryUntil: formatToIST(masterOrder.reservationExpiresAt),
     orderUrl,
   });
 
