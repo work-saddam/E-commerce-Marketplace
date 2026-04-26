@@ -26,11 +26,14 @@ const formatDate = (value) =>
     timeStyle: "short",
   }).format(new Date(value));
 
-const getShortId = (value) => String(value ?? "").slice(-8).toUpperCase();
+const getShortId = (value) =>
+  String(value ?? "")
+    .slice(-8)
+    .toUpperCase();
 
 const renderItemsHtml = (items) => {
   if (!items.length) {
-    return "<p style=\"margin: 0; color: #4b5563;\">No items available.</p>";
+    return '<p style="margin: 0; color: #4b5563;">No items available.</p>';
   }
 
   return `
@@ -128,7 +131,8 @@ const renderTextShell = ({
     detailsText,
     "",
     actionLabel && actionUrl ? `${actionLabel}: ${actionUrl}` : "",
-    footerText || `You are receiving this message because you have an account with ${BRAND_NAME}.`,
+    footerText ||
+      `You are receiving this message because you have an account with ${BRAND_NAME}.`,
   ]
     .filter(Boolean)
     .join("\n");
@@ -153,7 +157,8 @@ const buildSellerApprovedTemplate = ({ sellerName, shopName, loginUrl }) => {
       detailsHtml,
       actionLabel: "Open seller dashboard",
       actionUrl: loginUrl,
-      footerText: "If you were waiting for approval, you can now continue in the seller app.",
+      footerText:
+        "If you were waiting for approval, you can now continue in the seller app.",
     }),
     text: renderTextShell({
       title: "Seller account approved",
@@ -161,7 +166,8 @@ const buildSellerApprovedTemplate = ({ sellerName, shopName, loginUrl }) => {
       detailsText,
       actionLabel: "Open seller dashboard",
       actionUrl: loginUrl,
-      footerText: "If you were waiting for approval, you can now continue in the seller app.",
+      footerText:
+        "If you were waiting for approval, you can now continue in the seller app.",
     }),
   };
 };
@@ -186,7 +192,8 @@ const buildSellerRejectedTemplate = ({ sellerName, shopName, loginUrl }) => {
       detailsHtml,
       actionLabel: "Open seller app",
       actionUrl: loginUrl,
-      footerText: "You can use the seller app link above if you need to review your account details.",
+      footerText:
+        "You can use the seller app link above if you need to review your account details.",
     }),
     text: renderTextShell({
       title: "Seller application update",
@@ -194,7 +201,8 @@ const buildSellerRejectedTemplate = ({ sellerName, shopName, loginUrl }) => {
       detailsText,
       actionLabel: "Open seller app",
       actionUrl: loginUrl,
-      footerText: "You can use the seller app link above if you need to review your account details.",
+      footerText:
+        "You can use the seller app link above if you need to review your account details.",
     }),
   };
 };
@@ -236,7 +244,8 @@ const buildBuyerOrderConfirmedTemplate = ({
       detailsHtml,
       actionLabel: "View your orders",
       actionUrl: orderUrl,
-      footerText: "We will keep you posted as your items move through fulfillment.",
+      footerText:
+        "We will keep you posted as your items move through fulfillment.",
     }),
     text: renderTextShell({
       title: "Your order is confirmed",
@@ -244,7 +253,8 @@ const buildBuyerOrderConfirmedTemplate = ({
       detailsText,
       actionLabel: "View your orders",
       actionUrl: orderUrl,
-      footerText: "We will keep you posted as your items move through fulfillment.",
+      footerText:
+        "We will keep you posted as your items move through fulfillment.",
     }),
   };
 };
@@ -260,9 +270,10 @@ const buildBuyerPaymentFailedTemplate = ({
 }) => {
   const subject = `Payment failed for order #${getShortId(masterOrderId)}`;
   const intro = `Hi ${buyerName}, your payment attempt was not completed.`;
-  const retryText = retryUntil
-    ? `You can retry this payment before ${formatDate(retryUntil)}.`
-    : "You can open your orders and try the payment again if the reservation is still active.";
+  const retryText =
+    retryUntil && retryUntil !== "N/A"
+      ? `You can retry this payment before ${retryUntil}.`
+      : "You can open your orders and try the payment again if the time not expired.";
   const safeReason = failureReason || "payment_failed";
   const detailsHtml = `
     <p style="margin: 0 0 12px;"><strong>Order:</strong> #${escapeHtml(getShortId(masterOrderId))}</p>
@@ -287,7 +298,8 @@ const buildBuyerPaymentFailedTemplate = ({
       detailsHtml,
       actionLabel: "View your orders",
       actionUrl: orderUrl,
-      footerText: "If you still want the order, please retry payment before the reservation expires.",
+      footerText:
+        "If you still want the order, please retry payment before the reservation expires.",
     }),
     text: renderTextShell({
       title: "Payment attempt failed",
@@ -295,7 +307,8 @@ const buildBuyerPaymentFailedTemplate = ({
       detailsText,
       actionLabel: "View your orders",
       actionUrl: orderUrl,
-      footerText: "If you still want the order, please retry payment before the reservation expires.",
+      footerText:
+        "If you still want the order, please retry payment before the reservation expires.",
     }),
   };
 };
@@ -362,7 +375,8 @@ const buildBuyerOrderStatusUpdatedTemplate = ({
       detailsHtml,
       actionLabel: "View your orders",
       actionUrl: orderUrl,
-      footerText: "You can open your order history anytime to see the latest status.",
+      footerText:
+        "You can open your order history anytime to see the latest status.",
     }),
     text: renderTextShell({
       title: statusCopy.title,
@@ -370,7 +384,8 @@ const buildBuyerOrderStatusUpdatedTemplate = ({
       detailsText,
       actionLabel: "View your orders",
       actionUrl: orderUrl,
-      footerText: "You can open your order history anytime to see the latest status.",
+      footerText:
+        "You can open your order history anytime to see the latest status.",
     }),
   };
 };
