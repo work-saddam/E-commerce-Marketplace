@@ -43,7 +43,7 @@ export default function SellerOrders() {
         { withCredentials: true },
       );
       setOrders(res?.data?.data || []);
-      setTotalPages(res?.data?.pagination.totalPages || 1);
+      setTotalPages(res?.data?.pagination?.totalPages || 1);
     } catch (err) {
       console.error(err);
     } finally {
@@ -130,53 +130,69 @@ export default function SellerOrders() {
                   {/* Left */}
                   <div className="space-y-2 w-full md:w-2/3">
                     <h2 className="text-lg font-semibold">
-                      Order #{order._id}
+                      Order #{order?._id}
                     </h2>
                     <p className="text-sm text-muted-foreground">
-                      Placed on: {new Date(order.createdAt).toDateString()} •
-                      Buyer: {order.buyer[0].name}
+                      Placed on:{" "}
+                      {order?.createdAt
+                        ? new Date(order.createdAt).toDateString()
+                        : "Unknown date"}{" "}
+                      • Buyer: {order?.buyer?.[0]?.name ?? "Unknown buyer"}
                     </p>
 
                     <div className="space-y-3 mt-3">
-                      {order.products.map((product) => (
-                        <div
-                          key={product?._id}
-                          className="flex items-center gap-3"
-                        >
-                          <img
-                            src={product.image?.url}
-                            alt="product"
-                            className="w-16 h-16 rounded-md object-cover"
-                          />
-                          <div>
-                            <p className="text-base line-clamp-1">
-                              {product?.title}
-                            </p>
-                            <p className="text-sm text-muted-foreground">
-                              Qty: {product?.quantity}
-                            </p>
+                      {Array.isArray(order?.products) &&
+                      order.products.length > 0 ? (
+                        order.products.map((product) => (
+                          <div
+                            key={product?._id}
+                            className="flex items-center gap-3"
+                          >
+                            <img
+                              src={product?.image?.url}
+                              alt="product"
+                              className="w-16 h-16 rounded-md object-cover"
+                            />
+                            <div>
+                              <p className="text-base line-clamp-1">
+                                {product?.title ?? "Unknown product"}
+                              </p>
+                              <p className="text-sm text-muted-foreground">
+                                Qty: {product?.quantity ?? 0}
+                              </p>
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        ))
+                      ) : (
+                        <p className="text-sm text-muted-foreground">
+                          No products available
+                        </p>
+                      )}
                     </div>
                   </div>
 
                   {/* Right */}
                   <div className="md:w-1/3 space-y-3 text-right">
-                    <p className="text-lg font-semibold">₹ {order.subTotal}</p>
+                    <p className="text-lg font-semibold">
+                      ₹ {order?.subTotal ?? 0}
+                    </p>
                     <Badge
-                      className={`${statusColors[order.orderStatus]} text-sm`}
+                      className={`${statusColors[order?.orderStatus] ?? "bg-gray-500 text-white"} text-sm`}
                     >
-                      {order.orderStatus.toUpperCase()}
+                      {order?.orderStatus
+                        ? order.orderStatus.toUpperCase()
+                        : "N/A"}
                     </Badge>
 
                     <div className="flex flex-col items-end gap-2">
                       <Select
-                        defaultValue={order.orderStatus}
-                        onValueChange={(v) => updateOrderStatus(order._id, v)}
+                        defaultValue={order?.orderStatus}
+                        onValueChange={(v) => updateOrderStatus(order?._id, v)}
                       >
                         <SelectTrigger className="w-[140px]">
-                          <SelectValue placeholder={order.orderStatus} />
+                          <SelectValue
+                            placeholder={order?.orderStatus ?? "Status"}
+                          />
                         </SelectTrigger>
 
                         <SelectContent>
@@ -187,7 +203,7 @@ export default function SellerOrders() {
                         </SelectContent>
                       </Select>
 
-                      <Link to={`/order/${order._id}`}>
+                      <Link to={`/order/${order?._id}`}>
                         <Button variant="outline">View</Button>
                       </Link>
                     </div>
