@@ -35,13 +35,13 @@ export function Signup() {
       const res = await axios.post(
         `${BASE_URL}/api/seller/register`,
         { sellerName, shopName, email, password, phone, gstNumber, panNumber },
-        { withCredentials: true }
+        { withCredentials: true },
       );
-      console.log(res?.data?.data);
+      // console.log(res?.data?.data);
     } catch (error) {
       setError(
         error?.response?.data?.message ||
-          "Something went wrong. Please try again."
+          "Something went wrong. Please try again.",
       );
     } finally {
       setLoading(false);

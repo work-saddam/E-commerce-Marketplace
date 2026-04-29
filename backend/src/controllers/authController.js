@@ -1,7 +1,10 @@
 const User = require("../models/user");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { validateUserRegisterData } = require("../utils/validation");
+const {
+  validateUserRegisterData,
+  validateLoginData,
+} = require("../utils/validation");
 
 const register = async (req, res) => {
   try {
@@ -32,6 +35,13 @@ const register = async (req, res) => {
       .status(201)
       .json({ message: "Registration Successful!", data: savedUser });
   } catch (error) {
+    if (error.code === 11000) {
+      const duplicateField = Object.keys(error.keyPattern || {})[0];
+      const fieldMessage =
+        duplicateField === "phone" ? "Phone number already registered!" : "Email already registered!";
+      return res.status(409).json({ message: fieldMessage });
+    }
+
     res
       .status(500)
       .json({ message: "Registration Failed!", error: error.message });
@@ -40,10 +50,12 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
   try {
-    const { identifier, password } = req.body;
-    if (!identifier || !password) {
-      return res.status(400).json({ message: "All fields are required!" });
+    const error = validateLoginData(req);
+    if (error) {
+      return res.status(error.status).json({ message: error.message });
     }
+
+    const { identifier, password } = req.body;
 
     const user = await User.findOne({
       $or: [{ email: identifier }, { phone: identifier }],

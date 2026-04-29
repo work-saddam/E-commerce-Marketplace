@@ -1,6 +1,9 @@
 const Order = require("../models/order");
 const Seller = require("../models/seller");
-const { validateSellerRegisterData } = require("../utils/validation");
+const {
+  validateSellerRegisterData,
+  validateSellerLoginData,
+} = require("../utils/validation");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
@@ -50,6 +53,13 @@ exports.sellerRegister = async (req, res) => {
       .status(201)
       .json({ message: "Register Successfully!", data: savedSeller });
   } catch (error) {
+    if (error.code === 11000) {
+      const duplicateField = Object.keys(error.keyPattern || {})[0];
+      const fieldMessage =
+        duplicateField === "phone" ? "Phone Number is already Registered!" : "Email is already Registered!";
+      return res.status(409).json({ message: fieldMessage });
+    }
+
     res
       .status(500)
       .json({ message: "Registration Failed!", error: error.message });
@@ -58,11 +68,12 @@ exports.sellerRegister = async (req, res) => {
 
 exports.sellerLogin = async (req, res) => {
   try {
-    const { identifier, password } = req.body;
-
-    if (!identifier || !password) {
-      return res.status(400).json({ message: "All fields are required!" });
+    const error = validateSellerLoginData(req);
+    if (error) {
+      return res.status(error.status).json({ message: error.message });
     }
+
+    const { identifier, password } = req.body;
 
     const seller = await Seller.findOne({
       $or: [{ email: identifier }, { phone: identifier }],
