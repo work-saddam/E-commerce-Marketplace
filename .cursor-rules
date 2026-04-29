@@ -1,0 +1,414 @@
+# Cursor AI Rules - E-Commerce Marketplace
+
+You are assisting with an enterprise e-commerce marketplace project. Always follow these rules.
+
+## 📋 NEW: Specialized Agent System (ai/ folder)
+
+### BEFORE answering, identify the domain and load the appropriate agent:
+
+| Task Type | Agent File | Key Topics |
+|-----------|-----------|-----------|
+| **Backend/API** | `ai/agents/backend.agent.md` | Routes, services, middleware, controllers |
+| **Frontend/React** | `ai/agents/frontend.agent.md` | Components, Redux, forms, styling |
+| **Database** | `ai/agents/db.agent.md` | Schemas, queries, indexes, transactions |
+| **Security** | `ai/agents/security.agent.md` | Auth, validation, payments, webhooks |
+
+### Then reference supporting files:
+- **Context**: `ai/context/domain.md` (business logic), `ai/context/stack.md` (tech), `ai/context/conventions.md` (style)
+- **Prompts**: `ai/prompts/` (templates for code generation)
+
+### Original Documentation (Now Consolidated in ai/):
+1. **ai/guides/00-QUICK_START.md** - For quick reference
+2. **ai/guides/01-ARCHITECTURE.md** - Project architecture
+3. **ai/guides/02-DEBUGGING.md** - 15 known issues
+4. **ai/guides/03-DEVELOPMENT_PLANNER.md** - Planning templates
+5. **ai/guides/04-SKILLS_API.md** - API patterns (50+ examples)
+6. **ai/guides/05-SKILLS_DATABASE.md** - Database patterns (30+ examples)
+7. **ai/tools/00-AI-TOOLS.md** - AI tool setup
+
+### Common file mappings:
+- API endpoint work → `ai/guides/04-SKILLS_API.md` + `ai/agents/backend.agent.md`
+- Database/query work → `ai/guides/05-SKILLS_DATABASE.md` + `ai/agents/db.agent.md`
+- Payment/security work → `ai/agents/security.agent.md` + `ai/guides/02-DEBUGGING.md`
+- Bug fixes → `ai/guides/02-DEBUGGING.md`
+- Complex features → `ai/guides/03-DEVELOPMENT_PLANNER.md`
+- Architecture questions → `ai/guides/01-ARCHITECTURE.md`
+
+---
+
+## 🎯 Project Structure (Critical)
+
+```
+Project Root
+├─ ai/                     (AI Agent Hub - Auto-loaded)
+│  ├─ guides/              (6 comprehensive guides - 20K+ lines)
+│  ├─ agents/              (4 domain-specific agent rules)
+│  ├─ context/             (3 project reference files)
+│  ├─ prompts/             (3 code generation templates)
+│  └─ tools/               (AI tool setup guide)
+│
+├─ backend/
+│  ├─ src/
+│  │  ├─ controllers/      (request handlers)
+│  │  ├─ models/           (Mongoose schemas)
+│  │  ├─ services/         (business logic)
+│  │  ├─ middlewares/      (auth, validation)
+│  │  ├─ queues/           (BullMQ definitions)
+│  │  ├─ routers/          (API routes)
+│  │  ├─ utils/            (helpers, validators)
+│  │  ├─ workers/          (background job processors)
+│  │  ├─ config/           (database, redis, cloudinary)
+│  │  ├─ templates/        (email templates)
+│  │  ├─ jobs/             (mail, inventory)
+│  │  └─ validations/      (request schemas)
+│  ├─ package.json
+│  └─ .env
+│
+├─ client/                 (Buyer frontend - React/Vite)
+├─ seller/                 (Seller frontend - React/Vite)
+│
+├─ .copilot-instructions   (Copilot config - auto-loaded)
+├─ .cursor-rules           (This file - auto-loaded)
+└─ [Old root files consolidated into ai/]
+```
+
+---
+
+## 🔧 Implementation Rules
+
+### ALWAYS:
+1. ✅ Validate all inputs at API boundary
+2. ✅ Handle errors explicitly with try-catch
+3. ✅ Use `.lean()` for read-only queries
+4. ✅ Check for N+1 queries (use `.populate()` or aggregation)
+5. ✅ Add indexes on frequently queried fields
+6. ✅ Verify webhook signatures before processing
+7. ✅ Rate limit authentication endpoints
+8. ✅ Use HTTPS for all requests
+9. ✅ Never log sensitive data
+10. ✅ Implement proper transaction handling
+
+### NEVER:
+1. ❌ Trust unverified webhook data
+2. ❌ Use hardcoded secrets or credentials
+3. ❌ Skip input validation
+4. ❌ Log passwords, tokens, or card numbers
+5. ❌ Use `eval()` or dynamic code execution
+6. ❌ Leave console.log in production code
+7. ❌ Skip error handling
+8. ❌ Make assumptions about data types
+9. ❌ Assume CORS is already configured
+10. ❌ Skip database indexing for unique fields
+
+---
+
+## 🛡️ Security Checklist
+
+For ANY code suggestion, verify:
+- [ ] Input validation (type, length, format)
+- [ ] Authorization checks (user owned resource?)
+- [ ] Webhook signature verification (if applicable)
+- [ ] CORS origin check (if API endpoint)
+- [ ] Rate limiting (if public endpoint)
+- [ ] No sensitive data in logs/responses
+- [ ] HTTPS enforced (production)
+- [ ] Database queries parameterized (no concat)
+
+---
+
+## 📊 Code Quality Standards
+
+### Response Format
+```javascript
+✅ Good response format:
+{ 
+  message: "Success message",
+  data: { ... },    // Actual data
+  pagination: {}    // If list
+}
+
+✅ Error response:
+{ 
+  message: "Error description",
+  error: "Error details (dev only)"
+}
+```
+
+### Query Optimization
+```javascript
+❌ Slow (N+1):
+const orders = await Order.find();
+for (let order of orders) {
+  order.seller = await Seller.findById(order.seller);  // 100 queries!
+}
+
+✅ Fast (single query):
+const orders = await Order.find()
+  .populate("seller", "shopName email")
+  .lean();  // 20% faster for reads
+```
+
+### Middleware Pattern
+```javascript
+✅ Good middleware chain:
+router.post("/products", authRequired, sellerOnly, validateInput, createProduct);
+
+❌ Bad (no validation):
+router.post("/products", createProduct);
+```
+
+---
+
+## 🐛 Known Issues (Reference Database)
+
+### 🔴 CRITICAL (Fix in 40 min)
+- Issue #1: Weak cookie security
+- Issue #2: No input validation
+- Issue #3: No rate limiting
+- Issue #4: Unvalidated file uploads
+- Issue #5: Unverified webhooks
+
+**File**: DEBUGGING_GUIDE.md - Each issue has root cause + fix
+
+### 🟠 HIGH (Fix in 1-2 hours)
+- Issue #6: Missing idempotency
+- Issue #7: No HTTPS enforcement
+- Issue #8: N+1 queries
+- Issue #9: Missing indexes
+- Issue #10: Info leakage in errors
+
+### 🟡 MEDIUM (Fix in 1-2 hours)
+- Issue #11-15: Input sanitization, logging, CSRF, versioning, env vars
+
+---
+
+## 🎯 Response Pattern for Code Issues
+
+### When analyzing code:
+1. **Identify** the issue (reference DEBUGGING_GUIDE.md if applicable)
+2. **Explain** why it's a problem (security/performance/maintainability)
+3. **Show** before/after code
+4. **Verify** against security checklist
+5. **Reference** the SKILL file for pattern
+
+### Example:
+```
+Issue: No input validation on email
+
+Root Cause: Lines 12-15 don't validate email format
+
+Why it matters: 
+- Database errors on invalid input
+- Potential for injection attacks
+- Poor user experience
+
+Fix (from SKILLS_API_BACKEND.md #2):
+[show before/after code]
+
+Also see: DEBUGGING_GUIDE.md Issue #2
+```
+
+---
+
+## 💡 Common Patterns to Enforce
+
+### Pattern 1: API Endpoint Structure
+**Reference**: SKILLS_API_BACKEND.md Section 1
+
+```javascript
+const endpoint = async (req, res) => {
+  try {
+    // 1. Validate
+    const { field } = req.body;
+    if (!field) return res.status(400).json({ message: "Required" });
+    
+    // 2. Authorize
+    if (req.user.id !== resource.userId) {
+      return res.status(403).json({ message: "Forbidden" });
+    }
+    
+    // 3. Business logic
+    const result = await Model.findByIdAndUpdate(...);
+    
+    // 4. Response
+    return res.status(200).json({ message: "Success", data: result });
+  } catch (error) {
+    res.status(500).json({ message: "Error", error: error.message });
+  }
+};
+```
+
+### Pattern 2: Database Query Optimization
+**Reference**: SKILLS_DATABASE_OPTIMIZATION.md Section 2
+
+```javascript
+// ✅ Use .populate() with field selection + .lean()
+const orders = await Order.find({ seller: id })
+  .populate("buyer", "name email -password")
+  .lean()
+  .limit(100);
+```
+
+### Pattern 3: Payment Webhook Verification
+**Reference**: SKILLS_PAYMENT_SECURITY.md Section 3
+
+```javascript
+// ✅ ALWAYS verify signature first
+const signature = req.headers["x-razorpay-signature"];
+const verified = crypto
+  .createHmac("sha256", SECRET)
+  .update(req.rawBody)
+  .digest("hex") === signature;
+
+if (!verified) return res.status(401).json({ message: "Unauthorized" });
+```
+
+---
+
+## 📈 Performance Guidelines
+
+### Query Targets
+- Response time: < 500ms (P95)
+- Database query: < 200ms (P95)
+- Memory: < 100MB per query
+- CPU: < 50% sustained
+
+### Optimization Priority
+1. Add indexes (5-100x speedup)
+2. Fix N+1 queries (10-100x speedup)
+3. Use .lean() for reads (15-20% speedup)
+4. Add pagination (reduce memory)
+5. Aggregate complex queries (varies)
+
+---
+
+## 🔄 Task Routing Decision Tree
+
+```
+Start with task description
+    ↓
+Check MASTER_INDEX.md for task type
+    ↓
+Route to correct file:
+├─ New API → SKILLS_API_BACKEND.md
+├─ Slow query → SKILLS_DATABASE_OPTIMIZATION.md
+├─ Payment → SKILLS_PAYMENT_SECURITY.md
+├─ Bug fix → DEBUGGING_GUIDE.md
+├─ Complex task → AI_DEVELOPMENT_PLANNER.md
+└─ Architecture → AGENTS.md
+    ↓
+Read relevant section
+    ↓
+Show implementation with ✅/❌ patterns
+    ↓
+Reference specific checklist
+    ↓
+Done
+```
+
+---
+
+## 🎓 When Helping With Implementation
+
+1. **Read** the relevant SKILLS_*.md section
+2. **Show** the ✅ good and ❌ bad patterns
+3. **Explain** what makes it good/bad
+4. **Generate** code following ✅ pattern
+5. **Verify** against DEBUGGING_GUIDE.md checklist
+
+### Good Help:
+```
+"Based on SKILLS_API_BACKEND.md Section 2:
+
+❌ Bad: No validation
+✅ Good: Check format, validate length, check duplicates
+
+Here's the implementation:
+[code following ✅ pattern]
+```
+
+### Mediocre Help:
+```
+"Just add validation"
+```
+
+---
+
+## 📝 Database Rules
+
+### Indexes
+- All `unique: true` fields MUST have indexes
+- All frequently queried fields should have indexes
+- Compound indexes for common multi-field queries
+
+### Queries
+- Use `.lean()` for all read-only queries
+- Use `.select()` to exclude unused fields
+- Use `.populate()` instead of loops
+- Use aggregation for complex queries
+
+### Transactions
+- Keep transactions SHORT (not long-running)
+- Always use `session.abortTransaction()` in catch
+- Don't do external API calls inside transaction
+
+---
+
+## 🚀 Code Generation Rules
+
+When generating code:
+1. ✅ Include input validation
+2. ✅ Include error handling
+3. ✅ Use patterns from SKILLS_*.md
+4. ✅ Follow naming conventions from codebase
+5. ✅ Add comments for non-obvious logic
+6. ✅ Include security checks
+7. ✅ Optimize queries
+
+---
+
+## 📞 Context Commands for User
+
+When user says:
+- "Fix this" → Ask for context and DEBUGGING_GUIDE.md check
+- "Optimize this" → Check SKILLS_DATABASE_OPTIMIZATION.md
+- "Create endpoint" → Reference SKILLS_API_BACKEND.md
+- "Help with feature" → Check AI_DEVELOPMENT_PLANNER.md
+- "What's best practice?" → Reference relevant SKILLS_*.md
+- "Check this code" → Run security checklist
+
+---
+
+## ✨ Golden Rules
+
+1. **Always reference** the documentation files
+2. **Show examples** with ✅ and ❌
+3. **Explain the why** before the how
+4. **Check security** before suggesting code
+5. **Verify patterns** from SKILLS_*.md
+6. **Link specific sections**, not just file names
+7. **Optimize for performance** from the start
+8. **Never assume** about data or context
+9. **Always validate** at boundaries
+10. **Think security first**
+
+---
+
+## 🎯 Success Criteria
+
+Your response is good if it:
+- ✅ References specific documentation files
+- ✅ Shows code examples (✅/❌ patterns)
+- ✅ Explains security/performance implications
+- ✅ Matches project conventions
+- ✅ Includes error handling
+- ✅ Passes security checklist
+- ✅ Would pass code review
+- ✅ Follows established patterns
+
+---
+
+**Mission**: Help developers write enterprise-grade code fast.
+**Method**: Reference patterns from documentation files.
+**Quality**: Never compromise on security or maintainability.
+
