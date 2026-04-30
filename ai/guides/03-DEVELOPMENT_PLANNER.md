@@ -278,7 +278,7 @@ Fix: Use .populate() instead of manual loop
 
 ### Use These Skills For:
 
-#### 🛠️ SKILLS_API_BACKEND.md
+#### 🛠️ ai/skills/api-development.md
 
 When implementing/debugging:
 
@@ -289,7 +289,7 @@ When implementing/debugging:
 - Response formatting
 - Middleware chains
 
-#### 🗄️ SKILLS_DATABASE_OPTIMIZATION.md
+#### 🗄️ ai/skills/database-optimization.md
 
 When working with:
 
@@ -301,7 +301,7 @@ When working with:
 - Transactions
 - Large datasets
 
-#### 💳 SKILLS_PAYMENT_SECURITY.md
+#### 💳 ai/agents/security.agent.md
 
 When working with:
 
@@ -330,19 +330,19 @@ When you encounter:
 ┌─ What type of task is this?
 │
 ├─→ SECURITY ISSUE?
-│   ├─ Yes → Check DEBUGGING_GUIDE.md + SKILLS_PAYMENT_SECURITY.md
+│   ├─ Yes → Check DEBUGGING_GUIDE.md + ai/agents/security.agent.md
 │   └─ No ↓
 │
 ├─→ PAYMENT/WEBHOOK?
-│   ├─ Yes → Check SKILLS_PAYMENT_SECURITY.md
+│   ├─ Yes → Check ai/agents/security.agent.md
 │   └─ No ↓
 │
 ├─→ DATABASE/QUERY PROBLEM?
-│   ├─ Yes → Check SKILLS_DATABASE_OPTIMIZATION.md
+│   ├─ Yes → Check ai/skills/database-optimization.md
 │   └─ No ↓
 │
 ├─→ API ENDPOINT/VALIDATION?
-│   ├─ Yes → Check SKILLS_API_BACKEND.md
+│   ├─ Yes → Check ai/skills/api-development.md
 │   └─ No ↓
 │
 ├─→ GENERAL BUG/DEBUG?
@@ -433,7 +433,7 @@ Root Cause: Loop with findById inside
 Pattern: Anywhere we populate related data
 Prevention: Always use .populate() or aggregation
 Code Pattern: Check for loops with DB queries
-Documentation: Add to SKILLS_DATABASE_OPTIMIZATION.md
+Documentation: Add to ai/skills/database-optimization.md
 ```
 
 ---

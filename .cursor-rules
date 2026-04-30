@@ -16,19 +16,18 @@ You are assisting with an enterprise e-commerce marketplace project. Always foll
 ### Then reference supporting files:
 - **Context**: `ai/context/domain.md` (business logic), `ai/context/stack.md` (tech), `ai/context/conventions.md` (style)
 - **Prompts**: `ai/prompts/` (templates for code generation)
+- **Skills**: `ai/skills/api-development.md` (API patterns), `ai/skills/database-optimization.md` (DB patterns)
 
 ### Original Documentation (Now Consolidated in ai/):
 1. **ai/guides/00-QUICK_START.md** - For quick reference
 2. **ai/guides/01-ARCHITECTURE.md** - Project architecture
 3. **ai/guides/02-DEBUGGING.md** - 15 known issues
 4. **ai/guides/03-DEVELOPMENT_PLANNER.md** - Planning templates
-5. **ai/guides/04-SKILLS_API.md** - API patterns (50+ examples)
-6. **ai/guides/05-SKILLS_DATABASE.md** - Database patterns (30+ examples)
-7. **ai/tools/00-AI-TOOLS.md** - AI tool setup
+5. **ai/tools/00-AI-TOOLS.md** - AI tool setup
 
 ### Common file mappings:
-- API endpoint work → `ai/guides/04-SKILLS_API.md` + `ai/agents/backend.agent.md`
-- Database/query work → `ai/guides/05-SKILLS_DATABASE.md` + `ai/agents/db.agent.md`
+- API endpoint work → `ai/skills/api-development.md` + `ai/agents/backend.agent.md`
+- Database/query work → `ai/skills/database-optimization.md` + `ai/agents/db.agent.md`
 - Payment/security work → `ai/agents/security.agent.md` + `ai/guides/02-DEBUGGING.md`
 - Bug fixes → `ai/guides/02-DEBUGGING.md`
 - Complex features → `ai/guides/03-DEVELOPMENT_PLANNER.md`
@@ -41,7 +40,8 @@ You are assisting with an enterprise e-commerce marketplace project. Always foll
 ```
 Project Root
 ├─ ai/                     (AI Agent Hub - Auto-loaded)
-│  ├─ guides/              (6 comprehensive guides - 20K+ lines)
+│  ├─ guides/              (4 comprehensive guides)
+│  ├─ skills/              (2 development patterns - NEW)
 │  ├─ agents/              (4 domain-specific agent rules)
 │  ├─ context/             (3 project reference files)
 │  ├─ prompts/             (3 code generation templates)
@@ -69,7 +69,7 @@ Project Root
 │
 ├─ .copilot-instructions   (Copilot config - auto-loaded)
 ├─ .cursor-rules           (This file - auto-loaded)
-└─ [Old root files consolidated into ai/]
+└─ [Other root files]
 ```
 
 ---
@@ -202,7 +202,7 @@ Why it matters:
 - Potential for injection attacks
 - Poor user experience
 
-Fix (from SKILLS_API_BACKEND.md #2):
+Fix (from ai/skills/api-development.md #2):
 [show before/after code]
 
 Also see: DEBUGGING_GUIDE.md Issue #2
@@ -213,7 +213,7 @@ Also see: DEBUGGING_GUIDE.md Issue #2
 ## 💡 Common Patterns to Enforce
 
 ### Pattern 1: API Endpoint Structure
-**Reference**: SKILLS_API_BACKEND.md Section 1
+**Reference**: ai/skills/api-development.md Section 1
 
 ```javascript
 const endpoint = async (req, res) => {
@@ -239,7 +239,7 @@ const endpoint = async (req, res) => {
 ```
 
 ### Pattern 2: Database Query Optimization
-**Reference**: SKILLS_DATABASE_OPTIMIZATION.md Section 2
+**Reference**: ai/skills/database-optimization.md Section 2
 
 ```javascript
 // ✅ Use .populate() with field selection + .lean()
@@ -250,7 +250,7 @@ const orders = await Order.find({ seller: id })
 ```
 
 ### Pattern 3: Payment Webhook Verification
-**Reference**: SKILLS_PAYMENT_SECURITY.md Section 3
+**Reference**: ai/agents/security.agent.md Section 3
 
 ```javascript
 // ✅ ALWAYS verify signature first
@@ -287,14 +287,14 @@ if (!verified) return res.status(401).json({ message: "Unauthorized" });
 ```
 Start with task description
     ↓
-Check MASTER_INDEX.md for task type
+Check ai/README.md for task type
     ↓
 Route to correct file:
-├─ New API → SKILLS_API_BACKEND.md
-├─ Slow query → SKILLS_DATABASE_OPTIMIZATION.md
-├─ Payment → SKILLS_PAYMENT_SECURITY.md
+├─ New API → ai/skills/api-development.md
+├─ Slow query → ai/skills/database-optimization.md
+├─ Payment → ai/agents/security.agent.md
 ├─ Bug fix → DEBUGGING_GUIDE.md
-├─ Complex task → AI_DEVELOPMENT_PLANNER.md
+├─ Complex task → ai/guides/03-DEVELOPMENT_PLANNER.md
 └─ Architecture → AGENTS.md
     ↓
 Read relevant section
@@ -318,7 +318,7 @@ Done
 
 ### Good Help:
 ```
-"Based on SKILLS_API_BACKEND.md Section 2:
+"Based on ai/skills/api-development.md Section 2:
 
 ❌ Bad: No validation
 ✅ Good: Check format, validate length, check duplicates
@@ -371,9 +371,9 @@ When generating code:
 
 When user says:
 - "Fix this" → Ask for context and DEBUGGING_GUIDE.md check
-- "Optimize this" → Check SKILLS_DATABASE_OPTIMIZATION.md
-- "Create endpoint" → Reference SKILLS_API_BACKEND.md
-- "Help with feature" → Check AI_DEVELOPMENT_PLANNER.md
+- "Optimize this" → Check ai/skills/database-optimization.md
+- "Create endpoint" → Reference ai/skills/api-development.md
+- "Help with feature" → Check ai/guides/03-DEVELOPMENT_PLANNER.md
 - "What's best practice?" → Reference relevant SKILLS_*.md
 - "Check this code" → Run security checklist
 

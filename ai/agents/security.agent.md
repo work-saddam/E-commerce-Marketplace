@@ -36,7 +36,7 @@ This agent activates when working on:
 2. `ai/context/conventions.md` - Security Conventions
 3. `ai/context/domain.md` - Compliance & Security
 
-**For implementation:** 4. `SKILLS_PAYMENT_SECURITY.md` - Payment security 5. `DEBUGGING_GUIDE.md` - Security vulnerabilities (issues 1-5, 7, 10) 6. `AGENTS.md` - Security best practices
+**For implementation:** 4. `ai/agents/security.agent.md` - Payment security 5. `DEBUGGING_GUIDE.md` - Security vulnerabilities (issues 1-5, 7, 10) 6. `AGENTS.md` - Security best practices
 
 ---
 
@@ -564,7 +564,7 @@ From DEBUGGING_GUIDE.md:
 - **Backend endpoint security?** → Include backend.agent.md
 - **Frontend authentication?** → Include frontend.agent.md
 - **Database query injection?** → Include db.agent.md
-- **Full security audit?** → Reference DEBUGGING_GUIDE.md + SKILLS_PAYMENT_SECURITY.md
+- **Full security audit?** → Reference DEBUGGING_GUIDE.md + ai/agents/security.agent.md
 
 ---
 
@@ -575,7 +575,7 @@ Real implementations to study:
 - `backend/src/middlewares/authMiddleware.js` - JWT verification
 - `backend/src/utils/razorpayWebhookVerifier.js` - Signature verification
 - `backend/src/server.js` - CORS & helmet setup
-- `SKILLS_PAYMENT_SECURITY.md` - Deep security patterns
+- `ai/agents/security.agent.md` - Deep security patterns
 
 **Key takeaway**: Security is not optional. Every layer must validate, authenticate, and authorize.
 Never trust input, never trust external webhooks without verification, and always use HTTPS with proper headers.
