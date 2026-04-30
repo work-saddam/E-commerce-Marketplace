@@ -31,7 +31,8 @@
 
 | Folder       | Files   | Purpose                                  |
 | ------------ | ------- | ---------------------------------------- |
-| **guides/**  | 6 `.md` | Comprehensive documentation (20K+ lines) |
+| **guides/**  | 4 `.md` | Core documentation & architecture        |
+| **skills/**  | 2 `.md` | Development patterns & best practices    |
 | **agents/**  | 4 `.md` | Domain-specific rules for Copilot/Cursor |
 | **context/** | 3 `.md` | Project reference knowledge              |
 | **prompts/** | 3 `.md` | Code generation templates                |
@@ -39,30 +40,25 @@
 
 ---
 
-## 📖 GUIDES - Comprehensive Documentation
+## 📖 GUIDES - Core Documentation
 
-Read these for deep understanding of the system and how to implement features correctly.
+Core guides for understanding architecture, debugging, and planning.
 
-| File                                                                     | Focus                       | Best For                 |
-| ------------------------------------------------------------------------ | --------------------------- | ------------------------ |
-| **[guides/00-QUICK_START.md](guides/00-QUICK_START.md)**                 | Quick reference             | Starting quickly         |
-| **[guides/01-ARCHITECTURE.md](guides/01-ARCHITECTURE.md)**               | Full system design          | Understanding everything |
-| **[guides/02-DEBUGGING.md](guides/02-DEBUGGING.md)**                     | 15 known code issues        | Fixing problems          |
-| **[guides/03-DEVELOPMENT_PLANNER.md](guides/03-DEVELOPMENT_PLANNER.md)** | Workflows & planning        | Planning new work        |
-| **[guides/04-SKILLS_API.md](guides/04-SKILLS_API.md)**                   | API patterns (50+ examples) | Building endpoints       |
-| **[guides/05-SKILLS_DATABASE.md](guides/05-SKILLS_DATABASE.md)**         | DB optimization patterns    | Query performance        |
+| File                                                                     | Focus                | Best For                 |
+| ------------------------------------------------------------------------ | -------------------- | ------------------------ |
+| **[guides/00-QUICK_START.md](guides/00-QUICK_START.md)**                 | Quick reference      | Starting quickly         |
+| **[guides/01-ARCHITECTURE.md](guides/01-ARCHITECTURE.md)**               | Full system design   | Understanding everything |
+| **[guides/02-DEBUGGING.md](guides/02-DEBUGGING.md)**                     | 15 known code issues | Fixing problems          |
+| **[guides/03-DEVELOPMENT_PLANNER.md](guides/03-DEVELOPMENT_PLANNER.md)** | Workflows & planning | Planning new work        |
 
-**Total**: ~20,000 lines of production-grade documentation
+## 🛠️ SKILLS - Development Patterns
 
-### How to Use Guides
+Production-tested patterns for common tasks.
 
-```
-1. Pick your task from the table below
-2. Go to recommended guide
-3. Read relevant section
-4. Apply pattern to your code
-5. Reference guides while coding
-```
+| File                                                                   | Focus              | Best For           |
+| ---------------------------------------------------------------------- | ------------------ | ------------------ |
+| **[skills/api-development.md](skills/api-development.md)**             | REST API patterns  | Building endpoints |
+| **[skills/database-optimization.md](skills/database-optimization.md)** | Query optimization | Performance tuning |
 
 ---
 
@@ -627,15 +623,15 @@ Documentation and configuration files outside ai/:
 - `.cursor-rules` - Cursor AI auto-configuration
 - Root .md files (Old, now consolidated into ai/):
   - AGENTS.md _(now: guides/01-ARCHITECTURE.md)_
-  - DEBUGGING_GUIDE.md _(now: guides/02-DEBUGGING.md)_
-  - QUICK_START_AI_GUIDE.md _(now: guides/00-QUICK_START.md)_
-  - AI_DEVELOPMENT_PLANNER.md _(now: guides/03-DEVELOPMENT_PLANNER.md)_
-  - SKILLS_API_BACKEND.md _(now: guides/04-SKILLS_API.md)_
-  - SKILLS_DATABASE_OPTIMIZATION.md _(now: guides/05-SKILLS_DATABASE.md)_
-  - AI_TOOLS_INTEGRATION_GUIDE.md _(now: tools/00-AI-TOOLS.md)_
-  - AI_ASSISTANT_GUIDELINES.md _(now: tools/00-AI-TOOLS.md)_
-  - UNIVERSAL_AI_SETUP.md _(now: tools/00-AI-TOOLS.md)_
-  - ALL_AI_TOOLS_COMPLETE.md _(now: tools/00-AI-TOOLS.md)_
+  - DEBUGGING*GUIDE.md *(now: guides/02-DEBUGGING.md)\_
+  - QUICK*START_AI_GUIDE.md *(now: guides/00-QUICK*START.md)*
+  - AI*DEVELOPMENT_PLANNER.md *(now: guides/03-DEVELOPMENT*PLANNER.md)*
+  - SKILLS*API_BACKEND.md *(now: guides/04-SKILLS*API.md)*
+  - SKILLS*DATABASE_OPTIMIZATION.md *(now: guides/05-SKILLS*DATABASE.md)*
+  - AI*TOOLS_INTEGRATION_GUIDE.md *(now: tools/00-AI-TOOLS.md)\_
+  - AI*ASSISTANT_GUIDELINES.md *(now: tools/00-AI-TOOLS.md)\_
+  - UNIVERSAL*AI_SETUP.md *(now: tools/00-AI-TOOLS.md)\_
+  - ALL*AI_TOOLS_COMPLETE.md *(now: tools/00-AI-TOOLS.md)\_
 
 **Note**: Root files are now consolidated into `/ai/` for clean organization.
 
@@ -679,7 +675,7 @@ ls -la .cursor-rules
 → Check `DEBUGGING_GUIDE.md`
 
 **Quick reference?**
-→ Check `QUICK_START_AI_GUIDE.md`
+→ Check `ai/guides/00-QUICK_START.md`
 
 ---
 

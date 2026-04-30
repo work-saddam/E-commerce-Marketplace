@@ -21,6 +21,7 @@ Load the relevant agent based on task domain:
 
 - **Context**: `ai/context/domain.md`, `ai/context/stack.md`, `ai/context/conventions.md`
 - **Prompts**: `ai/prompts/api-route.prompt.md`, `ai/prompts/component.prompt.md`, `ai/prompts/schema.prompt.md`
+- **Skills**: `ai/skills/api-development.md`, `ai/skills/database-optimization.md`
 
 ### 2. COMPREHENSIVE GUIDES (ai/guides/)
 
@@ -30,13 +31,11 @@ For deep understanding and implementation details:
 - **ai/guides/01-ARCHITECTURE.md** - Complete architecture & setup
 - **ai/guides/02-DEBUGGING.md** - 15 known code issues with fixes
 - **ai/guides/03-DEVELOPMENT_PLANNER.md** - Workflow templates & planning
-- **ai/guides/04-SKILLS_API.md** - API patterns with 50+ examples
-- **ai/guides/05-SKILLS_DATABASE.md** - Database patterns with 30+ examples
 
 ### 3. Implementation Guidance
 
-- **API endpoints** → `ai/guides/04-SKILLS_API.md` + `ai/agents/backend.agent.md`
-- **Database queries** → `ai/guides/05-SKILLS_DATABASE.md` + `ai/agents/db.agent.md`
+- **API endpoints** → `ai/skills/api-development.md` + `ai/agents/backend.agent.md`
+- **Database queries** → `ai/skills/database-optimization.md` + `ai/agents/db.agent.md`
 - **Payments/security** → `ai/agents/security.agent.md` + `ai/guides/02-DEBUGGING.md` Issue #5-6
 - **Bug fixes** → `ai/guides/02-DEBUGGING.md`
 - **Complex tasks** → `ai/guides/03-DEVELOPMENT_PLANNER.md`
@@ -115,7 +114,7 @@ seller/src/        (Seller frontend)
 ✅ GOOD RESPONSE:
 
 ```
-Based on SKILLS_API_BACKEND.md Section 2, you should:
+Based on ai/skills/api-development.md Section 2, you should:
 1. [Step 1 with code pattern]
 2. [Step 2 with validation]
 3. [Step 3 with error handling]
@@ -156,8 +155,8 @@ Just use express like this:
 | "Query is slow"            | ai/guides/05-SKILLS_DATABASE.md     | ai/guides/02-DEBUGGING.md #8 |
 | "Payment not working"      | ai/agents/security.agent.md         | ai/guides/02-DEBUGGING.md #5 |
 | "Fix security issue"       | ai/guides/02-DEBUGGING.md           | ai/agents/security.agent.md  |
-| "Build feature X"          | ai/guides/03-DEVELOPMENT_PLANNER.md | ai/guides/04-SKILLS_API.md   |
-| "Optimize performance"     | ai/guides/05-SKILLS_DATABASE.md     | ai/guides/02-DEBUGGING.md    |
+| "Build feature X"          | ai/guides/03-DEVELOPMENT_PLANNER.md | ai/skills/api-development.md |
+| "Optimize performance"     | ai/skills/database-optimization.md  | ai/guides/02-DEBUGGING.md    |
 
 ---
 
@@ -235,7 +234,7 @@ When helping with code, verify:
 ### Be specific:
 
 ```
-✅ "See SKILLS_API_BACKEND.md Section 2 for validation patterns"
+✅ "See ai/skills/api-development.md Section 2 for validation patterns"
 ❌ "Use validation"
 ```
 
@@ -306,9 +305,9 @@ http://localhost:4000/api/admin/queues  # BullMQ Dashboard
 ### When suggesting fixes:
 
 1. Start with security issues (DEBUGGING_GUIDE.md 🔴)
-2. Then performance (SKILLS_DATABASE_OPTIMIZATION.md)
-3. Then quality (SKILLS_API_BACKEND.md)
-4. Then features (AI_DEVELOPMENT_PLANNER.md)
+2. Then performance (ai/skills/database-optimization.md)
+3. Then quality (ai/skills/api-development.md)
+4. Then features (ai/guides/03-DEVELOPMENT_PLANNER.md)
 
 ---
 
@@ -327,8 +326,8 @@ http://localhost:4000/api/admin/queues  # BullMQ Dashboard
 
 ## 📞 When in Doubt
 
-1. Check **MASTER_INDEX.md** for task routing
-2. Read the relevant **SKILLS\_\*.md file**
+1. Check **ai/README.md** for task routing
+2. Read the relevant `ai/skills/` or `ai/agents/` file
 3. Reference **DEBUGGING_GUIDE.md** for similar issues
 4. Follow the patterns shown (✅ examples)
 5. Ask user for clarification if needed
