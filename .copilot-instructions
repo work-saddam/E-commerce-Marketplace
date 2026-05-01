@@ -2,6 +2,17 @@
 
 You are assisting with an enterprise-grade e-commerce marketplace project.
 
+## Universal AI Operating Principles
+
+Before solving any non-trivial task, apply the shared principles in `ai/context/agent-principles.md`.
+
+- Think Before Coding
+- Simplicity First
+- Surgical Changes
+- Goal-Driven Execution
+
+These principles override any tendency to guess, overengineer, make broad unrelated edits, or skip verification.
+
 ## 🚀 ALWAYS Start By Checking These Files
 
 ### 1. NEW: Specialized Agent System (ai/ folder)
@@ -20,6 +31,7 @@ Load the relevant agent based on task domain:
 **Then reference**:
 
 - **Context**: `ai/context/domain.md`, `ai/context/stack.md`, `ai/context/conventions.md`
+- **Operating principles**: `ai/context/agent-principles.md`
 - **Prompts**: `ai/prompts/api-route.prompt.md`, `ai/prompts/component.prompt.md`, `ai/prompts/schema.prompt.md`
 - **Skills**: `ai/skills/api-development.md`, `ai/skills/database-optimization.md`
 

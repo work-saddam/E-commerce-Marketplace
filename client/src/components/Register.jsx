@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BASE_URL } from "../utils/constants";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { buildRateLimitMessage, getRateLimitRetrySeconds } from "../utils/authRateLimit";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -10,19 +11,68 @@ const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [cooldownEndsAt, setCooldownEndsAt] = useState(null);
+  const [remainingSeconds, setRemainingSeconds] = useState(0);
+
+  const isRateLimited = Boolean(cooldownEndsAt && remainingSeconds > 0);
+
+  useEffect(() => {
+    if (!cooldownEndsAt) {
+      setRemainingSeconds(0);
+      return undefined;
+    }
+
+    const syncCooldown = () => {
+      const seconds = Math.max(0, Math.ceil((cooldownEndsAt - Date.now()) / 1000));
+
+      setRemainingSeconds(seconds);
+      if (seconds === 0) {
+        setCooldownEndsAt(null);
+        setError("");
+      } else {
+        setError(buildRateLimitMessage(seconds));
+      }
+    };
+
+    syncCooldown();
+    const intervalId = setInterval(syncCooldown, 1000);
+
+    return () => clearInterval(intervalId);
+  }, [cooldownEndsAt]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (isRateLimited) {
+      setError(buildRateLimitMessage(remainingSeconds));
+      return;
+    }
+
     setError("");
+    setLoading(true);
+
     try {
-      const res = await axios.post(
+      await axios.post(
         `${BASE_URL}/api/auth/register`,
         { name, phone, email, password },
         { withCredentials: true }
       );
+      setCooldownEndsAt(null);
+      setRemainingSeconds(0);
       navigate("/login");
     } catch (error) {
-      setError(error.response?.data?.message || "Something went wrong!");
+      const retryAfterSeconds = getRateLimitRetrySeconds(error);
+
+      if (retryAfterSeconds) {
+        setCooldownEndsAt(Date.now() + retryAfterSeconds * 1000);
+        setRemainingSeconds(retryAfterSeconds);
+        setError(buildRateLimitMessage(retryAfterSeconds));
+      } else {
+        setError(error.response?.data?.message || "Something went wrong!");
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -94,9 +144,10 @@ const Register = () => {
 
           <button
             type="submit"
+            disabled={loading || isRateLimited}
             className="mt-2 w-full rounded-lg bg-yellow-500 px-4 py-2 font-medium text-white transition hover:bg-yellow-600"
           >
-            Register
+            {loading ? "Registering..." : isRateLimited ? `Try again in ${remainingSeconds}s` : "Register"}
           </button>
         </form>
       </div>

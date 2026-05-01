@@ -1,7 +1,14 @@
 const User = require("../models/user");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { validateUserRegisterData } = require("../utils/validation");
+const {
+  validateUserRegisterData,
+  validateLoginData,
+} = require("../utils/validation");
+const {
+  getAuthCookieOptions,
+  getAuthClearCookieOptions,
+} = require("../config/security");
 
 const register = async (req, res) => {
   try {
@@ -32,18 +39,27 @@ const register = async (req, res) => {
       .status(201)
       .json({ message: "Registration Successful!", data: savedUser });
   } catch (error) {
+    if (error.code === 11000) {
+      return res.status(409).json({
+        message:
+          "Registration failed. Try logging in or resetting your password.",
+      });
+    }
+
     res
       .status(500)
-      .json({ message: "Registration Failed!", error: error.message });
+      .json({ message: "Registration Failed! Please try again later." });
   }
 };
 
 const login = async (req, res) => {
   try {
-    const { identifier, password } = req.body;
-    if (!identifier || !password) {
-      return res.status(400).json({ message: "All fields are required!" });
+    const error = validateLoginData(req);
+    if (error) {
+      return res.status(error.status).json({ message: error.message });
     }
+
+    const { identifier, password } = req.body;
 
     const user = await User.findOne({
       $or: [{ email: identifier }, { phone: identifier }],
@@ -61,12 +77,7 @@ const login = async (req, res) => {
       expiresIn: "3d",
     });
 
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      maxAge: 3 * 24 * 60 * 60 * 1000, // 3 days
-    });
+    res.cookie("token", token, getAuthCookieOptions());
 
     const userData = {
       _id: user._id,
@@ -79,19 +90,16 @@ const login = async (req, res) => {
       .status(200)
       .json({ message: "Login Successfully!", data: userData, token: token });
   } catch (error) {
-    res.status(500).json({ message: "Login Failed!", error: error.message });
+    res.status(500).json({ message: "Login Failed! Please try again later." });
   }
 };
 
 const logout = async (req, res) => {
   try {
-    res.clearCookie("token", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-    });
+    res.clearCookie("token", getAuthClearCookieOptions());
     res.status(200).json({ message: "Logout Successfully!" });
   } catch (error) {
-    res.status(500).json({ message: "Logout Failed!", error: error.message });
+    res.status(500).json({ message: "Logout Failed! Please try again later." });
   }
 };
 

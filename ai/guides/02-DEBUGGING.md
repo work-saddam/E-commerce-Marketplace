@@ -4,203 +4,26 @@
 
 ### 🚨 Critical Issues (Must Fix)
 
-#### 1. **Weak Cookie Security Configuration**
-
-**File**: `backend/src/server.js`
-**Severity**: 🔴 CRITICAL
-**Problem**:
-
-```javascript
-res.cookie("token", token, {
-  httpOnly: true,
-  secure: process.env.NODE_ENV === "production", // ❌ Not set in dev!
-  sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-});
-```
-
-- `sameSite: "none"` REQUIRES `secure: true` (HTTPS)
-- In development, cookie might not be sent
-- XSS vulnerability if secure flag missing
-
-**Solution**:
-
-```javascript
-res.cookie("token", token, {
-  httpOnly: true,
-  secure: true, // ✅ Always secure
-  sameSite: "strict", // ✅ Stronger default
-  domain:
-    process.env.NODE_ENV === "production"
-      ? process.env.COOKIE_DOMAIN
-      : undefined,
-  maxAge: 3 * 24 * 60 * 60 * 1000,
-});
-```
-
-#### 2. **No Input Validation on Auth Endpoints**
-
-**Files**:
-
-- `backend/src/controllers/authController.js` (line 8-9)
-- `backend/src/controllers/sellerController.js` (line 10-24)
-
-**Severity**: 🔴 CRITICAL
-**Problem**:
-
-```javascript
-// ❌ No validation before DB query
-const { name, email, password, phone } = req.body;
-const existingUser = await User.findOne({ $or: [{ email }, { phone }] });
-```
-
-- Email format not validated
-- Phone format not validated
-- Password strength not checked
-- SQL injection not prevented (Mongoose protects, but bad practice)
-
-**Solution**:
-
-```javascript
-// ✅ Validate first
-const validator = require("validator");
-if (!validator.isEmail(email)) {
-  return res.status(400).json({ message: "Invalid email format" });
-}
-if (!/^\d{10}$/.test(phone)) {
-  return res.status(400).json({ message: "Phone must be 10 digits" });
-}
-if (password.length < 8) {
-  return res.status(400).json({ message: "Password too weak" });
-}
-```
-
-#### 3. **Missing Rate Limiting on Auth Routes**
-
-**File**: `backend/src/server.js`
-**Severity**: 🔴 CRITICAL
-**Problem**:
-
-- No brute-force protection
-- Unlimited login attempts possible
-- No rate limiting middleware
-
-**Solution**:
-
-```javascript
-const rateLimit = require("express-rate-limit");
-
-const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5, // 5 attempts
-  message: "Too many login attempts, try again later",
-  standardHeaders: true,
-  legacyHeaders: false,
-});
-
-app.use("/api/auth/login", authLimiter);
-app.use("/api/auth/register", authLimiter);
-```
-
-#### 4. **No File Type/Size Validation on Uploads**
-
-**File**: `backend/src/middlewares/multer.js`
-**Severity**: 🔴 CRITICAL
-**Problem**:
-
-- No file type whitelist
-- No maximum file size
-- Could upload malware or exhaust storage
-
-**Solution**:
-
-```javascript
-const multer = require("multer");
-const path = require("path");
-
-const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
-const MAX_SIZE = 5 * 1024 * 1024; // 5MB
-
-const fileFilter = (req, file, cb) => {
-  if (!ALLOWED_TYPES.includes(file.mimetype)) {
-    return cb(new Error("Invalid file type"), false);
-  }
-  cb(null, true);
-};
-
-const upload = multer({
-  fileFilter,
-  limits: { fileSize: MAX_SIZE },
-});
-```
-
-#### 5. **Unverified Payment Webhooks**
-
-**File**: `backend/src/services/payment.service.js`
-**Severity**: 🔴 CRITICAL
-**Problem**:
-
-- Must verify webhook signature before processing
-- Unverified webhooks = fraud vulnerability
-- Attacker can fake payment confirmations
-
-**Current Code**: Uses `razorpayWebhookVerifier` ✅ (GOOD)
-**Ensure**: Raw body is preserved in Express middleware (already done in server.js)
-
----
-
 ### ⚠️ High Priority Issues
-
-#### 6. **Missing Idempotency in Payment Processing**
-
-**File**: `backend/src/services/payment.service.js` (line 78)
-**Severity**: 🟠 HIGH
-**Problem**:
-
-```javascript
-// TODO: later we can also add the idempotency key
-// ❌ Retry could create duplicate orders!
-```
-
-**Impact**: Network retry → double charge
-**Solution**:
-
-```javascript
-const idempotencyKey = `${buyerId}-${Date.now()}`; // or use MongoDB session ID
-
-// Check if order already exists
-const existingOrder = await MasterOrder.findOne({ idempotencyKey });
-if (existingOrder) {
-  return existingOrder; // Idempotent response
-}
-
-// Create new order
-const order = await MasterOrder.create({ ...data, idempotencyKey });
-```
 
 #### 7. **No HTTPS Enforcement**
 
-**File**: `backend/src/server.js`, `backend/src/controllers/authController.js`
-**Severity**: 🟠 HIGH
-**Problem**:
+**File**: `backend/src/server.js`, `backend/src/config/security.js`
+**Status**: ✅ RESOLVED
+**What is in place**:
 
-- No HSTS header
-- CORS allows HTTP in production config
-- Cookies not properly secured
+- Production requests are rejected unless they arrive over HTTPS
+- `helmet` adds HSTS in production with a one-year preload policy
+- Production CORS origins are derived from deployed app URLs, not localhost
+- Auth cookies now use shared secure options across buyer and seller flows
 
-**Solution**:
+**Current Code**:
 
-```javascript
-const helmet = require("helmet");
+- `backend/src/server.js` trusts the proxy, applies `helmet`, and enforces HTTPS
+- `backend/src/config/security.js` centralizes CORS, HTTPS, and cookie policy
+- `backend/src/controllers/authController.js` and `sellerController.js` use shared auth cookie options
 
-app.use(helmet()); // Adds security headers including HSTS
-app.use(
-  helmet.hsts({
-    maxAge: 31536000, // 1 year
-    includeSubDomains: true,
-    preload: true,
-  }),
-);
-```
+**Audit Note**: Keep `CLIENT_APP_URL` and `SELLER_APP_URL` on `https://` origins in production.
 
 #### 8. **N+1 Query in Order Fetching**
 
@@ -257,30 +80,6 @@ orderSchema.index({ seller: 1 });
 orderSchema.index({ status: 1 });
 orderSchema.index({ createdAt: -1 });
 ```
-
-#### 10. **Weak Error Messages (Information Leakage)**
-
-**File**: `backend/src/controllers/authController.js` (line 47-50)
-**Severity**: 🟠 HIGH
-**Problem**:
-
-```javascript
-// ❌ Reveals if email/user exists!
-const field = existingUser.email == email ? "Email" : "Phone number";
-return res.status(400).json({ message: `${field} already registered!` });
-```
-
-**Attack**: Attacker can enumerate all registered emails
-**Solution**:
-
-```javascript
-// ✅ Generic message
-if (existingUser) {
-  return res.status(400).json({ message: "Registration failed. Try again." });
-}
-```
-
----
 
 ### 📌 Medium Priority Issues
 
@@ -386,7 +185,7 @@ res.json({ csrfToken: req.csrfToken() });
 
 **Do these first (High ROI):**
 
-1. Add rate limiting (5 min)
+1. Review rate limiting behavior and frontend cooldown UX
 2. Fix cookie security (5 min)
 3. Add input validation (15 min)
 4. Create database indexes (10 min)

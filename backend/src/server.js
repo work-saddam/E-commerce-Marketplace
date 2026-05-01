@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const app = express();
 const cors = require("cors");
+const helmet = require("helmet");
 const connectDB = require("./config/database");
 const cookieParser = require("cookie-parser");
 const authRoutes = require("./routers/authRouter");
@@ -13,18 +14,23 @@ const productRoutes = require("./routers/productRouter");
 const paymentRoutes = require("./routers/paymentRouter");
 const { startMailWorker } = require("./workers/mail.worker");
 const { startInventoryWorker } = require("./workers/inventory.worker");
+const {
+  allowedCorsOrigins,
+  helmetOptions,
+  requireHttps,
+} = require("./config/security");
+
+app.disable("x-powered-by");
+app.set("trust proxy", 1);
 
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      "http://localhost:5174",
-      "https://trustkart-lemon.vercel.app",
-      "https://trustkart-seller.vercel.app",
-    ],
+    origin: allowedCorsOrigins,
     credentials: true,
   }),
 );
+app.use(helmet(helmetOptions));
+app.use(requireHttps);
 app.use(
   express.json({
     verify: (req, _res, buf) => {

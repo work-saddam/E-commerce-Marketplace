@@ -428,6 +428,20 @@ router.post("/login", async (req, res) => {
 });
 ```
 
+### Frontend 429 Handling
+
+```javascript
+// ✅ CORRECT: Show the rate-limit message inline and keep it live
+if (error.response?.status === 429) {
+  const retryAfter = Number(error.response?.data?.retryAfter ?? 60);
+  setCooldownEndsAt(Date.now() + retryAfter * 1000);
+  setError(`Too many attempts. Try again in ${retryAfter}s.`);
+}
+
+// Disable submit while the cooldown is active.
+<button disabled={isRateLimited}>Login</button>;
+```
+
 ### General API Rate Limiting
 
 ```javascript

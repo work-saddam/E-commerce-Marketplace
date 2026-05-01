@@ -69,9 +69,9 @@ Your project is now equipped with a complete, consolidated AI development framew
 ```
 1. Load: ai/agents/security.agent.md
 2. Reference: ai/guides/02-DEBUGGING.md Issue #5
-3. Fix: Add signature verification
-4. Test: Verify webhook works
-✓ Done in 20 minutes
+3. Audit: Confirm signature verification and raw body preservation are intact
+4. Check: Verify webhook route and secret wiring still match production config
+✓ Done in 10 minutes
 ```
 
 ---
@@ -82,17 +82,15 @@ Your project is now equipped with a complete, consolidated AI development framew
 
 1. Weak cookie security
 2. No input validation
-3. No rate limiting
+3. Auth rate limiting now enabled
 4. Unvalidated file uploads
-5. Unverified payment webhooks
 
 ### 🟠 High (1-2 hours)
 
-6. Missing idempotency keys
-7. No HTTPS enforcement
-8. N+1 queries
-9. Missing database indexes
-10. Weak error messages
+5. Missing idempotency keys
+6. N+1 queries
+7. Missing database indexes
+8. Weak error messages
 
 ### 🟡 Medium (1-2 hours)
 
@@ -190,7 +188,7 @@ redis-cli                   # Connect to Redis
 ### Short Term (2 hours)
 
 1. Fix Priority 1 security issues
-2. Add rate limiting to auth endpoints
+2. Review auth rate limiting and live 429 UX
 3. Add input validation
 4. Test locally
 
