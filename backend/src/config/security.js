@@ -79,12 +79,7 @@ const requireHttps = (req, res, next) => {
     return next();
   }
 
-  const forwardedProtoHeader = req.get("x-forwarded-proto");
-  const forwardedProto = forwardedProtoHeader
-    ? forwardedProtoHeader.split(",")[0].trim()
-    : "";
-
-  if (req.secure || forwardedProto === "https") {
+  if (req.secure) {
     return next();
   }
 

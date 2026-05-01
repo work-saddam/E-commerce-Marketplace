@@ -10,11 +10,14 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { buildRateLimitMessage, getRateLimitRetrySeconds } from "@/utils/authRateLimit";
+import {
+  buildRateLimitMessage,
+  getRateLimitRetrySeconds,
+} from "@/utils/authRateLimit";
 import { BASE_URL } from "@/utils/constant";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export function Signup() {
   const [sellerName, setSellerName] = useState("");
@@ -37,7 +40,10 @@ export function Signup() {
     }
 
     const syncCooldown = () => {
-      const seconds = Math.max(0, Math.ceil((cooldownEndsAt - Date.now()) / 1000));
+      const seconds = Math.max(
+        0,
+        Math.ceil((cooldownEndsAt - Date.now()) / 1000),
+      );
 
       setRemainingSeconds(seconds);
       if (seconds === 0) {
@@ -196,7 +202,11 @@ export function Signup() {
               className="w-full mt-4"
               disabled={loading || isRateLimited}
             >
-              {loading ? "Sign Up..." : isRateLimited ? `Try again in ${remainingSeconds}s` : "Sign Up"}
+              {loading
+                ? "Sign Up..."
+                : isRateLimited
+                  ? `Try again in ${remainingSeconds}s`
+                  : "Sign Up"}
             </Button>
           </form>
         </CardContent>

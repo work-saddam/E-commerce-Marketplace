@@ -4,7 +4,8 @@ const createRedisConnection = require("../config/redis");
 
 const AUTH_WINDOW_MS = 60 * 1000;
 const AUTH_MAX_REQUESTS = 5;
-const AUTH_RATE_LIMIT_MESSAGE = "Too many authentication attempts. Try again later.";
+const AUTH_RATE_LIMIT_MESSAGE =
+  "Too many authentication attempts. Try again later.";
 const FALLBACK_RETRY_AFTER_SECONDS = Math.ceil(AUTH_WINDOW_MS / 1000);
 
 const redisClient = createRedisConnection();
@@ -20,7 +21,10 @@ const getRetryAfterSeconds = (resetTime) => {
     return FALLBACK_RETRY_AFTER_SECONDS;
   }
 
-  return Math.max(1, Math.ceil((new Date(resetTime).getTime() - Date.now()) / 1000));
+  return Math.max(
+    1,
+    Math.ceil((new Date(resetTime).getTime() - Date.now()) / 1000),
+  );
 };
 
 const createAuthLimiter = (prefix, options = {}) =>
@@ -30,6 +34,7 @@ const createAuthLimiter = (prefix, options = {}) =>
     standardHeaders: true,
     legacyHeaders: false,
     store: createRateLimitStore(prefix),
+    passOnStoreError: true,
     ...options,
     handler: (req, res, _next, limitOptions) => {
       const retryAfter = getRetryAfterSeconds(req.rateLimit?.resetTime);

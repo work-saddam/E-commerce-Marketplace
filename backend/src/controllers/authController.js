@@ -40,15 +40,15 @@ const register = async (req, res) => {
       .json({ message: "Registration Successful!", data: savedUser });
   } catch (error) {
     if (error.code === 11000) {
-      const duplicateField = Object.keys(error.keyPattern || {})[0];
-      const fieldMessage =
-        duplicateField === "phone" ? "Phone number already registered!" : "Email already registered!";
-      return res.status(409).json({ message: fieldMessage });
+      return res.status(409).json({
+        message:
+          "Registration failed. Try logging in or resetting your password.",
+      });
     }
 
     res
       .status(500)
-      .json({ message: "Registration Failed!", error: error.message });
+      .json({ message: "Registration Failed! Please try again later." });
   }
 };
 
@@ -90,7 +90,7 @@ const login = async (req, res) => {
       .status(200)
       .json({ message: "Login Successfully!", data: userData, token: token });
   } catch (error) {
-    res.status(500).json({ message: "Login Failed!", error: error.message });
+    res.status(500).json({ message: "Login Failed! Please try again later." });
   }
 };
 
@@ -99,7 +99,7 @@ const logout = async (req, res) => {
     res.clearCookie("token", getAuthClearCookieOptions());
     res.status(200).json({ message: "Logout Successfully!" });
   } catch (error) {
-    res.status(500).json({ message: "Logout Failed!", error: error.message });
+    res.status(500).json({ message: "Logout Failed! Please try again later." });
   }
 };
 
