@@ -4,31 +4,25 @@
 
 ### 🚨 Critical Issues (Must Fix)
 
-#### 3. **Missing Rate Limiting on Auth Routes**
+#### 3. **Auth Rate Limiting on Auth Routes**
 
 **File**: `backend/src/server.js`
 **Severity**: 🔴 CRITICAL
-**Problem**:
+**Status**: Fixed with Redis-backed auth throttling and live 429 frontend feedback
+**Current Behavior**:
 
-- No brute-force protection
-- Unlimited login attempts possible
-- No rate limiting middleware
+- Buyer and seller login/register routes are limited to 5 requests per minute per IP
+- Login routes skip successful requests
+- `429` responses include JSON plus `Retry-After` and standard rate-limit headers
+- Buyer and seller auth forms show a live inline countdown while blocked
 
 **Solution**:
 
 ```javascript
-const rateLimit = require("express-rate-limit");
+const { loginLimiter, registerLimiter } = require("./middlewares/authRateLimit");
 
-const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5, // 5 attempts
-  message: "Too many login attempts, try again later",
-  standardHeaders: true,
-  legacyHeaders: false,
-});
-
-app.use("/api/auth/login", authLimiter);
-app.use("/api/auth/register", authLimiter);
+router.post("/login", loginLimiter, login);
+router.post("/register", registerLimiter, register);
 ```
 
 #### 4. **No File Type/Size Validation on Uploads**
@@ -316,7 +310,7 @@ res.json({ csrfToken: req.csrfToken() });
 
 **Do these first (High ROI):**
 
-1. Add rate limiting (5 min)
+1. Review rate limiting behavior and frontend cooldown UX
 2. Fix cookie security (5 min)
 3. Add input validation (15 min)
 4. Create database indexes (10 min)

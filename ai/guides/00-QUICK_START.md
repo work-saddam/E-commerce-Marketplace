@@ -82,7 +82,7 @@ Your project is now equipped with a complete, consolidated AI development framew
 
 1. Weak cookie security
 2. No input validation
-3. No rate limiting
+3. Auth rate limiting now enabled
 4. Unvalidated file uploads
 5. Unverified payment webhooks
 
@@ -190,7 +190,7 @@ redis-cli                   # Connect to Redis
 ### Short Term (2 hours)
 
 1. Fix Priority 1 security issues
-2. Add rate limiting to auth endpoints
+2. Review auth rate limiting and live 429 UX
 3. Add input validation
 4. Test locally
 

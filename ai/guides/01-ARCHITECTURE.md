@@ -186,7 +186,7 @@ See `ai/agents/` for specialized documentation:
 
 1. Weak cookie security
 2. No input validation
-3. No rate limiting
+3. Auth rate limiting configured on buyer and seller login/register routes
 4. Unvalidated file uploads
 5. Unverified payment webhooks
 

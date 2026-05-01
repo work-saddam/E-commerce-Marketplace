@@ -10,9 +10,10 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { buildRateLimitMessage, getRateLimitRetrySeconds } from "@/utils/authRateLimit";
 import { BASE_URL } from "@/utils/constant";
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 export function Signup() {
@@ -25,24 +26,66 @@ export function Signup() {
   const [panNumber, setPanNumber] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [cooldownEndsAt, setCooldownEndsAt] = useState(null);
+  const [remainingSeconds, setRemainingSeconds] = useState(0);
+  const isRateLimited = Boolean(cooldownEndsAt && remainingSeconds > 0);
+
+  useEffect(() => {
+    if (!cooldownEndsAt) {
+      setRemainingSeconds(0);
+      return undefined;
+    }
+
+    const syncCooldown = () => {
+      const seconds = Math.max(0, Math.ceil((cooldownEndsAt - Date.now()) / 1000));
+
+      setRemainingSeconds(seconds);
+      if (seconds === 0) {
+        setCooldownEndsAt(null);
+        setError("");
+      } else {
+        setError(buildRateLimitMessage(seconds));
+      }
+    };
+
+    syncCooldown();
+    const intervalId = setInterval(syncCooldown, 1000);
+
+    return () => clearInterval(intervalId);
+  }, [cooldownEndsAt]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (isRateLimited) {
+      setError(buildRateLimitMessage(remainingSeconds));
+      return;
+    }
+
     setError("");
     setLoading(true);
 
     try {
-      const res = await axios.post(
+      await axios.post(
         `${BASE_URL}/api/seller/register`,
         { sellerName, shopName, email, password, phone, gstNumber, panNumber },
         { withCredentials: true },
       );
-      // console.log(res?.data?.data);
+      setCooldownEndsAt(null);
+      setRemainingSeconds(0);
     } catch (error) {
-      setError(
-        error?.response?.data?.message ||
-          "Something went wrong. Please try again.",
-      );
+      const retryAfterSeconds = getRateLimitRetrySeconds(error);
+
+      if (retryAfterSeconds) {
+        setCooldownEndsAt(Date.now() + retryAfterSeconds * 1000);
+        setRemainingSeconds(retryAfterSeconds);
+        setError(buildRateLimitMessage(retryAfterSeconds));
+      } else {
+        setError(
+          error?.response?.data?.message ||
+            "Something went wrong. Please try again.",
+        );
+      }
     } finally {
       setLoading(false);
     }
@@ -63,7 +106,7 @@ export function Signup() {
           </CardAction>
         </CardHeader>
         <CardContent>
-          <form>
+          <form onSubmit={handleSubmit}>
             <div className="flex flex-col gap-4">
               <div className="grid gap-2">
                 <Label htmlFor="sellerName">Seller Name</Label>
@@ -151,10 +194,9 @@ export function Signup() {
             <Button
               type="submit"
               className="w-full mt-4"
-              onClick={handleSubmit}
-              disabled={loading}
+              disabled={loading || isRateLimited}
             >
-              {loading ? "Sign Up..." : "Sign Up"}
+              {loading ? "Sign Up..." : isRateLimited ? `Try again in ${remainingSeconds}s` : "Sign Up"}
             </Button>
           </form>
         </CardContent>

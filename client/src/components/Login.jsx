@@ -1,9 +1,13 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { BASE_URL } from "../utils/constants";
 import { useDispatch } from "react-redux";
 import { addUser } from "../store/userSlice";
 import { useNavigate } from "react-router-dom";
+import {
+  buildRateLimitMessage,
+  getRateLimitRetrySeconds,
+} from "../utils/authRateLimit";
 
 const Login = () => {
   const dispatch = useDispatch();
@@ -12,20 +16,72 @@ const Login = () => {
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [cooldownEndsAt, setCooldownEndsAt] = useState(null);
+  const [remainingSeconds, setRemainingSeconds] = useState(0);
+
+  const isRateLimited = Boolean(cooldownEndsAt && remainingSeconds > 0);
+
+  useEffect(() => {
+    if (!cooldownEndsAt) {
+      setRemainingSeconds(0);
+      return undefined;
+    }
+
+    const syncCooldown = () => {
+      const seconds = Math.max(
+        0,
+        Math.ceil((cooldownEndsAt - Date.now()) / 1000),
+      );
+
+      setRemainingSeconds(seconds);
+      if (seconds === 0) {
+        setCooldownEndsAt(null);
+        setError("");
+      } else {
+        setError(buildRateLimitMessage(seconds));
+      }
+    };
+
+    syncCooldown();
+    const intervalId = setInterval(syncCooldown, 1000);
+
+    return () => clearInterval(intervalId);
+  }, [cooldownEndsAt]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (isRateLimited) {
+      setError(buildRateLimitMessage(remainingSeconds));
+      return;
+    }
+
     setError("");
+    setLoading(true);
+
     try {
       const res = await axios.post(
         `${BASE_URL}/api/auth/login`,
         { identifier, password },
-        { withCredentials: true }
+        { withCredentials: true },
       );
+      setCooldownEndsAt(null);
+      setRemainingSeconds(0);
       dispatch(addUser(res?.data?.data));
       navigate("/");
     } catch (error) {
-      setError(error.response?.data?.message || "Something went wrong!");
+      const retryAfterSeconds = getRateLimitRetrySeconds(error);
+
+      if (retryAfterSeconds) {
+        setCooldownEndsAt(Date.now() + retryAfterSeconds * 1000);
+        setRemainingSeconds(retryAfterSeconds);
+        setError(buildRateLimitMessage(retryAfterSeconds));
+      } else {
+        setError(error.response?.data?.message || "Something went wrong!");
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -71,9 +127,14 @@ const Login = () => {
 
           <button
             type="submit"
+            disabled={loading || isRateLimited}
             className="mt-2 w-full rounded-lg bg-yellow-500 px-4 py-2 font-medium text-white transition hover:bg-yellow-600"
           >
-            Login
+            {loading
+              ? "Logging in..."
+              : isRateLimited
+                ? `Try again in ${remainingSeconds}s`
+                : "Login"}
           </button>
         </form>
 

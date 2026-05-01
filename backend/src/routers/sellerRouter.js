@@ -14,12 +14,13 @@ const {
   editProduct,
 } = require("../controllers/productControllers");
 const checkSellerStatus = require("../middlewares/checkSellerStatus");
+const { loginLimiter, registerLimiter } = require("../middlewares/authRateLimit");
 const upload = require("../middlewares/multer");
 const { getOrderbyId } = require("../controllers/orderController");
 const router = express.Router();
 
-router.post("/register", sellerRegister);
-router.post("/login", sellerLogin);
+router.post("/register", registerLimiter, sellerRegister);
+router.post("/login", loginLimiter, sellerLogin);
 router.get("/profile", userAuth, getSellerProfile);
 
 //product routes
