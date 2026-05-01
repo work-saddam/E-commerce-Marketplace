@@ -115,6 +115,7 @@ REDIS_URL=redis://localhost:6379
 # Payment Gateway
 RAZORPAY_KEY_ID=your_key
 RAZORPAY_KEY_SECRET=your_secret
+RAZORPAY_WEBHOOK_SECRET=your_webhook_secret
 
 # Email Service
 RESEND_API_KEY=your_key
@@ -188,15 +189,13 @@ See `ai/agents/` for specialized documentation:
 2. No input validation
 3. Auth rate limiting configured on buyer and seller login/register routes
 4. Unvalidated file uploads
-5. Unverified payment webhooks
 
 ### 🟠 High Priority (1-2 hours)
 
-6. Missing idempotency keys
-7. No HTTPS enforcement
-8. N+1 queries
-9. Missing database indexes
-10. Weak error messages
+5. Missing idempotency keys
+6. N+1 queries
+7. Missing database indexes
+8. Weak error messages
 
 ### 🟡 Medium Priority (1-2 hours)
 

@@ -5,6 +5,10 @@ const {
   validateUserRegisterData,
   validateLoginData,
 } = require("../utils/validation");
+const {
+  getAuthCookieOptions,
+  getAuthClearCookieOptions,
+} = require("../config/security");
 
 const register = async (req, res) => {
   try {
@@ -73,12 +77,7 @@ const login = async (req, res) => {
       expiresIn: "3d",
     });
 
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      maxAge: 3 * 24 * 60 * 60 * 1000, // 3 days
-    });
+    res.cookie("token", token, getAuthCookieOptions());
 
     const userData = {
       _id: user._id,
@@ -97,10 +96,7 @@ const login = async (req, res) => {
 
 const logout = async (req, res) => {
   try {
-    res.clearCookie("token", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-    });
+    res.clearCookie("token", getAuthClearCookieOptions());
     res.status(200).json({ message: "Logout Successfully!" });
   } catch (error) {
     res.status(500).json({ message: "Logout Failed!", error: error.message });

@@ -8,6 +8,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
 const TransactionalMailService = require("../services/transactionalMail.service");
+const { getAuthCookieOptions } = require("../config/security");
 
 exports.sellerRegister = async (req, res) => {
   try {
@@ -93,12 +94,7 @@ exports.sellerLogin = async (req, res) => {
       { expiresIn: "3d" },
     );
 
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      maxAge: 3 * 24 * 60 * 60 * 1000, // 3 days
-    });
+    res.cookie("token", token, getAuthCookieOptions());
 
     const sellerData = {
       _id: seller._id,

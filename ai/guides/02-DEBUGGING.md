@@ -4,74 +4,26 @@
 
 ### 🚨 Critical Issues (Must Fix)
 
-#### 5. **Unverified Payment Webhooks**
-
-**File**: `backend/src/services/payment.service.js`
-**Severity**: 🔴 CRITICAL
-**Problem**:
-
-- Must verify webhook signature before processing
-- Unverified webhooks = fraud vulnerability
-- Attacker can fake payment confirmations
-
-**Current Code**: Uses `razorpayWebhookVerifier` ✅ (GOOD)
-**Ensure**: Raw body is preserved in Express middleware (already done in server.js)
-
----
-
 ### ⚠️ High Priority Issues
-
-#### 6. **Missing Idempotency in Payment Processing**
-
-**File**: `backend/src/services/payment.service.js` (line 78)
-**Severity**: 🟠 HIGH
-**Problem**:
-
-```javascript
-// TODO: later we can also add the idempotency key
-// ❌ Retry could create duplicate orders!
-```
-
-**Impact**: Network retry → double charge
-**Solution**:
-
-```javascript
-const idempotencyKey = `${buyerId}-${Date.now()}`; // or use MongoDB session ID
-
-// Check if order already exists
-const existingOrder = await MasterOrder.findOne({ idempotencyKey });
-if (existingOrder) {
-  return existingOrder; // Idempotent response
-}
-
-// Create new order
-const order = await MasterOrder.create({ ...data, idempotencyKey });
-```
 
 #### 7. **No HTTPS Enforcement**
 
-**File**: `backend/src/server.js`, `backend/src/controllers/authController.js`
-**Severity**: 🟠 HIGH
-**Problem**:
+**File**: `backend/src/server.js`, `backend/src/config/security.js`
+**Status**: ✅ RESOLVED
+**What is in place**:
 
-- No HSTS header
-- CORS allows HTTP in production config
-- Cookies not properly secured
+- Production requests are rejected unless they arrive over HTTPS
+- `helmet` adds HSTS in production with a one-year preload policy
+- Production CORS origins are derived from deployed app URLs, not localhost
+- Auth cookies now use shared secure options across buyer and seller flows
 
-**Solution**:
+**Current Code**:
 
-```javascript
-const helmet = require("helmet");
+- `backend/src/server.js` trusts the proxy, applies `helmet`, and enforces HTTPS
+- `backend/src/config/security.js` centralizes CORS, HTTPS, and cookie policy
+- `backend/src/controllers/authController.js` and `sellerController.js` use shared auth cookie options
 
-app.use(helmet()); // Adds security headers including HSTS
-app.use(
-  helmet.hsts({
-    maxAge: 31536000, // 1 year
-    includeSubDomains: true,
-    preload: true,
-  }),
-);
-```
+**Audit Note**: Keep `CLIENT_APP_URL` and `SELLER_APP_URL` on `https://` origins in production.
 
 #### 8. **N+1 Query in Order Fetching**
 
