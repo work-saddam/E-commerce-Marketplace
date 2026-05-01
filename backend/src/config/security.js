@@ -2,6 +2,7 @@ const DEV_CORS_ORIGINS = ["http://localhost:5173", "http://localhost:5174"];
 const AUTH_COOKIE_MAX_AGE_MS = 3 * 24 * 60 * 60 * 1000;
 
 const isProduction = process.env.NODE_ENV === "production";
+const isDevelopment = process.env.NODE_ENV === "development";
 
 const normalizeOrigin = (value) => {
   if (!value) {
@@ -48,7 +49,7 @@ const allowedCorsOrigins = [
 ];
 
 const helmetOptions = {
-  contentSecurityPolicy: false,
+  ...(isDevelopment ? { contentSecurityPolicy: false } : {}),
   crossOriginEmbedderPolicy: false,
   hsts: isProduction
     ? {
@@ -88,7 +89,13 @@ const requireHttps = (req, res, next) => {
   });
 };
 
+const disableContentSecurityPolicy = (_req, res, next) => {
+  res.removeHeader("Content-Security-Policy");
+  next();
+};
+
 module.exports = {
+  disableContentSecurityPolicy,
   getAuthClearCookieOptions,
   getAuthCookieOptions,
   allowedCorsOrigins,

@@ -81,30 +81,6 @@ orderSchema.index({ status: 1 });
 orderSchema.index({ createdAt: -1 });
 ```
 
-#### 10. **Weak Error Messages (Information Leakage)**
-
-**File**: `backend/src/controllers/authController.js` (line 47-50)
-**Severity**: 🟠 HIGH
-**Problem**:
-
-```javascript
-// ❌ Reveals if email/user exists!
-const field = existingUser.email == email ? "Email" : "Phone number";
-return res.status(400).json({ message: `${field} already registered!` });
-```
-
-**Attack**: Attacker can enumerate all registered emails
-**Solution**:
-
-```javascript
-// ✅ Generic message
-if (existingUser) {
-  return res.status(400).json({ message: "Registration failed. Try again." });
-}
-```
-
----
-
 ### 📌 Medium Priority Issues
 
 #### 11. **No Input Sanitization for Strings**
