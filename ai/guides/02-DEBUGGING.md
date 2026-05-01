@@ -4,59 +4,6 @@
 
 ### 🚨 Critical Issues (Must Fix)
 
-#### 3. **Auth Rate Limiting on Auth Routes**
-
-**File**: `backend/src/server.js`
-**Severity**: 🔴 CRITICAL
-**Status**: Fixed with Redis-backed auth throttling and live 429 frontend feedback
-**Current Behavior**:
-
-- Buyer and seller login/register routes are limited to 5 requests per minute per IP
-- Login routes skip successful requests
-- `429` responses include JSON plus `Retry-After` and standard rate-limit headers
-- Buyer and seller auth forms show a live inline countdown while blocked
-
-**Solution**:
-
-```javascript
-const { loginLimiter, registerLimiter } = require("./middlewares/authRateLimit");
-
-router.post("/login", loginLimiter, login);
-router.post("/register", registerLimiter, register);
-```
-
-#### 4. **No File Type/Size Validation on Uploads**
-
-**File**: `backend/src/middlewares/multer.js`
-**Severity**: 🔴 CRITICAL
-**Problem**:
-
-- No file type whitelist
-- No maximum file size
-- Could upload malware or exhaust storage
-
-**Solution**:
-
-```javascript
-const multer = require("multer");
-const path = require("path");
-
-const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
-const MAX_SIZE = 5 * 1024 * 1024; // 5MB
-
-const fileFilter = (req, file, cb) => {
-  if (!ALLOWED_TYPES.includes(file.mimetype)) {
-    return cb(new Error("Invalid file type"), false);
-  }
-  cb(null, true);
-};
-
-const upload = multer({
-  fileFilter,
-  limits: { fileSize: MAX_SIZE },
-});
-```
-
 #### 5. **Unverified Payment Webhooks**
 
 **File**: `backend/src/services/payment.service.js`

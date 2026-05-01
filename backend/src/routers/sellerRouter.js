@@ -15,7 +15,7 @@ const {
 } = require("../controllers/productControllers");
 const checkSellerStatus = require("../middlewares/checkSellerStatus");
 const { loginLimiter, registerLimiter } = require("../middlewares/authRateLimit");
-const upload = require("../middlewares/multer");
+const { singleImageUpload } = require("../middlewares/multer");
 const { getOrderbyId } = require("../controllers/orderController");
 const router = express.Router();
 
@@ -28,7 +28,7 @@ router.post(
   "/products",
   userAuth,
   checkSellerStatus,
-  upload.single("productImage"),
+  singleImageUpload("productImage"),
   addProduct
 );
 router.get("/products", userAuth, getAllSellerProduct);
@@ -36,7 +36,7 @@ router.put(
   "/products/:id",
   userAuth,
   checkSellerStatus,
-  upload.single("productImage"),
+  singleImageUpload("productImage"),
   editProduct
 );
 router.delete("/products/:id", userAuth, checkSellerStatus, deleteProduct);
