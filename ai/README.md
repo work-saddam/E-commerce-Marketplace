@@ -25,6 +25,10 @@
 
 → See [tools/00-AI-TOOLS.md](tools/00-AI-TOOLS.md#-copy-paste-method-any-ai-tool)
 
+### Shared Operating Rules
+
+All AI tools should apply [context/agent-principles.md](context/agent-principles.md) before acting on non-trivial coding tasks.
+
 ---
 
 ## 📁 Complete Folder Structure

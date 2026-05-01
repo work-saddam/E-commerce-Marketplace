@@ -1,5 +1,16 @@
 # 📌 AGENTS.md - Architecture Guide (Consolidated)
 
+## AI Operating Principles
+
+All AI agents working in this repository should apply the shared principles in `ai/context/agent-principles.md` before making non-trivial changes.
+
+- Think Before Coding
+- Simplicity First
+- Surgical Changes
+- Goal-Driven Execution
+
+These principles are the default operating behavior for AGENTS-aware tools in this repo.
+
 **Status**: Content moved to `/ai/guides/01-ARCHITECTURE.md` for better organization
 
 ---
