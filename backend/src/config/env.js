@@ -14,8 +14,6 @@ const REQUIRED_ENVS = [
   "CLOUDINARY_API_SECRET",
   "RESEND_API_KEY",
   "MAIL_FROM",
-  "CLIENT_APP_URL",
-  "SELLER_APP_URL",
 ];
 
 const readEnv = (name) => {
@@ -125,25 +123,28 @@ const validateEnvironment = () => {
     validateUrl("REDIS_URL", env.REDIS_URL, ["redis:", "rediss:"], errors);
   }
 
-  if (env.CLIENT_APP_URL) {
-    validateUrl(
-      "CLIENT_APP_URL",
-      env.CLIENT_APP_URL,
-      ["http:", "https:"],
-      errors,
-    );
-  }
-
-  if (env.SELLER_APP_URL) {
-    validateUrl(
-      "SELLER_APP_URL",
-      env.SELLER_APP_URL,
-      ["http:", "https:"],
-      errors,
-    );
-  }
-
   if (nodeEnv === "production") {
+    env.CLIENT_APP_URL = requireEnv("CLIENT_APP_URL", errors);
+    env.SELLER_APP_URL = requireEnv("SELLER_APP_URL", errors);
+
+    if (env.CLIENT_APP_URL) {
+      validateUrl(
+        "CLIENT_APP_URL",
+        env.CLIENT_APP_URL,
+        ["http:", "https:"],
+        errors,
+      );
+    }
+
+    if (env.SELLER_APP_URL) {
+      validateUrl(
+        "SELLER_APP_URL",
+        env.SELLER_APP_URL,
+        ["http:", "https:"],
+        errors,
+      );
+    }
+
     if (env.CLIENT_APP_URL && !env.CLIENT_APP_URL.startsWith("https://")) {
       errors.push("CLIENT_APP_URL must use HTTPS in production");
     }

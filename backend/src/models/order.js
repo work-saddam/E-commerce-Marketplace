@@ -68,6 +68,7 @@ orderSchema.index({ buyer: 1, createdAt: -1 });
 orderSchema.index({ seller: 1, orderStatus: 1, createdAt: -1 });
 orderSchema.index({ orderStatus: 1, createdAt: -1 });
 orderSchema.index({ masterOrder: 1, orderStatus: 1 });
+orderSchema.index({ "products.product": 1, createdAt: -1 });
 
 const Order = mongoose.model("Order", orderSchema);
 module.exports = Order;
