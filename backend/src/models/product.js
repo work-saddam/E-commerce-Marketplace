@@ -50,6 +50,12 @@ const productSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
+productSchema.index({ seller: 1, createdAt: -1 });
+productSchema.index({ category: 1, createdAt: -1 });
+productSchema.index({ slug: 1 }, { unique: true, sparse: true });
+productSchema.index({ createdAt: -1 });
+productSchema.index({ price: 1 });
+
 productSchema.pre("save", function (next) {
   if (this.isModified("title")) {
     const baseSlug = slugify(this.title, { lower: true, strict: true });
