@@ -95,9 +95,7 @@ const validateEnvironment = () => {
   process.env.NODE_ENV = nodeEnv;
 
   if (!ALLOWED_NODE_ENVS.includes(nodeEnv)) {
-    errors.push(
-      `NODE_ENV must be one of: ${ALLOWED_NODE_ENVS.join(", ")}`,
-    );
+    errors.push(`NODE_ENV must be one of: ${ALLOWED_NODE_ENVS.join(", ")}`);
   }
 
   const env = Object.fromEntries(
@@ -154,11 +152,17 @@ const validateEnvironment = () => {
     }
   }
 
-  if (env.MAIL_FROM && !validator.isEmail(env.MAIL_FROM)) {
+  if (
+    env.MAIL_FROM &&
+    !validator.isEmail(env.MAIL_FROM, { allow_display_name: true })
+  ) {
     errors.push("MAIL_FROM must be a valid email address");
   }
 
-  if (mailReplyTo && !validator.isEmail(mailReplyTo)) {
+  if (
+    mailReplyTo &&
+    !validator.isEmail(mailReplyTo, { allow_display_name: true })
+  ) {
     errors.push("MAIL_REPLY_TO must be a valid email address");
   }
 

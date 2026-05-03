@@ -30,7 +30,7 @@ This agent activates when working on:
 2. `ai/context/conventions.md` - Code Style, Error Handling
 3. `ai/context/domain.md` - Business Domain, API Layers
 
-**For implementation:** 4. `ai/prompts/api-route.prompt.md` - Endpoint patterns 5. `DEBUGGING_GUIDE.md` - Known issues 6. `ai/skills/api-development.md` - Deep patterns
+**For implementation:** 4. `ai/prompts/api-route.prompt.md` - Endpoint patterns 5. `ai/skills/api-development.md` - Deep patterns 6. `ai/guides/03-DEVELOPMENT_PLANNER.md` - Planning workflow
 
 ---
 

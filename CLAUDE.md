@@ -2,33 +2,25 @@
 
 Use this file as the default instruction entry point for Claude-style agents in this repository.
 
-## Universal AI Operating Principles
+## Read First
 
-Apply the shared principles in `ai/context/agent-principles.md` before making non-trivial changes.
+1. `ai/context/agent-principles.md`
+2. `ai/README.md`
+3. The matching domain guide in `ai/agents/`
 
-- Think Before Coding
-- Simplicity First
-- Surgical Changes
-- Goal-Driven Execution
+## Supporting References
 
-## Repo Instruction Order
+- `ai/context/domain.md`
+- `ai/context/stack.md`
+- `ai/context/conventions.md`
+- `ai/guides/01-ARCHITECTURE.md`
+- `ai/guides/03-DEVELOPMENT_PLANNER.md`
+- `ai/skills/api-development.md`
+- `ai/skills/database-optimization.md`
 
-1. Read `ai/context/agent-principles.md`
-2. Read `ai/README.md`
-3. Load the relevant domain guide:
-   - `ai/agents/backend.agent.md`
-   - `ai/agents/frontend.agent.md`
-   - `ai/agents/db.agent.md`
-   - `ai/agents/security.agent.md`
-4. Reference supporting context as needed:
-   - `ai/context/domain.md`
-   - `ai/context/stack.md`
-   - `ai/context/conventions.md`
-   - `ai/guides/02-DEBUGGING.md`
+## Working Style
 
-## Required Working Style
-
+- Prefer direct, minimal implementations.
 - Do not guess through ambiguity.
-- Prefer minimal, direct implementations.
-- Keep changes narrowly scoped to the request.
-- Verify the result with tests, checks, or concrete inspection when possible.
+- Keep changes scoped to the request.
+- Verify outcomes with tests, checks, or concrete inspection when possible.

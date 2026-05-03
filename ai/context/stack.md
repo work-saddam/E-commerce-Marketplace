@@ -224,7 +224,7 @@ VITE_API_TIMEOUT=10000
 ### Logging
 
 - **Service**: Winston logger (TODO)
-- **Level**: error, warn, info, debug
+- **Level**: error, warn, info, trace
 - **Storage**: CloudWatch / Datadog
 
 ### Error Tracking

@@ -179,27 +179,14 @@ See `ai/agents/` for specialized documentation:
 
 ---
 
-## 🐛 Known Issues & Debugging
+## Implementation Focus
 
-**See `ai/guides/02-DEBUGGING.md` for complete 15-issue guide with fixes:**
+When extending the system, prioritize:
 
-### 🔴 Critical (Fix First - 40 min)
-
-1. Weak cookie security
-2. No input validation
-3. Auth rate limiting configured on buyer and seller login/register routes
-4. Unvalidated file uploads
-
-### 🟠 High Priority (1-2 hours)
-
-5. Missing idempotency keys
-6. N+1 queries
-7. Missing database indexes
-8. Weak error messages
-
-### 🟡 Medium Priority (1-2 hours)
-
-11-15. Other issues (see full guide)
+1. Security-sensitive flows first
+2. Data integrity and transaction safety
+3. Query efficiency and pagination
+4. Clear API contracts and verification
 
 ---
 
@@ -301,4 +288,4 @@ POST   /webhook            Razorpay webhook
 
 ---
 
-**Next**: Read `ai/guides/02-DEBUGGING.md` for 15 specific issues with fixes.
+**Next**: Read `ai/guides/03-DEVELOPMENT_PLANNER.md` for planning workflow and `ai/skills/` for implementation patterns.
