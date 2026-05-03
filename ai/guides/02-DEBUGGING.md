@@ -4,23 +4,6 @@
 
 ### 🚨 Critical Issues (Must Fix)
 
-#### 13. **No Environment Variable Validation**
-
-**Severity**: 🟡 MEDIUM
-**Problem**: Missing env vars crash server silently
-**Solution**:
-
-```javascript
-// At startup
-const requiredEnvs = ["PORT", "MONGODB_URI", "JWT_SECRET", "RAZORPAY_KEY_ID"];
-
-requiredEnvs.forEach((env) => {
-  if (!process.env[env]) {
-    throw new Error(`Missing required env: ${env}`);
-  }
-});
-```
-
 #### 15. **No API Versioning**
 
 **Severity**: 🟡 MEDIUM
