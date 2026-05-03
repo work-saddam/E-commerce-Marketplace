@@ -34,5 +34,8 @@ const sellerSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+sellerSchema.index({ status: 1, createdAt: -1 });
+sellerSchema.index({ createdAt: -1 });
+
 const Seller = mongoose.model("Seller", sellerSchema);
 module.exports = Seller;

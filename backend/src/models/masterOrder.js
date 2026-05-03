@@ -31,6 +31,8 @@ const masterOrderSchema = new mongoose.Schema(
 );
 
 masterOrderSchema.index({ reservationExpiresAt: 1 });
+masterOrderSchema.index({ buyer: 1, createdAt: -1 });
+masterOrderSchema.index({ paymentStatus: 1, reservationExpiresAt: 1 });
 
 const MasterOrder = mongoose.model("MasterOrder", masterOrderSchema);
 module.exports = MasterOrder;

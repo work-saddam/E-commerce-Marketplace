@@ -269,9 +269,6 @@ const orders = await Order.find()
 ## 10. Query Analysis & Monitoring
 
 ```javascript
-// Enable query logging (development only)
-mongoose.set("debug", true);
-
 // Check index usage
 db.collection.aggregate([{ $indexStats: {} }]);
 

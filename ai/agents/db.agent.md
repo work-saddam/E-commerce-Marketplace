@@ -32,7 +32,7 @@ This agent activates when working on:
 2. `ai/context/conventions.md` - Database Field naming
 3. `ai/context/domain.md` - Entity relationships
 
-**For implementation:** 4. `ai/prompts/schema.prompt.md` - Schema patterns 5. `ai/skills/database-optimization.md` - Query patterns 6. `DEBUGGING_GUIDE.md` - Database issues
+**For implementation:** 4. `ai/prompts/schema.prompt.md` - Schema patterns 5. `ai/skills/database-optimization.md` - Query patterns 6. `ai/guides/03-DEVELOPMENT_PLANNER.md` - Execution workflow
 
 ---
 

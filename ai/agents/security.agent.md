@@ -36,7 +36,7 @@ This agent activates when working on:
 2. `ai/context/conventions.md` - Security Conventions
 3. `ai/context/domain.md` - Compliance & Security
 
-**For implementation:** 4. `ai/agents/security.agent.md` - Payment security 5. `DEBUGGING_GUIDE.md` - Security vulnerabilities (issues 1-5, 7, 10) 6. `AGENTS.md` - Security best practices
+**For implementation:** 4. `ai/agents/security.agent.md` - Payment security 5. `ai/skills/api-development.md` - Validation and response patterns 6. `AGENTS.md` - Repository defaults
 
 ---
 
@@ -559,17 +559,15 @@ MONGODB_URI=mongodb+srv://user:password@cluster.mongodb.net
 
 ---
 
-## 🚨 Critical Security Issues
+## 🚨 Critical Security Focus
 
-From DEBUGGING_GUIDE.md:
-
-- 🔴 **Unverified Payment Webhooks** - Must verify signature
-- 🔴 **Weak Cookie Security** - Must use secure flag
-- 🔴 **No Input Validation** - Validate all inputs
-- 🔴 **No Rate Limiting** - Prevent brute force
-- 🔴 **Missing Idempotency** - Prevent duplicate charges
-- 🟠 **No HTTPS Enforcement** - Require HTTPS
-- 🟠 **Weak Error Messages** - Don't leak user existence
+- 🔴 **Webhook verification** - Verify signatures before processing
+- 🔴 **Cookie safety** - Use secure production cookie settings
+- 🔴 **Input validation** - Validate all external input
+- 🔴 **Rate limiting** - Protect public auth and payment paths
+- 🟠 **Idempotency** - Prevent duplicate payment side effects
+- 🟠 **HTTPS enforcement** - Require secure transport in production
+- 🟠 **Safe errors** - Do not leak account existence or internal details
 
 ---
 
@@ -578,7 +576,7 @@ From DEBUGGING_GUIDE.md:
 - **Backend endpoint security?** → Include backend.agent.md
 - **Frontend authentication?** → Include frontend.agent.md
 - **Database query injection?** → Include db.agent.md
-- **Full security audit?** → Reference DEBUGGING_GUIDE.md + ai/agents/security.agent.md
+- **Full security audit?** → Reference `ai/agents/security.agent.md` + `ai/context/conventions.md`
 
 ---
 
