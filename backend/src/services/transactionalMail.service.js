@@ -153,7 +153,7 @@ const queueBuyerOrderConfirmedEmail = async ({ masterOrderId }) => {
       subject: template.subject,
       html: template.html,
       text: template.text,
-      idempotencyKey: `buyer-order-confirmed-${masterOrder._id.toString()}`,
+      idempotencyKey: `buyer-order-confirmed-${masterOrder._id.toString()}-${new Date(masterOrder.createdAt).getTime()}`,
       tags: [
         { name: "template", value: "buyer-order-confirmed" },
         { name: "master_order_id", value: masterOrder._id.toString() },
@@ -216,7 +216,7 @@ const queueBuyerPaymentFailedEmail = async ({
       subject: template.subject,
       html: template.html,
       text: template.text,
-      idempotencyKey: `buyer-payment-failed-${paymentId}`,
+      idempotencyKey: `buyer-payment-failed-${paymentId}-${new Date().getTime()}`,
       tags: [
         { name: "template", value: "buyer-payment-failed" },
         { name: "master_order_id", value: masterOrder._id.toString() },
