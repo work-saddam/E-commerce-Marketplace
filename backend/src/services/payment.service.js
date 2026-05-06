@@ -189,7 +189,11 @@ exports.verifyPaymentWebhook = async (req, res) => {
       return res.status(200).json({ received: true });
     }
 
-    if (event === "payment.failed" && paymentRecord.status === "failed") {
+    if (
+      event === "payment.failed" &&
+      paymentRecord.status === "failed" &&
+      payload.id === paymentRecord.razorpayPaymentId
+    ) {
       return res.status(200).json({ received: true });
     }
 
@@ -377,8 +381,12 @@ exports.markSuccess = async (paymentRecord, payload, session) => {
 const withSession = (session) => (session ? { session } : {});
 
 exports.markFailed = async (paymentRecord, data = {}, session = null) => {
-  // IDEMPOTENCY GUARD
-  if (paymentRecord.status === "failed") {
+  const isDuplicateFailedPayment =
+    paymentRecord.status === "failed" &&
+    data.razorpayPaymentId &&
+    paymentRecord.razorpayPaymentId === data.razorpayPaymentId;
+
+  if (isDuplicateFailedPayment) {
     return;
   }
 
