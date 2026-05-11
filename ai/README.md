@@ -9,40 +9,51 @@ The `ai/` folder is the documentation hub for repository-aware AI tools and huma
 3. Read `guides/01-ARCHITECTURE.md`
 4. Load the most relevant domain guide in `agents/`
 
-## Folder Map
+## Structure
 
-| Folder | Purpose |
-| --- | --- |
-| `agents/` | Domain-specific working rules |
-| `context/` | Project domain, stack, and conventions |
-| `guides/` | Quick start, architecture, and planning |
-| `prompts/` | Reusable implementation templates |
-| `skills/` | API and database patterns |
-| `tools/` | AI tool usage notes |
+| Folder     | Purpose                                 |
+| ---------- | --------------------------------------- |
+| `agents/`  | Domain-specific working rules           |
+| `context/` | Project domain, stack, and conventions  |
+| `guides/`  | Quick start, architecture, and planning |
+| `prompts/` | Reusable implementation templates       |
+| `skills/`  | Built-in API and database patterns      |
+| `tools/`   | AI tool usage notes                     |
 
 ## Core Guides
 
-| File | Use |
-| --- | --- |
-| `guides/00-QUICK_START.md` | Fast orientation |
-| `guides/01-ARCHITECTURE.md` | System structure and runtime setup |
+| File                               | Use                                  |
+| ---------------------------------- | ------------------------------------ |
+| `guides/00-QUICK_START.md`         | Fast orientation                     |
+| `guides/01-ARCHITECTURE.md`        | System structure and runtime setup   |
 | `guides/03-DEVELOPMENT_PLANNER.md` | Planning and implementation workflow |
 
 ## Domain Guides
 
-| File | Use |
-| --- | --- |
-| `agents/backend.agent.md` | Express controllers, routes, services, middleware |
-| `agents/frontend.agent.md` | React components, pages, state management |
-| `agents/db.agent.md` | Schemas, queries, indexes, aggregations |
-| `agents/security.agent.md` | Auth, validation, payments, webhooks, headers |
+| File                       | Use                                               |
+| -------------------------- | ------------------------------------------------- |
+| `agents/backend.agent.md`  | Express controllers, routes, services, middleware |
+| `agents/frontend.agent.md` | React components, pages, state management         |
+| `agents/db.agent.md`       | Schemas, queries, indexes, aggregations           |
+| `agents/security.agent.md` | Auth, validation, payments, webhooks, headers     |
 
-## Skills
+## Skill Registry
 
-| File | Use |
-| --- | --- |
-| `skills/api-development.md` | Endpoint design and request handling |
-| `skills/database-optimization.md` | Query tuning and index strategy |
+**Built-in Skills** (`ai/skills/`)
+
+- `api-development.md` — Endpoint design and request handling
+- `database-optimization.md` — Query tuning and index strategy
+
+**Installed Skills** (registered in `skills-lock.json`)
+
+- `frontend-design` — Production-grade UI/UX and React components
+- `vercel-react-best-practices` — React/Next.js performance optimization patterns
+
+**How to Add Skills**
+
+1. Register new skill in `skills-lock.json` via `skills.sh` webapp
+2. Add one-line description to this **Installed Skills** section
+3. All agents automatically inherit the new skill
 
 ## Common Routing
 
