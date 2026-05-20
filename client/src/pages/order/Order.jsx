@@ -205,23 +205,42 @@ const Order = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6">
+    <div className="min-h-screen bg-[#f5f7fb] px-4 py-6 sm:px-6">
       <div className="mx-auto max-w-6xl space-y-6">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-slate-500">
-              Orders
-            </p>
-            <h3 className="mt-2 text-3xl font-semibold text-slate-950">
-              Your order groups
-            </h3>
+        <section className="rounded-[32px] border border-slate-200/80 bg-white/90 px-5 py-6 shadow-[0_24px_70px_-48px_rgba(15,23,42,0.45)] backdrop-blur-sm sm:px-8 sm:py-8">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-slate-500">
+                Orders
+              </p>
+              <h3 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-slate-950 sm:text-4xl">
+                Your order groups
+              </h3>
+            </div>
+
+            <div className="self-start rounded-[24px] border border-slate-200/80 bg-white px-5 py-4 shadow-[0_18px_42px_-36px_rgba(15,23,42,0.6)]">
+              <p className="text-2xl font-semibold tracking-[-0.04em] text-slate-950 sm:text-3xl">
+                {pagination?.total ?? orderGroups.length}
+              </p>
+              <p className="mt-1 text-sm text-slate-500">
+                master order
+                {Number(pagination?.total ?? orderGroups.length) === 1 ? "" : "s"}
+              </p>
+            </div>
           </div>
 
-          <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600 shadow-sm">
-            {pagination?.total ?? orderGroups.length} master order
-            {Number(pagination?.total ?? orderGroups.length) === 1 ? "" : "s"}
-          </div>
-        </div>
+          {!isLoading && !errorMessage && orderGroups.length > 0 ? (
+            <div className="mt-6 flex flex-col gap-2 border-t border-slate-200/80 pt-4 sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-sm text-slate-600 sm:text-base">
+                Showing {orderGroups.length} group
+                {orderGroups.length === 1 ? "" : "s"} on this page
+              </p>
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">
+                Page {currentPage} of {pagination?.totalPages || 1}
+              </p>
+            </div>
+          ) : null}
+        </section>
 
         {isLoading ? (
           <div className="space-y-4">
@@ -254,25 +273,6 @@ const Order = () => {
 
         {!isLoading && !errorMessage && orderGroups.length > 0 ? (
           <div className="space-y-6">
-            <div className="flex flex-col gap-2 text-sm text-slate-600 sm:flex-row sm:items-center sm:justify-between">
-              <p>
-                Showing{" "}
-                <span className="font-semibold text-slate-900">
-                  {orderGroups.length}
-                </span>{" "}
-                group{orderGroups.length === 1 ? "" : "s"} on this page
-              </p>
-              {pagination ? (
-                <p>
-                  Total{" "}
-                  <span className="font-semibold text-slate-900">
-                    {pagination.total}
-                  </span>{" "}
-                  master order{pagination.total === 1 ? "" : "s"}
-                </p>
-              ) : null}
-            </div>
-
             {orderGroups.map((group) => (
               <OrderGroupCard
                 key={group.id}

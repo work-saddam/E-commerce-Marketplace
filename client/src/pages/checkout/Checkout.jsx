@@ -58,6 +58,8 @@ const Checkout = () => {
       return;
     }
 
+    let masterOrderId = null;
+
     try {
       setLoading(true);
       const orderRes = await axios.post(
@@ -70,7 +72,7 @@ const Checkout = () => {
         navigate("/account/orders");
         dispatch(clearCart());
       } else if (paymentMethod === "Razorpay") {
-        const masterOrderId = orderRes?.data?.masterOrderId;
+        masterOrderId = orderRes?.data?.masterOrderId;
         if (!masterOrderId) {
           throw new Error("Order created but payment could not be initialized");
         }
@@ -104,11 +106,19 @@ const Checkout = () => {
         });
       }
     } catch (error) {
-      toast.error(
+      const errorMessage =
         error?.response?.data?.message ||
           error?.message ||
-          "Failed to place order",
-      );
+          "Failed to place order";
+
+      if (masterOrderId) {
+        toast.error(errorMessage);
+        navigate("/account/orders");
+        dispatch(clearCart());
+        return;
+      }
+
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
