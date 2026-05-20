@@ -1,25 +1,26 @@
 import axios from "axios";
 import { BASE_URL } from "../../utils/constants";
-import { useEffect } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { clearCart } from "../../store/cartSlice";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import { launchRazorpayPayment } from "../../utils/razorpayPayment";
 
 const Checkout = () => {
   const [addresses, setAddresses] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [showAllAddresses, setShowAllAddress] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState("COD");
-  const [loading, setloading] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState("Razorpay");
+  const [loading, setLoading] = useState(false);
   const cart = useSelector((store) => store.cart);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const fetchAddresses = async () => {
+  const fetchAddresses = async (signal) => {
     try {
       const res = await axios.get(`${BASE_URL}/api/users/address`, {
+        signal,
         withCredentials: true,
       });
 
@@ -29,6 +30,10 @@ const Checkout = () => {
       setAddresses(all);
       setSelectedAddress(defaultAdd?._id || null);
     } catch (error) {
+      if (error?.code === "ERR_CANCELED") {
+        return;
+      }
+
       toast.error(
         error?.response?.data?.message || "Failed to fetch addresses",
       );
@@ -36,35 +41,11 @@ const Checkout = () => {
   };
 
   useEffect(() => {
-    fetchAddresses();
+    const controller = new AbortController();
+    fetchAddresses(controller.signal);
+
+    return () => controller.abort();
   }, []);
-
-  const verifyPayment = async (response) => {
-    try {
-      setloading(true);
-      const res = await axios.post(
-        `${BASE_URL}/api/payment/verify`,
-        {
-          razorpay_payment_id: response.razorpay_payment_id,
-          razorpay_order_id: response.razorpay_order_id,
-          razorpay_signature: response.razorpay_signature,
-        },
-        { withCredentials: true },
-      );
-
-      if (res?.data?.success) {
-        toast.success(res?.data?.message || "Payment verified successfully");
-        navigate("/account/orders");
-        dispatch(clearCart());
-      } else {
-        toast.error("Payment verification failed.");
-      }
-    } catch (error) {
-      toast.error(error?.response?.data?.message || "Failed to verify payment");
-    } finally {
-      setloading(false);
-    }
-  };
 
   const handlePlaceOrder = async () => {
     if (cart.length === 0) {
@@ -77,8 +58,10 @@ const Checkout = () => {
       return;
     }
 
+    let masterOrderId = null;
+
     try {
-      setloading(true);
+      setLoading(true);
       const orderRes = await axios.post(
         `${BASE_URL}/api/users/checkout`,
         { cart, addressId: selectedAddress, paymentMethod },
@@ -89,36 +72,55 @@ const Checkout = () => {
         navigate("/account/orders");
         dispatch(clearCart());
       } else if (paymentMethod === "Razorpay") {
-        const paymentRes = await axios.post(
-          `${BASE_URL}/api/payment/create`,
-          { masterOrderId: orderRes?.data?.masterOrderId },
-          { withCredentials: true },
-        );
-        const { order, keyId, user } = paymentRes?.data || {};
-        const options = {
-          key: keyId,
-          amount: order.amount,
-          currency: order.currency,
-          name: "TrustKart Store",
-          description: "Order Transaction",
-          order_id: order.id,
-          prefill: {
-            name: user.name,
-            email: user.email,
-            contact: user.phone,
+        masterOrderId = orderRes?.data?.masterOrderId;
+        if (!masterOrderId) {
+          throw new Error("Order created but payment could not be initialized");
+        }
+
+        await launchRazorpayPayment({
+          masterOrderId,
+          onDismissed: async ({ hasFailedAttempt, message }) => {
+            if (hasFailedAttempt) {
+              toast.error(message);
+            } else {
+              toast(message);
+            }
+
+            navigate("/account/orders");
           },
-          theme: {
-            color: "#F37254",
+          onVerificationComplete: () => {
+            setLoading(false);
           },
-          handler: verifyPayment,
-        };
-        const rzp = new window.Razorpay(options);
-        rzp.open();
+          onVerificationError: async ({ message }) => {
+            toast.error(message);
+            navigate("/account/orders");
+          },
+          onVerificationStart: () => {
+            setLoading(true);
+          },
+          onVerified: async ({ message }) => {
+            toast.success(message || "Payment verified successfully");
+            navigate("/account/orders");
+            dispatch(clearCart());
+          },
+        });
       }
     } catch (error) {
-      toast.error(error?.response?.data?.message || "Failed to place order");
+      const errorMessage =
+        error?.response?.data?.message ||
+          error?.message ||
+          "Failed to place order";
+
+      if (masterOrderId) {
+        toast.error(errorMessage);
+        navigate("/account/orders");
+        dispatch(clearCart());
+        return;
+      }
+
+      toast.error(errorMessage);
     } finally {
-      setloading(false);
+      setLoading(false);
     }
   };
 

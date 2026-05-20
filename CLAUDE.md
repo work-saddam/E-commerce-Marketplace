@@ -18,6 +18,11 @@ Use this file as the default instruction entry point for Claude-style agents in 
 - `ai/skills/api-development.md`
 - `ai/skills/database-optimization.md`
 
+## Skills
+
+See **Skill Registry** in `ai/README.md` for all available skills.
+All registered skills (built-in + installed) are automatically available to this agent.
+
 ## Working Style
 
 - Prefer direct, minimal implementations.

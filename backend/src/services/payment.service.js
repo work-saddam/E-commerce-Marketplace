@@ -75,6 +75,11 @@ exports.createPayment = async (req, res) => {
       throw createHttpError(400, "Invalid order amount");
     }
 
+    const user = await User.findById(userId).select("name email phone").lean();
+    if (!user) {
+      throw createHttpError(404, "User not found");
+    }
+
     // IDEMPOTENCY CHECK   //TODO: later we can also add the idempotency key
 
     const existingPayment = await Payment.findOne({
@@ -98,6 +103,7 @@ exports.createPayment = async (req, res) => {
             notes: existingPayment.notes,
           },
           keyId: process.env.RAZORPAY_KEY_ID,
+          user,
         });
       }
 
@@ -114,8 +120,6 @@ exports.createPayment = async (req, res) => {
         orderIds: masterOrder.orders,
       },
     });
-
-    const user = await User.findById(userId).select("name email phone");
 
     await Payment.create({
       masterOrder: masterOrder._id,

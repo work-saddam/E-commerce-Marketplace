@@ -29,10 +29,10 @@ exports.verifyPayment = async (req, res) => {
       });
     }
 
-    if (["captured", "paid"].includes(paymentRecord.status)) {
+    if (["captured", "paid", "success"].includes(paymentRecord.status)) {
       return res.status(200).json({
         success: true,
-        message: "Payment already verified",
+        message: "Payment confirmed successfully",
       });
     }
 
@@ -64,7 +64,7 @@ exports.verifyPayment = async (req, res) => {
     if (masterOrder.paymentStatus === "paid") {
       return res.status(200).json({
         success: true,
-        message: "Payment already confirmed",
+        message: "Payment confirmed successfully",
       });
     }
 
