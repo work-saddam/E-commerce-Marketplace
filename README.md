@@ -11,7 +11,7 @@ Multi-tenant e-commerce platform. Event-driven async architecture, real-time inv
 
 - **Async Job Processing**: BullMQ + Redis queues decouple I/O tasks (mail, inventory reconciliation, webhooks) from request/response cycles—eliminates blocking operations, handles 10k+ concurrent transactions.
 - **Inventory Reservation System**: Atomic MongoDB operations with optimistic locking prevent overselling. Reservations auto-expire, triggering inventory release jobs via BullMQ.
-- **Payment Retry Mechanism**: Failed payments can be retried unlimited times within 15 minutes of initial attempt. Idempotent via unique order receipts and webhook deduplication.
+- **Payment Retry Mechanism**: Failed payments can be retried within 15 minutes of initial attempt. Idempotent via unique order receipts and webhook deduplication.
 - **Multi-tenant Seller Isolation**: JWT-based stateless auth + role-based access control. Each seller operates independently; shared backend handles all business logic.
 - **Real-time Razorpay Integration**: Webhook signature verification (HMAC-SHA256), automatic payment settlement, transaction idempotency tracking.
 - **Optimized Media Pipeline**: Cloudinary auto-compression, responsive image transformation, reduces bandwidth by 60%+.
@@ -37,7 +37,7 @@ Multi-tenant e-commerce platform. Event-driven async architecture, real-time inv
 ```
 ┌──────────────────────────────────────────────────────────┐
 │                     FRONTEND                             │
-│  Buyer App (React/Vite)  │  Seller Dashboard (React)    │
+│     Buyer App (React)  │  Seller Dashboard (React)       │
 └──────────────────┬───────────────────────┬───────────────┘
                    │ Axios + Redux         │
                    ↓                       ↓
@@ -118,7 +118,7 @@ Buyer: POST /api/payments/retry
     ↓
 Buyer retries payment
     ├─ Success → complete flow (step 1)
-    └─ Failure → can retry again (unlimited within 15 min window)
+    └─ Failure → can retry again ( within 15 min window)
 ```
 
 #### 3️⃣ **Inventory Management**
@@ -227,7 +227,7 @@ POST /api/payments/retry
 backend/
 ├── config/          # MongoDB, Redis, services
 ├── controllers/     # HTTP handlers
-├── models/          # Schemas (+ retryCount for payments)
+├── models/          # Schemas
 ├── services/        # Business logic
 ├── jobs/            # BullMQ definitions
 ├── workers/         # Job processors
