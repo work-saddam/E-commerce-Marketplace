@@ -43,11 +43,11 @@ Multi-tenant e-commerce platform. Event-driven async architecture, real-time inv
                    ↓                       ↓
 ┌──────────────────────────────────────────────────────────┐
 │                  EXPRESS API                             │
-│  ├─ Auth Middleware (JWT validation)                    │
-│  ├─ Controllers (request handlers)                      │
-│  ├─ Services (business logic)                           │
-│  └─ Models (Mongoose schemas)                           │
-└────────┬─────────────────────────────────────┬──────────┘
+│  ├─ Auth Middleware (JWT validation)                     │
+│  ├─ Controllers (request handlers)                       │
+│  ├─ Services (business logic)                            │
+│  └─ Models (Mongoose schemas)                            │
+└────────┬──────────────────────────────────────┬──────────┘
          │                                      │
          ↓                                      ↓
     ┌─────────────┐                     ┌──────────────┐
@@ -65,9 +65,9 @@ Multi-tenant e-commerce platform. Event-driven async architecture, real-time inv
                                                ↓
                                      ┌──────────────────┐
                                      │  Workers         │
-                                     │  ├─ Mail jobs   │
-                                     │  ├─ Inventory   │
-                                     │  └─ Retries     │
+                                     │  ├─ Mail jobs    │
+                                     │  ├─ Inventory    │
+                                     │  └─ Retries      │
                                      └──────────────────┘
 ```
 
