@@ -1,5 +1,6 @@
 const User = require("../models/user");
 const Seller = require("../models/seller");
+const PasswordResetToken = require("../models/passwordResetToken");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const validator = require("validator");
@@ -15,6 +16,12 @@ const otpService = require("../services/otp.service");
 const {
   queueForgotPasswordOtpEmail,
 } = require("../services/transactionalMail.service");
+
+const RESET_TOKEN_EXPIRY_MS = 15 * 60 * 1000;
+const RESET_TOKEN_JWT_EXPIRY = "15m";
+
+const getResetTokenUserType = (userType) =>
+  userType === "seller" ? "Seller" : "User";
 
 const register = async (req, res) => {
   try {
@@ -184,14 +191,38 @@ const verifyOtp = async (req, res) => {
     const normalizedEmail = email.toLowerCase().trim();
     const validUserType =
       userType && ["buyer", "seller"].includes(userType) ? userType : "buyer";
+    const resetTokenUserType = getResetTokenUserType(validUserType);
 
     await otpService.verifyOTP(normalizedEmail, validUserType, otp);
+
+    let user;
+    if (validUserType === "seller") {
+      user = await Seller.findOne({ email: normalizedEmail }).select("_id");
+    } else {
+      user = await User.findOne({ email: normalizedEmail }).select("_id");
+    }
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    await PasswordResetToken.deleteMany({
+      userId: user._id,
+      userType: resetTokenUserType,
+    });
 
     const resetToken = jwt.sign(
       { email: normalizedEmail, userType: validUserType },
       process.env.JWT_SECRET,
-      { expiresIn: "15m" },
+      { expiresIn: RESET_TOKEN_JWT_EXPIRY },
     );
+
+    await PasswordResetToken.create({
+      userId: user._id,
+      userType: resetTokenUserType,
+      token: resetToken,
+      expiresAt: new Date(Date.now() + RESET_TOKEN_EXPIRY_MS),
+    });
 
     await otpService.deleteOtpRecord(normalizedEmail, validUserType);
 
@@ -234,6 +265,7 @@ const resetPassword = async (req, res) => {
     const { email, userType } = decoded;
     const normalizedEmail = email.toLowerCase().trim();
     const validUserType = userType || "buyer";
+    const resetTokenUserType = getResetTokenUserType(validUserType);
 
     if (
       !validator.isStrongPassword(newPassword, {
@@ -247,6 +279,19 @@ const resetPassword = async (req, res) => {
       return res.status(400).json({
         message:
           "Password must be at least 8 characters and include uppercase, lowercase, number, and symbol",
+      });
+    }
+
+    const storedResetToken = await PasswordResetToken.findOne({
+      token: resetToken,
+      userType: resetTokenUserType,
+      used: false,
+      expiresAt: { $gt: new Date() },
+    }).select("_id userId");
+
+    if (!storedResetToken) {
+      return res.status(401).json({
+        message: "Invalid, expired, or already used reset token",
       });
     }
 
@@ -271,6 +316,15 @@ const resetPassword = async (req, res) => {
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     user.password = hashedPassword;
     await user.save();
+
+    await PasswordResetToken.updateMany(
+      {
+        userId: storedResetToken.userId,
+        userType: resetTokenUserType,
+        used: false,
+      },
+      { $set: { used: true } },
+    );
 
     res.status(200).json({
       message:
