@@ -165,6 +165,53 @@ const requestOtp = async (req, res) => {
   }
 };
 
+const verifyOtp = async (req, res) => {
+  try {
+    const { email, otp, userType } = req.body;
+
+    if (!email || !otp) {
+      return res.status(400).json({ message: "Email and OTP are required" });
+    }
+
+    if (!validator.isEmail(email)) {
+      return res.status(400).json({ message: "Invalid email format" });
+    }
+
+    if (!/^\d{6}$/.test(otp)) {
+      return res.status(400).json({ message: "OTP must be 6 digits" });
+    }
+
+    const normalizedEmail = email.toLowerCase().trim();
+    const validUserType =
+      userType && ["buyer", "seller"].includes(userType) ? userType : "buyer";
+
+    await otpService.verifyOTP(normalizedEmail, validUserType, otp);
+
+    const resetToken = jwt.sign(
+      { email: normalizedEmail, userType: validUserType },
+      process.env.JWT_SECRET,
+      { expiresIn: "15m" },
+    );
+
+    await otpService.deleteOtpRecord(normalizedEmail, validUserType);
+
+    res.status(200).json({
+      message: "OTP verified successfully",
+      resetToken,
+    });
+  } catch (error) {
+    const message =
+      error.message || "OTP verification failed. Please try again later.";
+    const status =
+      error.message?.includes("not found") ||
+      error.message?.includes("expired") ||
+      error.message?.includes("attempts")
+        ? 400
+        : 500;
+    res.status(status).json({ message });
+  }
+};
+
 module.exports = {
   register,
   login,
