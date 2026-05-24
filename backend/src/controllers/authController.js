@@ -1,6 +1,8 @@
 const User = require("../models/user");
+const Seller = require("../models/seller");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const validator = require("validator");
 const {
   validateUserRegisterData,
   validateLoginData,
@@ -9,6 +11,10 @@ const {
   getAuthCookieOptions,
   getAuthClearCookieOptions,
 } = require("../config/security");
+const otpService = require("../services/otp.service");
+const {
+  queueForgotPasswordOtpEmail,
+} = require("../services/transactionalMail.service");
 
 const register = async (req, res) => {
   try {
@@ -103,4 +109,67 @@ const logout = async (req, res) => {
   }
 };
 
-module.exports = { register, login, logout };
+const requestOtp = async (req, res) => {
+  try {
+    const { email, userType } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ message: "Email is required" });
+    }
+
+    if (!validator.isEmail(email)) {
+      return res.status(400).json({ message: "Invalid email format" });
+    }
+
+    const normalizedEmail = email.toLowerCase().trim();
+    const validUserType =
+      userType && ["buyer", "seller"].includes(userType) ? userType : "buyer";
+
+    let user;
+    if (validUserType === "seller") {
+      user = await Seller.findOne({ email: normalizedEmail }).select(
+        "_id sellerName",
+      );
+    } else {
+      user = await User.findOne({ email: normalizedEmail }).select("_id name");
+    }
+
+    if (!user) {
+      return res.status(200).json({
+        message: "If an account exists with this email, an OTP will be sent.",
+      });
+    }
+
+    const otp = await otpService.createOtpRecord(
+      normalizedEmail,
+      validUserType,
+    );
+    const userName =
+      validUserType === "seller"
+        ? user.sellerName || "User"
+        : user.name || "User";
+
+    await queueForgotPasswordOtpEmail({
+      email: normalizedEmail,
+      otp,
+      userName,
+    });
+
+    res.status(200).json({
+      message: "OTP sent to your email. Valid for 10 minutes.",
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Failed to send OTP. Please try again later." });
+  }
+};
+
+module.exports = {
+  register,
+  login,
+  logout,
+  requestOtp,
+  verifyOtp,
+  resetPassword,
+};
