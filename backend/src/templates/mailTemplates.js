@@ -390,10 +390,51 @@ const buildBuyerOrderStatusUpdatedTemplate = ({
   };
 };
 
+const buildForgotPasswordOtpTemplate = ({ otp, userName }) => {
+  const subject = "Your password reset OTP";
+  const intro = `Hi ${userName}, you requested to reset your password.`;
+  const detailsHtml = `
+    <p style="margin: 0 0 20px;">Your one-time password (OTP) to reset your password is:</p>
+    <div style="margin: 0 0 20px; padding: 16px; background: #f3f4f6; border-radius: 8px; text-align: center;">
+      <p style="margin: 0; font-size: 32px; font-weight: 700; letter-spacing: 4px; font-family: monospace; color: #111827;">${escapeHtml(otp)}</p>
+    </div>
+    <p style="margin: 0 0 12px;"><strong>Valid for:</strong> 10 minutes</p>
+    <p style="margin: 0;">Do not share this OTP with anyone. If you didn't request a password reset, ignore this email.</p>
+  `;
+  const detailsText = [
+    "Your one-time password (OTP) to reset your password is:",
+    "",
+    otp,
+    "",
+    "Valid for: 10 minutes",
+    "",
+    "Do not share this OTP with anyone. If you didn't request a password reset, ignore this email.",
+  ].join("\n");
+
+  return {
+    subject,
+    html: renderEmailShell({
+      title: "Password reset request",
+      intro,
+      detailsHtml,
+      footerText:
+        "If you didn't request this password reset, you can safely ignore this email.",
+    }),
+    text: renderTextShell({
+      title: "Password reset request",
+      intro,
+      detailsText,
+      footerText:
+        "If you didn't request this password reset, you can safely ignore this email.",
+    }),
+  };
+};
+
 module.exports = {
   buildBuyerOrderConfirmedTemplate,
   buildBuyerPaymentFailedTemplate,
   buildBuyerOrderStatusUpdatedTemplate,
   buildSellerApprovedTemplate,
   buildSellerRejectedTemplate,
+  buildForgotPasswordOtpTemplate,
 };
