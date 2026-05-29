@@ -3,7 +3,7 @@ import axios from "axios";
 import { BASE_URL } from "../utils/constants";
 import { useDispatch } from "react-redux";
 import { addUser } from "../store/userSlice";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   buildRateLimitMessage,
   getRateLimitRetrySeconds,
@@ -138,14 +138,23 @@ const Login = () => {
           </button>
         </form>
 
+        <div className="mt-4 text-center">
+          <Link
+            to="/forgot-password"
+            className="text-sm text-blue-600 hover:underline"
+          >
+            Forgot password?
+          </Link>
+        </div>
+
         <p className=" mt-6 text-center text-sm text-gray-600">
           Dont have an account?{" "}
-          <a
-            href="/register"
+          <Link
+            to="/register"
             className="cursor-pointer font-medium text-blue-600 hover:underline"
           >
             Sign up
-          </a>
+          </Link>
         </p>
       </div>
     </div>

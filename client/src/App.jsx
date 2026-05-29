@@ -15,6 +15,7 @@ import Cart from "./pages/cart/Cart";
 import Checkout from "./pages/checkout/Checkout";
 import Order from "./pages/order/Order";
 import SearchResults from "./pages/SearchResults";
+import ForgotPassword from "./components/ForgotPassword";
 import { PersistGate } from "redux-persist/integration/react";
 import { Toaster } from "react-hot-toast";
 
@@ -32,6 +33,7 @@ function App() {
               <Route path="/cart" element={<Cart />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/search" element={<SearchResults />} />
 
               <Route element={<ProtectedLayout />}>
