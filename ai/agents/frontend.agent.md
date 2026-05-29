@@ -14,6 +14,8 @@ This agent activates when working on:
 - ✅ Pages and routes (`client/src/pages/`, `seller/src/pages/`)
 - ✅ Redux state management (`store/`)
 - ✅ UI styling (Tailwind CSS)
+- ✅ Use lucide-react for icons
+- ✅ Use Link from react-router-dom for navigation
 - ✅ API integration (Axios calls from frontend)
 - ✅ Forms and validation
 - ✅ Responsive design
