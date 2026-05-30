@@ -4,6 +4,7 @@ import { BASE_URL } from "../utils/constants";
 import { useDispatch } from "react-redux";
 import { addUser } from "../store/userSlice";
 import { Link, useNavigate } from "react-router-dom";
+import { ArrowRight, KeyRound, LockKeyhole, Mail, UserPlus } from "lucide-react";
 import {
   buildRateLimitMessage,
   getRateLimitRetrySeconds,
@@ -100,7 +101,8 @@ const Login = () => {
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">
+            <label className="mb-1 flex items-center gap-2 text-sm font-medium text-gray-700">
+              <Mail className="h-4 w-4 text-gray-500" aria-hidden="true" />
               Email or Phone
             </label>
             <input
@@ -113,7 +115,11 @@ const Login = () => {
           </div>
 
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">
+            <label className="mb-1 flex items-center gap-2 text-sm font-medium text-gray-700">
+              <LockKeyhole
+                className="h-4 w-4 text-gray-500"
+                aria-hidden="true"
+              />
               Password
             </label>
             <input
@@ -128,8 +134,11 @@ const Login = () => {
           <button
             type="submit"
             disabled={loading || isRateLimited}
-            className="mt-2 w-full rounded-lg bg-yellow-500 px-4 py-2 font-medium text-white transition hover:bg-yellow-600"
+            className="mt-2 flex w-full items-center justify-center gap-2 rounded-lg bg-yellow-500 px-4 py-2 font-medium text-white transition hover:bg-yellow-600"
           >
+            {!loading && !isRateLimited && (
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            )}
             {loading
               ? "Logging in..."
               : isRateLimited
@@ -141,8 +150,9 @@ const Login = () => {
         <div className="mt-4 text-center">
           <Link
             to="/forgot-password"
-            className="text-sm text-blue-600 hover:underline"
+            className="inline-flex items-center gap-1.5 text-sm text-blue-600 hover:underline"
           >
+            <KeyRound className="h-4 w-4" aria-hidden="true" />
             Forgot password?
           </Link>
         </div>
@@ -151,8 +161,9 @@ const Login = () => {
           Dont have an account?{" "}
           <Link
             to="/register"
-            className="cursor-pointer font-medium text-blue-600 hover:underline"
+            className="inline-flex cursor-pointer items-center gap-1.5 font-medium text-blue-600 hover:underline"
           >
+            <UserPlus className="h-4 w-4" aria-hidden="true" />
             Sign up
           </Link>
         </p>

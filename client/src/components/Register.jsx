@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { BASE_URL } from "../utils/constants";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { ArrowRight, LockKeyhole, Mail, Phone, User, UserPlus } from "lucide-react";
 import { buildRateLimitMessage, getRateLimitRetrySeconds } from "../utils/authRateLimit";
 
 const Register = () => {
@@ -91,7 +92,8 @@ const Register = () => {
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">
+            <label className="mb-1 flex items-center gap-2 text-sm font-medium text-gray-700">
+              <User className="h-4 w-4 text-gray-500" aria-hidden="true" />
               Name
             </label>
             <input
@@ -104,7 +106,8 @@ const Register = () => {
           </div>
 
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">
+            <label className="mb-1 flex items-center gap-2 text-sm font-medium text-gray-700">
+              <Phone className="h-4 w-4 text-gray-500" aria-hidden="true" />
               Phone
             </label>
             <input
@@ -117,7 +120,8 @@ const Register = () => {
           </div>
 
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">
+            <label className="mb-1 flex items-center gap-2 text-sm font-medium text-gray-700">
+              <Mail className="h-4 w-4 text-gray-500" aria-hidden="true" />
               Email
             </label>
             <input
@@ -130,7 +134,11 @@ const Register = () => {
           </div>
 
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">
+            <label className="mb-1 flex items-center gap-2 text-sm font-medium text-gray-700">
+              <LockKeyhole
+                className="h-4 w-4 text-gray-500"
+                aria-hidden="true"
+              />
               Password
             </label>
             <input
@@ -145,9 +153,15 @@ const Register = () => {
           <button
             type="submit"
             disabled={loading || isRateLimited}
-            className="mt-2 w-full rounded-lg bg-yellow-500 px-4 py-2 font-medium text-white transition hover:bg-yellow-600"
+            className="mt-2 flex w-full items-center justify-center gap-2 rounded-lg bg-yellow-500 px-4 py-2 font-medium text-white transition hover:bg-yellow-600"
           >
+            {!loading && !isRateLimited && (
+              <UserPlus className="h-4 w-4" aria-hidden="true" />
+            )}
             {loading ? "Registering..." : isRateLimited ? `Try again in ${remainingSeconds}s` : "Register"}
+            {!loading && !isRateLimited && (
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            )}
           </button>
         </form>
       </div>
