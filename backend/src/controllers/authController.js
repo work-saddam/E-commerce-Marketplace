@@ -142,8 +142,8 @@ const requestOtp = async (req, res) => {
     }
 
     if (!user) {
-      return res.status(404).json({
-        message: "No account found with this email",
+      return res.status(200).json({
+        message: "If an account exists, an OTP has been sent to the email",
       });
     }
 
@@ -163,7 +163,7 @@ const requestOtp = async (req, res) => {
     });
 
     res.status(200).json({
-      message: "OTP sent to your email. Valid for 10 minutes.",
+      message: "OTP sent to your email if an account exists",
     });
   } catch (error) {
     res

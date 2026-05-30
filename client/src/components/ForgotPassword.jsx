@@ -29,10 +29,11 @@ const ForgotPassword = () => {
 
     setLoading(true);
     try {
-      await axios.post(`${BASE_URL}/api/auth/forgot-password/request-otp`, {
-        email,
-      });
-      toast.success("OTP sent to your email");
+      const res = await axios.post(
+        `${BASE_URL}/api/auth/forgot-password/request-otp`,
+        { email },
+      );
+      toast.success(res?.data?.message || "OTP sent to your email");
       setStep(2);
       setResendCooldown(30);
     } catch (err) {
