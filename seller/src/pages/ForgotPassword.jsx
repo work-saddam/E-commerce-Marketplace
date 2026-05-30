@@ -13,6 +13,17 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import toast from "react-hot-toast";
+import {
+  ArrowLeft,
+  Eye,
+  EyeOff,
+  KeyRound,
+  LockKeyhole,
+  Mail,
+  RefreshCw,
+  Send,
+  ShieldCheck,
+} from "lucide-react";
 
 export function ForgotPassword() {
   const navigate = useNavigate();
@@ -180,7 +191,10 @@ export function ForgotPassword() {
           {step === 1 && (
             <form onSubmit={handleEmailSubmit} className="flex flex-col gap-4">
               <div className="grid gap-2">
-                <Label htmlFor="email">Email Address</Label>
+                <Label htmlFor="email" className="flex items-center gap-2">
+                  <Mail className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
+                  Email Address
+                </Label>
                 <Input
                   id="email"
                   type="email"
@@ -191,7 +205,8 @@ export function ForgotPassword() {
                 />
               </div>
 
-              <Button type="submit" disabled={loading} className="w-full">
+              <Button type="submit" disabled={loading} className="w-full gap-2">
+                {!loading && <Send className="h-4 w-4" aria-hidden="true" />}
                 {loading ? "Sending..." : "Send OTP"}
               </Button>
             </form>
@@ -200,7 +215,13 @@ export function ForgotPassword() {
           {step === 2 && (
             <form onSubmit={handleOtpSubmit} className="flex flex-col gap-4">
               <div className="grid gap-2">
-                <Label htmlFor="otp">6-Digit OTP</Label>
+                <Label htmlFor="otp" className="flex items-center gap-2">
+                  <KeyRound
+                    className="h-4 w-4 text-muted-foreground"
+                    aria-hidden="true"
+                  />
+                  6-Digit OTP
+                </Label>
                 <Input
                   id="otp"
                   type="text"
@@ -216,7 +237,10 @@ export function ForgotPassword() {
                 <p className="text-xs text-gray-600">Valid for 10 minutes</p>
               </div>
 
-              <Button type="submit" disabled={loading} className="w-full">
+              <Button type="submit" disabled={loading} className="w-full gap-2">
+                {!loading && (
+                  <ShieldCheck className="h-4 w-4" aria-hidden="true" />
+                )}
                 {loading ? "Verifying..." : "Verify OTP"}
               </Button>
 
@@ -225,8 +249,9 @@ export function ForgotPassword() {
                 onClick={handleResendOtp}
                 disabled={resendCooldown > 0 || loading}
                 variant="outline"
-                className="w-full"
+                className="w-full gap-2"
               >
+                <RefreshCw className="h-4 w-4" aria-hidden="true" />
                 {resendCooldown > 0
                   ? `Resend OTP (${resendCooldown}s)`
                   : "Resend OTP"}
@@ -240,7 +265,13 @@ export function ForgotPassword() {
               className="flex flex-col gap-4"
             >
               <div className="grid gap-2">
-                <Label htmlFor="newPassword">New Password</Label>
+                <Label htmlFor="newPassword" className="flex items-center gap-2">
+                  <LockKeyhole
+                    className="h-4 w-4 text-muted-foreground"
+                    aria-hidden="true"
+                  />
+                  New Password
+                </Label>
                 <div className="relative">
                   <Input
                     id="newPassword"
@@ -248,14 +279,20 @@ export function ForgotPassword() {
                     placeholder="Enter new password"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
+                    className="pr-10"
                     required
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-600 hover:text-gray-900"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
                   >
-                    {showPassword ? "Hide" : "Show"}
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" aria-hidden="true" />
+                    ) : (
+                      <Eye className="h-4 w-4" aria-hidden="true" />
+                    )}
                   </button>
                 </div>
                 <p className="text-xs text-gray-600">
@@ -265,7 +302,16 @@ export function ForgotPassword() {
               </div>
 
               <div className="grid gap-2">
-                <Label htmlFor="confirmPassword">Confirm Password</Label>
+                <Label
+                  htmlFor="confirmPassword"
+                  className="flex items-center gap-2"
+                >
+                  <LockKeyhole
+                    className="h-4 w-4 text-muted-foreground"
+                    aria-hidden="true"
+                  />
+                  Confirm Password
+                </Label>
                 <div className="relative">
                   <Input
                     id="confirmPassword"
@@ -273,19 +319,30 @@ export function ForgotPassword() {
                     placeholder="Confirm password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
+                    className="pr-10"
                     required
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-600 hover:text-gray-900"
+                    aria-label={
+                      showConfirmPassword ? "Hide password" : "Show password"
+                    }
                   >
-                    {showConfirmPassword ? "Hide" : "Show"}
+                    {showConfirmPassword ? (
+                      <EyeOff className="h-4 w-4" aria-hidden="true" />
+                    ) : (
+                      <Eye className="h-4 w-4" aria-hidden="true" />
+                    )}
                   </button>
                 </div>
               </div>
 
-              <Button type="submit" disabled={loading} className="w-full">
+              <Button type="submit" disabled={loading} className="w-full gap-2">
+                {!loading && (
+                  <ShieldCheck className="h-4 w-4" aria-hidden="true" />
+                )}
                 {loading ? "Resetting..." : "Reset Password"}
               </Button>
             </form>
@@ -293,7 +350,8 @@ export function ForgotPassword() {
 
           <div className="mt-4 text-center">
             <Link to="/">
-              <Button variant="link" size="sm">
+              <Button variant="link" size="sm" className="gap-1.5">
+                <ArrowLeft className="h-4 w-4" aria-hidden="true" />
                 Back to Login
               </Button>
             </Link>
