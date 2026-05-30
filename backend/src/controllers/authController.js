@@ -262,8 +262,7 @@ const resetPassword = async (req, res) => {
         .json({ message: "Invalid or expired reset token" });
     }
 
-    const { email, userType } = decoded;
-    const normalizedEmail = email.toLowerCase().trim();
+    const { userType } = decoded;
     const validUserType = userType || "buyer";
     const resetTokenUserType = getResetTokenUserType(validUserType);
 
@@ -282,12 +281,16 @@ const resetPassword = async (req, res) => {
       });
     }
 
-    const storedResetToken = await PasswordResetToken.findOne({
-      token: resetToken,
-      userType: resetTokenUserType,
-      used: false,
-      expiresAt: { $gt: new Date() },
-    }).select("_id userId");
+    const storedResetToken = await PasswordResetToken.findOneAndUpdate(
+      {
+        token: resetToken,
+        userType: resetTokenUserType,
+        used: false,
+        expiresAt: { $gt: new Date() },
+      },
+      { $set: { used: true } },
+      { new: false },
+    ).select("_id userId");
 
     if (!storedResetToken) {
       return res.status(401).json({
@@ -297,9 +300,9 @@ const resetPassword = async (req, res) => {
 
     let user;
     if (validUserType === "seller") {
-      user = await Seller.findOne({ email: normalizedEmail });
+      user = await Seller.findById(storedResetToken.userId);
     } else {
-      user = await User.findOne({ email: normalizedEmail });
+      user = await User.findById(storedResetToken.userId);
     }
 
     if (!user) {
@@ -317,18 +320,8 @@ const resetPassword = async (req, res) => {
     user.password = hashedPassword;
     await user.save();
 
-    await PasswordResetToken.updateMany(
-      {
-        userId: storedResetToken.userId,
-        userType: resetTokenUserType,
-        used: false,
-      },
-      { $set: { used: true } },
-    );
-
     res.status(200).json({
-      message:
-        "Password reset successfully. You can now log in with your new password.",
+      message: "Password reset successfully.",
     });
   } catch (error) {
     res.status(500).json({

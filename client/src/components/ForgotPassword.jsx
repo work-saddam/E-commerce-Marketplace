@@ -127,9 +127,7 @@ const ForgotPassword = () => {
         resetToken,
         newPassword,
       });
-      toast.success(
-        "Password reset successfully. Please login with your new password.",
-      );
+      toast.success("Password reset successfully.");
       navigate("/login");
     } catch (err) {
       setError(err.response?.data?.message || "Failed to reset password");
