@@ -129,6 +129,11 @@ export function Login() {
               <div className="grid gap-2">
                 <div className="flex items-center">
                   <Label htmlFor="password">Password</Label>
+                  <Link to="/forgot-password" className="ml-auto">
+                    <Button variant="link" size="sm">
+                      Forgot?
+                    </Button>
+                  </Link>
                 </div>
                 <Input
                   id="password"
