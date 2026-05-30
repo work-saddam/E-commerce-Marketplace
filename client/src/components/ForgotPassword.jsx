@@ -62,7 +62,7 @@ const ForgotPassword = () => {
       await axios.post(`${BASE_URL}/api/auth/forgot-password/request-otp`, {
         email,
       });
-      toast.success("OTP resent to your email");
+      toast.success("OTP resent to your email if an account exists");
       setResendCooldown(30);
     } catch (err) {
       setError(err.response?.data?.message || "Failed to resend OTP");

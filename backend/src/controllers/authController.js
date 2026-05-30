@@ -224,8 +224,6 @@ const verifyOtp = async (req, res) => {
       expiresAt: new Date(Date.now() + RESET_TOKEN_EXPIRY_MS),
     });
 
-    await otpService.deleteOtpRecord(normalizedEmail, validUserType);
-
     res.status(200).json({
       message: "OTP verified successfully",
       resetToken,
