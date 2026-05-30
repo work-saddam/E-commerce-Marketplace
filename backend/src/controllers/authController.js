@@ -236,6 +236,7 @@ const verifyOtp = async (req, res) => {
     const status =
       error.message?.includes("not found") ||
       error.message?.includes("expired") ||
+      error.message?.includes("attempt") ||
       error.message?.includes("attempts")
         ? 400
         : 500;

@@ -1,7 +1,8 @@
+const crypto = require("node:crypto");
 const OTP = require("../models/otp");
 
 const generateOTP = () => {
-  return Math.floor(100000 + Math.random() * 900000).toString();
+  return crypto.randomInt(100000, 1000000).toString();
 };
 
 const createOtpRecord = async (email, userType) => {
@@ -13,7 +14,7 @@ const createOtpRecord = async (email, userType) => {
   await OTP.findOneAndUpdate(
     { email, userType },
     { otp, attempts: 0, expiresAt },
-    { upsert: true, new: true }
+    { upsert: true, new: true },
   );
 
   return otp;
@@ -43,7 +44,7 @@ const verifyOTP = async (email, userType, enteredOtp) => {
     await otpRecord.save();
     const remainingAttempts = 3 - otpRecord.attempts;
     throw new Error(
-      `Invalid OTP. ${remainingAttempts} attempt${remainingAttempts !== 1 ? "s" : ""} remaining.`
+      `Invalid OTP. ${remainingAttempts} attempt${remainingAttempts !== 1 ? "s" : ""} remaining.`,
     );
   }
 

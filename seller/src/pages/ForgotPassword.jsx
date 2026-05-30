@@ -357,7 +357,7 @@ export function ForgotPassword() {
           )}
 
           <div className="mt-4 text-center">
-            <Link to="/">
+            <Link to="/login">
               <Button variant="link" size="sm" className="gap-1.5">
                 <ArrowLeft className="h-4 w-4" aria-hidden="true" />
                 Back to Login

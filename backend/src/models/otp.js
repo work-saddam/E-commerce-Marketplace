@@ -27,14 +27,14 @@ const otpSchema = new mongoose.Schema(
       required: true,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 // TTL index - automatically delete OTP records 10 minutes after creation
 otpSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
 // Compound index for fast lookups
-otpSchema.index({ email: 1, userType: 1 });
+otpSchema.index({ email: 1, userType: 1 }, { unique: true });
 
 const OTP = mongoose.model("OTP", otpSchema);
 module.exports = OTP;
