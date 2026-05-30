@@ -135,7 +135,7 @@ export function ForgotPassword() {
       !/[A-Z]/.test(newPassword) ||
       !/[a-z]/.test(newPassword) ||
       !/[0-9]/.test(newPassword) ||
-      !/[!@#$%^&*]/.test(newPassword)
+      !/[^A-Za-z0-9]/.test(newPassword)
     ) {
       setError(
         "Password must include uppercase, lowercase, number, and special character",
@@ -192,7 +192,10 @@ export function ForgotPassword() {
             <form onSubmit={handleEmailSubmit} className="flex flex-col gap-4">
               <div className="grid gap-2">
                 <Label htmlFor="email" className="flex items-center gap-2">
-                  <Mail className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
+                  <Mail
+                    className="h-4 w-4 text-muted-foreground"
+                    aria-hidden="true"
+                  />
                   Email Address
                 </Label>
                 <Input
@@ -265,7 +268,10 @@ export function ForgotPassword() {
               className="flex flex-col gap-4"
             >
               <div className="grid gap-2">
-                <Label htmlFor="newPassword" className="flex items-center gap-2">
+                <Label
+                  htmlFor="newPassword"
+                  className="flex items-center gap-2"
+                >
                   <LockKeyhole
                     className="h-4 w-4 text-muted-foreground"
                     aria-hidden="true"
@@ -286,7 +292,9 @@ export function ForgotPassword() {
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-600 hover:text-gray-900"
-                    aria-label={showPassword ? "Hide password" : "Show password"}
+                    aria-label={
+                      showPassword ? "Hide password" : "Show password"
+                    }
                   >
                     {showPassword ? (
                       <EyeOff className="h-4 w-4" aria-hidden="true" />

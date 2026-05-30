@@ -124,7 +124,7 @@ const ForgotPassword = () => {
       !/[A-Z]/.test(newPassword) ||
       !/[a-z]/.test(newPassword) ||
       !/[0-9]/.test(newPassword) ||
-      !/[!@#$%^&*]/.test(newPassword)
+      !/[^A-Za-z0-9]/.test(newPassword)
     ) {
       setError(
         "Password must include uppercase, lowercase, number, and special character",
@@ -322,14 +322,14 @@ const ForgotPassword = () => {
 
             <button
               type="submit"
-            disabled={loading}
-            className="mt-2 flex w-full items-center justify-center gap-2 rounded-lg bg-yellow-500 px-4 py-2 font-medium text-white transition hover:bg-yellow-600 disabled:bg-gray-400"
-          >
-            {!loading && (
-              <ShieldCheck className="h-4 w-4" aria-hidden="true" />
-            )}
-            {loading ? "Resetting..." : "Reset Password"}
-          </button>
+              disabled={loading}
+              className="mt-2 flex w-full items-center justify-center gap-2 rounded-lg bg-yellow-500 px-4 py-2 font-medium text-white transition hover:bg-yellow-600 disabled:bg-gray-400"
+            >
+              {!loading && (
+                <ShieldCheck className="h-4 w-4" aria-hidden="true" />
+              )}
+              {loading ? "Resetting..." : "Reset Password"}
+            </button>
           </form>
         )}
 
