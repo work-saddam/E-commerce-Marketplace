@@ -13,6 +13,7 @@ Multi-tenant e-commerce platform. Event-driven async architecture, real-time inv
 - **Inventory Reservation System**: Atomic MongoDB operations with optimistic locking prevent overselling. Reservations auto-expire, triggering inventory release jobs via BullMQ.
 - **Payment Retry Mechanism**: Failed payments can be retried within 15 minutes of initial attempt. Idempotent via unique order receipts and webhook deduplication.
 - **Multi-tenant Seller Isolation**: JWT-based stateless auth + role-based access control. Each seller operates independently; shared backend handles all business logic.
+- **Password Reset Flow**: Buyer and seller users can reset forgotten passwords using OTP email verification.
 - **Real-time Razorpay Integration**: Webhook signature verification (HMAC-SHA256), automatic payment settlement, transaction idempotency tracking.
 - **Optimized Media Pipeline**: Cloudinary auto-compression, responsive image transformation, reduces bandwidth by 60%+.
 - **Rate Limiting & DDoS Protection**: Express middleware enforces per-IP request limits, protects endpoints from abuse.
@@ -209,6 +210,9 @@ VITE_API_URL=http://localhost:5000/api
 | ------ | ----------------------- | ------ | ----------------- |
 | POST   | `/api/auth/login`       | -      | Login             |
 | POST   | `/api/auth/register`    | -      | Signup            |
+| POST   | `/api/auth/forgot-password/request-otp` | - | Send reset OTP |
+| POST   | `/api/auth/forgot-password/verify-otp` | - | Verify reset OTP |
+| POST   | `/api/auth/forgot-password/reset-password` | - | Reset password |
 | GET    | `/api/products`         | -      | List (paginated)  |
 | POST   | `/api/products`         | Seller | Create            |
 | PUT    | `/api/products/:id`     | Seller | Update            |
