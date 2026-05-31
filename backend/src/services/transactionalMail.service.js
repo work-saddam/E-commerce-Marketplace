@@ -10,6 +10,7 @@ const {
   buildBuyerOrderStatusUpdatedTemplate,
   buildSellerApprovedTemplate,
   buildSellerRejectedTemplate,
+  buildForgotPasswordOtpTemplate,
 } = require("../templates/mailTemplates");
 
 const createMailPayload = ({
@@ -294,9 +295,37 @@ const queueBuyerOrderStatusUpdatedEmail = async ({ orderId, status }) => {
   );
 };
 
+const queueForgotPasswordOtpEmail = async ({ email, otp, userName }) => {
+  const { mailReplyTo } = getMailTemplateConfig();
+  const template = buildForgotPasswordOtpTemplate({
+    otp,
+    userName: userName || "User",
+  });
+
+  return enqueueMailJob(
+    createMailPayload({
+      templateKey: "forgot-password-otp",
+      to: email,
+      subject: template.subject,
+      html: template.html,
+      text: template.text,
+      idempotencyKey: `forgot-password-otp-${email.toLowerCase()}-${new Date().getTime()}`,
+      tags: [
+        { name: "template", value: "forgot-password-otp" },
+        { name: "email", value: email.toLowerCase() },
+      ],
+      meta: {
+        email: email.toLowerCase(),
+      },
+      replyTo: mailReplyTo,
+    }),
+  );
+};
+
 module.exports = {
   queueBuyerOrderConfirmedEmail,
   queueBuyerPaymentFailedEmail,
   queueBuyerOrderStatusUpdatedEmail,
   queueSellerStatusEmail,
+  queueForgotPasswordOtpEmail,
 };

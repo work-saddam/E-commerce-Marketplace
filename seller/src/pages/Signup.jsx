@@ -18,6 +18,18 @@ import { BASE_URL } from "@/utils/constant";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import {
+  ArrowRight,
+  BadgePercent,
+  Building2,
+  IdCard,
+  LockKeyhole,
+  LogIn,
+  Mail,
+  Phone,
+  Store,
+  User,
+} from "lucide-react";
 
 export function Signup() {
   const [sellerName, setSellerName] = useState("");
@@ -106,16 +118,25 @@ export function Signup() {
             Enter your all the details below to signup
           </CardDescription>
           <CardAction>
-            <Link to={"/login"}>
-              <Button variant="link">Login</Button>
-            </Link>
+            <Button asChild variant="link" className="gap-1.5">
+              <Link to="/login">
+                <LogIn className="h-4 w-4" aria-hidden="true" />
+                Login
+              </Link>
+            </Button>
           </CardAction>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit}>
             <div className="flex flex-col gap-4">
               <div className="grid gap-2">
-                <Label htmlFor="sellerName">Seller Name</Label>
+                <Label htmlFor="sellerName" className="flex items-center gap-2">
+                  <User
+                    className="h-4 w-4 text-muted-foreground"
+                    aria-hidden="true"
+                  />
+                  Seller Name
+                </Label>
                 <Input
                   id="sellerName"
                   type="text"
@@ -126,7 +147,13 @@ export function Signup() {
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="shopName">Shop Name</Label>
+                <Label htmlFor="shopName" className="flex items-center gap-2">
+                  <Store
+                    className="h-4 w-4 text-muted-foreground"
+                    aria-hidden="true"
+                  />
+                  Shop Name
+                </Label>
                 <Input
                   id="shopName"
                   type="text"
@@ -137,7 +164,13 @@ export function Signup() {
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email" className="flex items-center gap-2">
+                  <Mail
+                    className="h-4 w-4 text-muted-foreground"
+                    aria-hidden="true"
+                  />
+                  Email
+                </Label>
                 <Input
                   id="email"
                   type="email"
@@ -149,7 +182,13 @@ export function Signup() {
               </div>
               <div className="grid gap-2">
                 <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
+                  <Label htmlFor="password" className="flex items-center gap-2">
+                    <LockKeyhole
+                      className="h-4 w-4 text-muted-foreground"
+                      aria-hidden="true"
+                    />
+                    Password
+                  </Label>
                 </div>
                 <Input
                   id="password"
@@ -161,7 +200,13 @@ export function Signup() {
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="phone">Phone Number</Label>
+                <Label htmlFor="phone" className="flex items-center gap-2">
+                  <Phone
+                    className="h-4 w-4 text-muted-foreground"
+                    aria-hidden="true"
+                  />
+                  Phone Number
+                </Label>
                 <Input
                   id="phone"
                   type="text"
@@ -172,7 +217,13 @@ export function Signup() {
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="gstNumber">GST Number</Label>
+                <Label htmlFor="gstNumber" className="flex items-center gap-2">
+                  <BadgePercent
+                    className="h-4 w-4 text-muted-foreground"
+                    aria-hidden="true"
+                  />
+                  GST Number
+                </Label>
                 <Input
                   id="gstNumber"
                   type="text"
@@ -183,7 +234,13 @@ export function Signup() {
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="panNumber">PAN Number</Label>
+                <Label htmlFor="panNumber" className="flex items-center gap-2">
+                  <IdCard
+                    className="h-4 w-4 text-muted-foreground"
+                    aria-hidden="true"
+                  />
+                  PAN Number
+                </Label>
                 <Input
                   id="panNumber"
                   type="text"
@@ -202,11 +259,17 @@ export function Signup() {
               className="w-full mt-4"
               disabled={loading || isRateLimited}
             >
+              {!loading && !isRateLimited && (
+                <Building2 className="h-4 w-4" aria-hidden="true" />
+              )}
               {loading
                 ? "Sign Up..."
                 : isRateLimited
                   ? `Try again in ${remainingSeconds}s`
                   : "Sign Up"}
+              {!loading && !isRateLimited && (
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              )}
             </Button>
           </form>
         </CardContent>

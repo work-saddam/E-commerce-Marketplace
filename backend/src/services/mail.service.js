@@ -25,11 +25,45 @@ const normalizeIdempotencyKey = (idempotencyKey) => {
     .slice(0, 255);
 };
 
+const normalizeTagPart = (value) => {
+  if (value === undefined || value === null) {
+    return undefined;
+  }
+
+  const normalized = String(value)
+    .replace(/[^A-Za-z0-9_-]/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "")
+    .slice(0, 255);
+
+  return normalized || undefined;
+};
+
+const normalizeTags = (tags) => {
+  if (!Array.isArray(tags)) {
+    return undefined;
+  }
+
+  return tags
+    .map((tag) => {
+      const name = normalizeTagPart(tag?.name);
+      const value = normalizeTagPart(tag?.value);
+
+      if (!name || !value) {
+        return null;
+      }
+
+      return { name, value };
+    })
+    .filter(Boolean);
+};
+
 const sendMail = async (payload) => {
   const client = getResendClient();
   const { mailFrom, mailReplyTo } = getMailWorkerConfig();
   const replyTo = payload.replyTo || mailReplyTo;
   const resendIdempotencyKey = normalizeIdempotencyKey(payload.idempotencyKey);
+  const tags = normalizeTags(payload.tags);
 
   const { data, error } = await client.emails.send(
     {
@@ -39,7 +73,7 @@ const sendMail = async (payload) => {
       html: payload.html,
       text: payload.text,
       ...(replyTo ? { replyTo } : {}),
-      tags: payload.tags,
+      ...(tags?.length ? { tags } : {}),
     },
     {
       idempotencyKey: resendIdempotencyKey,

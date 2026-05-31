@@ -20,6 +20,13 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
+import {
+  ArrowRight,
+  KeyRound,
+  LockKeyhole,
+  Mail,
+  UserPlus,
+} from "lucide-react";
 
 export function Login() {
   const [identifier, setIdentifier] = useState("");
@@ -107,16 +114,25 @@ export function Login() {
             Enter your credentials below to login
           </CardDescription>
           <CardAction>
-            <Link to={"/signup"}>
-              <Button variant="link">Sign Up</Button>
-            </Link>
+            <Button asChild variant="link" className="gap-1.5">
+              <Link to="/signup">
+                <UserPlus className="h-4 w-4" aria-hidden="true" />
+                Sign Up
+              </Link>
+            </Button>
           </CardAction>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit}>
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
-                <Label htmlFor="email">Email/Mobile</Label>
+                <Label htmlFor="email" className="flex items-center gap-2">
+                  <Mail
+                    className="h-4 w-4 text-muted-foreground"
+                    aria-hidden="true"
+                  />
+                  Email/Mobile
+                </Label>
                 <Input
                   id="email"
                   type="text"
@@ -129,15 +145,28 @@ export function Login() {
               <div className="grid gap-2">
                 <div className="flex items-center">
                   <Label htmlFor="password">Password</Label>
+                  <Link to="/forgot-password" className="ml-auto">
+                    <Button variant="link" size="sm" className="gap-1.5">
+                      <KeyRound className="h-4 w-4" aria-hidden="true" />
+                      Forgot?
+                    </Button>
+                  </Link>
                 </div>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="Enter strong password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
+                <div className="relative">
+                  <LockKeyhole
+                    className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+                    aria-hidden="true"
+                  />
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="Enter strong password"
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="pl-9"
+                  />
+                </div>
               </div>
             </div>
             {error && (
@@ -148,6 +177,9 @@ export function Login() {
               className="w-full mt-4"
               disabled={loading || isRateLimited}
             >
+              {!loading && !isRateLimited && (
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              )}
               {loading
                 ? "Logging in..."
                 : isRateLimited
