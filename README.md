@@ -1,11 +1,20 @@
-# E-commerce Marketplace
+# TrustKart - E-commerce Marketplace
 
 [![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
 [![MongoDB](https://img.shields.io/badge/MongoDB-6.0+-blue.svg)](https://www.mongodb.com/)
 [![Redis](https://img.shields.io/badge/Redis-7.0+-red.svg)](https://redis.io/)
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![React](https://img.shields.io/badge/React-18+-61DAFB.svg)](https://react.dev/)
 
-Multi-tenant e-commerce platform. Event-driven async architecture, real-time inventory, idempotent payment processing with retry, 99.9% uptime SLA.
+<!-- [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) -->
+
+TrustKart is a multi-tenant e-commerce marketplace with separate buyer and seller experiences, real-time inventory handling, secure Razorpay payments, OTP-based password reset, and queue-driven background processing.
+
+## 🚀 Live Project
+
+| App              | URL                                                |
+| ---------------- | -------------------------------------------------- |
+| Buyer App        | https://trustkart.saddamcodes.online               |
+| Seller Dashboard | https://seller.trustkart.saddamcodes.online/orders |
 
 ## ✨ Core Features
 
@@ -19,60 +28,37 @@ Multi-tenant e-commerce platform. Event-driven async architecture, real-time inv
 - **Rate Limiting & DDoS Protection**: Express middleware enforces per-IP request limits, protects endpoints from abuse.
 - **Modular, Testable Architecture**: Clean separation of concerns (controllers → services → models) enables horizontal scaling, easy unit/integration testing.
 
-## 📊 Stack
+## 📊 Tech Stack
 
-| Layer           | Tech                             |
-| --------------- | -------------------------------- |
-| **Backend**     | Node.js 18+ / Express 5.1        |
-| **DB**          | MongoDB 6.0+ w/ Mongoose         |
-| **Cache/Queue** | Redis 7.0+ / BullMQ 5.73         |
-| **Frontend**    | React 18+ / Vite / Redux Toolkit |
-| **Payments**    | Razorpay (HMAC verified)         |
-| **Media**       | Cloudinary                       |
-| **Email**       | Resend                           |
+| Layer           | Technology                              |
+| --------------- | --------------------------------------- |
+| Backend         | Node.js 18+, Express 5.1                |
+| Database        | MongoDB 6.0+, Mongoose                  |
+| Cache and Queue | Redis 7.0+, BullMQ 5.73                 |
+| Frontend        | React 18+, Vite, Redux Toolkit          |
+| Payments        | Razorpay with HMAC webhook verification |
+| Media           | Cloudinary                              |
+| Email           | Resend                                  |
 
-## 🏗 Architecture & Workflows
+## 🏗 Architecture
 
-### System Architecture
-
-```
-┌──────────────────────────────────────────────────────────┐
-│                     FRONTEND                             │
-│     Buyer App (React)  │  Seller Dashboard (React)       │
-└──────────────────┬───────────────────────┬───────────────┘
-                   │ Axios + Redux         │
-                   ↓                       ↓
-┌──────────────────────────────────────────────────────────┐
-│                  EXPRESS API                             │
-│  ├─ Auth Middleware (JWT validation)                     │
-│  ├─ Controllers (request handlers)                       │
-│  ├─ Services (business logic)                            │
-│  └─ Models (Mongoose schemas)                            │
-└────────┬──────────────────────────────────────┬──────────┘
-         │                                      │
-         ↓                                      ↓
-    ┌─────────────┐                     ┌──────────────┐
-    │  MongoDB    │                     │  BullMQ      │
-    │  (persistent│                     │  (job queue) │
-    │   storage)  │                     └──────┬───────┘
-    └─────────────┘                            │
-                                               ↓
-                                          ┌─────────────┐
-                                          │  Redis      │
-                                          │  (sessions, │
-                                          │   queues)   │
-                                          └─────────────┘
-                                               │
-                                               ↓
-                                     ┌──────────────────┐
-                                     │  Workers         │
-                                     │  ├─ Mail jobs    │
-                                     │  ├─ Inventory    │
-                                     │  └─ Retries      │
-                                     └──────────────────┘
+```mermaid
+flowchart TD
+  Buyer[Buyer App - React] --> API[Express API]
+  Seller[Seller Dashboard - React] --> API
+  API --> Auth[JWT Auth and RBAC]
+  API --> Mongo[(MongoDB)]
+  API --> Razorpay[Razorpay]
+  API --> Queue[BullMQ Queues]
+  Queue --> Redis[(Redis)]
+  Queue --> Workers[Workers]
+  Workers --> Mail[Email Jobs]
+  Workers --> Inventory[Inventory Jobs]
+  Workers --> Retry[Payment Retry Jobs]
+  API --> Cloudinary[Cloudinary]
 ```
 
-### Core Workflows
+## 🔄 Core Workflows
 
 #### 1️⃣ **Order → Payment → Fulfillment**
 
@@ -126,40 +112,44 @@ Buyer retries payment
 
 ```
 Order created
-    ├─ Add reservation job to BullMQ (30 min TTL)
+    ├─ Add reservation job to BullMQ (15 min TTL)
     └─ Decrement available stock atomically
     ↓
 Payment captured
     ├─ Confirm inventory (reservation → sold)
     └─ Remove scheduled release job
     ↓
-Payment failed or reservation expires
+Reservation expires
     ├─ Release inventory (add back to stock)
-    ├─ Update seller dashboard in real-time
-    └─ Retry notification queued
+    └─ Update seller dashboard in real-time
 ```
 
-#### 4️⃣ **Webhook Safety (Razorpay)**
+#### 4️⃣ **Password Reset**
 
 ```
-Razorpay → POST /api/payments/webhook
-    ├─ Validate signature (HMAC verify)
-    ├─ Check idempotency: payment already processed?
-    │  ├─ Yes → return 200 (duplicate prevention)
-    │  └─ No → process event
-    ├─ Start DB transaction
-    ├─ Update payment status
-    ├─ Trigger workflows (inventory, email, orders)
-    └─ Commit transaction or rollback on error
+Password reset requested
+    ├─ Generate OTP and send via email
+    └─ Store OTP with expiration (TTL)
+    ↓
+User verifies OTP
+    ├─ Validate OTP and expiration
+    └─ Issue secure reset token
+    ↓
+Password reset completed
+    ├─ User submits new password
+    ├─ Update password securely (hash)
+    └─ Invalidate OTP and reset token
 ```
 
 ## 🚀 Setup
 
 ### Prerequisites
 
-```
-Node.js 18+, MongoDB 6.0+, Redis 7.0+
-Razorpay, Cloudinary, Resend API keys
+```text
+Node.js 18+
+MongoDB 6.0+
+Redis 7.0+
+Razorpay, Cloudinary, and Resend API keys
 ```
 
 ### Quick Start
@@ -168,25 +158,30 @@ Razorpay, Cloudinary, Resend API keys
 git clone <repo>
 cd e-commerce-marketplace
 
-# Install all
 cd backend && npm install
 cd ../client && npm install
 cd ../seller && npm install
 
-# Configure
-cp .env.example .env  # Edit in /backend, /client, /seller
+# Configure environment files in backend, client, and seller
+cp .env.example .env
 
-# Run
-cd backend && npm run dev  # Terminal 1
-cd client && npm run dev   # Terminal 2
-cd seller && npm run dev   # Terminal 3
+# Run each app in a separate terminal
+cd backend && npm run dev
+cd client && npm run dev
+cd seller && npm run dev
 ```
 
-**Access**: `localhost:5000` (API) | `localhost:5173` (client) | `localhost:5174` (seller)
+### Local URLs
 
-### Environment
+| Service          | URL                   |
+| ---------------- | --------------------- |
+| API              | http://localhost:5000 |
+| Buyer App        | http://localhost:5173 |
+| Seller Dashboard | http://localhost:5174 |
 
-**Backend**:
+## Environment Variables
+
+### Backend
 
 ```env
 MONGODB_URI=mongodb://localhost:27017/ecommerce
@@ -198,7 +193,7 @@ CLOUDINARY_CLOUD_NAME=...
 RESEND_API_KEY=re_...
 ```
 
-**Frontend**:
+### Frontend
 
 ```env
 VITE_API_URL=http://localhost:5000/api
@@ -206,24 +201,20 @@ VITE_API_URL=http://localhost:5000/api
 
 ## 📡 API Reference
 
-| Method | Endpoint                | Auth   | Purpose           |
-| ------ | ----------------------- | ------ | ----------------- |
-| POST   | `/api/auth/login`       | -      | Login             |
-| POST   | `/api/auth/register`    | -      | Signup            |
-| POST   | `/api/auth/forgot-password/request-otp` | - | Send reset OTP |
-| POST   | `/api/auth/forgot-password/verify-otp` | - | Verify reset OTP |
-| POST   | `/api/auth/forgot-password/reset-password` | - | Reset password |
-| GET    | `/api/products`         | -      | List (paginated)  |
-| POST   | `/api/products`         | Seller | Create            |
-| PUT    | `/api/products/:id`     | Seller | Update            |
-| POST   | `/api/orders`           | Buyer  | Create order      |
-| POST   | `/api/payments/verify`  | Buyer  | Verify payment    |
-| POST   | `/api/payments/webhook` | -      | Razorpay callback |
-
-```bash
-POST /api/payments/retry
-{ "paymentId": "payment_id_here" }
-```
+| Method | Endpoint                                   | Auth   | Purpose              |
+| ------ | ------------------------------------------ | ------ | -------------------- |
+| POST   | `/api/auth/login`                          | Public | Login                |
+| POST   | `/api/auth/register`                       | Public | Signup               |
+| POST   | `/api/auth/forgot-password/request-otp`    | Public | Send reset OTP       |
+| POST   | `/api/auth/forgot-password/verify-otp`     | Public | Verify reset OTP     |
+| POST   | `/api/auth/forgot-password/reset-password` | Public | Reset password       |
+| GET    | `/api/products`                            | Public | List products        |
+| POST   | `/api/products`                            | Seller | Create product       |
+| PUT    | `/api/products/:id`                        | Seller | Update product       |
+| POST   | `/api/orders`                              | Buyer  | Create order         |
+| POST   | `/api/payments/verify`                     | Buyer  | Verify payment       |
+| POST   | `/api/payments/retry`                      | Buyer  | Retry failed payment |
+| POST   | `/api/payments/webhook`                    | Public | Razorpay callback    |
 
 ## 📂 Project Structure
 
@@ -240,15 +231,14 @@ backend/
 ├── middlewares/     # Auth, validation
 └── utils/           # Helpers
 
-client/  # Buyer app (React/Vite)
-seller/  # Seller dashboard (React/Vite)
+client/  # Buyer app
+seller/  # Seller dashboard
 ai/      # Docs & guides
 ```
 
 ## 🚀 Deployment
 
-**Production**:
-
-- MongoDB Atlas, Redis Cloud
-- Backend: Render
-- Frontend: Vercel
+- **Database**: MongoDB Atlas
+- **Cache and queues**: Redis Cloud (Upstash)
+- **Backend**: Render
+- **Frontend**: Vercel
