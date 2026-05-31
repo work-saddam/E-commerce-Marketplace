@@ -118,12 +118,12 @@ export function Signup() {
             Enter your all the details below to signup
           </CardDescription>
           <CardAction>
-            <Link to={"/login"}>
-              <Button variant="link" className="gap-1.5">
+            <Button asChild variant="link" className="gap-1.5">
+              <Link to="/login">
                 <LogIn className="h-4 w-4" aria-hidden="true" />
                 Login
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           </CardAction>
         </CardHeader>
         <CardContent>
@@ -131,7 +131,10 @@ export function Signup() {
             <div className="flex flex-col gap-4">
               <div className="grid gap-2">
                 <Label htmlFor="sellerName" className="flex items-center gap-2">
-                  <User className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
+                  <User
+                    className="h-4 w-4 text-muted-foreground"
+                    aria-hidden="true"
+                  />
                   Seller Name
                 </Label>
                 <Input
@@ -145,7 +148,10 @@ export function Signup() {
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="shopName" className="flex items-center gap-2">
-                  <Store className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
+                  <Store
+                    className="h-4 w-4 text-muted-foreground"
+                    aria-hidden="true"
+                  />
                   Shop Name
                 </Label>
                 <Input
@@ -159,7 +165,10 @@ export function Signup() {
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="email" className="flex items-center gap-2">
-                  <Mail className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
+                  <Mail
+                    className="h-4 w-4 text-muted-foreground"
+                    aria-hidden="true"
+                  />
                   Email
                 </Label>
                 <Input
@@ -192,7 +201,10 @@ export function Signup() {
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="phone" className="flex items-center gap-2">
-                  <Phone className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
+                  <Phone
+                    className="h-4 w-4 text-muted-foreground"
+                    aria-hidden="true"
+                  />
                   Phone Number
                 </Label>
                 <Input
@@ -223,7 +235,10 @@ export function Signup() {
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="panNumber" className="flex items-center gap-2">
-                  <IdCard className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
+                  <IdCard
+                    className="h-4 w-4 text-muted-foreground"
+                    aria-hidden="true"
+                  />
                   PAN Number
                 </Label>
                 <Input

@@ -20,7 +20,13 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowRight, KeyRound, LockKeyhole, Mail, UserPlus } from "lucide-react";
+import {
+  ArrowRight,
+  KeyRound,
+  LockKeyhole,
+  Mail,
+  UserPlus,
+} from "lucide-react";
 
 export function Login() {
   const [identifier, setIdentifier] = useState("");
@@ -108,12 +114,12 @@ export function Login() {
             Enter your credentials below to login
           </CardDescription>
           <CardAction>
-            <Link to={"/signup"}>
-              <Button variant="link" className="gap-1.5">
+            <Button asChild variant="link" className="gap-1.5">
+              <Link to="/signup">
                 <UserPlus className="h-4 w-4" aria-hidden="true" />
                 Sign Up
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           </CardAction>
         </CardHeader>
         <CardContent>
@@ -121,7 +127,10 @@ export function Login() {
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
                 <Label htmlFor="email" className="flex items-center gap-2">
-                  <Mail className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
+                  <Mail
+                    className="h-4 w-4 text-muted-foreground"
+                    aria-hidden="true"
+                  />
                   Email/Mobile
                 </Label>
                 <Input
@@ -148,15 +157,15 @@ export function Login() {
                     className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
                     aria-hidden="true"
                   />
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="Enter strong password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="pl-9"
-                />
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="Enter strong password"
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="pl-9"
+                  />
                 </div>
               </div>
             </div>
