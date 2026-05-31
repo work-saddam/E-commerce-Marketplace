@@ -7,14 +7,14 @@
 
 <!-- [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) -->
 
-TrustKart is a multi-tenant e-commerce marketplace with separate buyer and seller experiences, real-time inventory handling, secure Razorpay payments, OTP-based password reset, and queue-driven background processing.
+TrustKart is a multi-tenant e-commerce marketplace with separate buyer and seller experiences, real-time inventory handling, secure Razorpay payments, OTP-based password reset, and event-driven background processing.
 
 ## 🚀 Live Project
 
-| App              | URL                                                |
-| ---------------- | -------------------------------------------------- |
-| Buyer App        | https://trustkart.saddamcodes.online               |
-| Seller Dashboard | https://seller.trustkart.saddamcodes.online/orders |
+| App              | URL                                         |
+| ---------------- | ------------------------------------------- |
+| Buyer App        | https://trustkart.saddamcodes.online        |
+| Seller Dashboard | https://seller.trustkart.saddamcodes.online |
 
 ## ✨ Core Features
 
