@@ -25,7 +25,7 @@ const Header = () => {
       await axios.post(
         `${BASE_URL}/api/auth/logout`,
         {},
-        { withCredentials: true }
+        { withCredentials: true },
       );
       dispatch(removeUser());
       dispatch(clearCart());
@@ -110,10 +110,15 @@ const Header = () => {
             </div>
           </Link>
 
-          <div className="flex items-center gap-2 cursor-pointer">
+          <a
+            href="https://seller.trustkart.saddamcodes.online"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 cursor-pointer"
+          >
             <img src={storeImage} alt="store-image" className="w-6 shrink-0" />
             <span className="font-medium hidden lg:block">Seller</span>
-          </div>
+          </a>
         </div>
       </div>
 
