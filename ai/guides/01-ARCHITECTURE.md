@@ -288,4 +288,4 @@ POST   /webhook            Razorpay webhook
 
 ---
 
-**Next**: Read `ai/guides/03-DEVELOPMENT_PLANNER.md` for planning workflow and `ai/skills/` for implementation patterns.
+**Next**: Read `ai/guides/03-DEVELOPMENT_PLANNER.md` for planning workflow and `ai/agents/` for domain-specific patterns.

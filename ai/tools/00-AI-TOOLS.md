@@ -25,7 +25,6 @@ I am working in this repository.
 
 Relevant project guidance:
 - [paste section from ai/agents/...]
-- [paste section from ai/skills/...]
 
 My current code/problem:
 [paste code or description]
