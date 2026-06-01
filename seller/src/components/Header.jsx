@@ -21,7 +21,7 @@ export default function Header() {
       await axios.post(
         `${BASE_URL}/api/auth/logout`,
         {},
-        { withCredentials: true }
+        { withCredentials: true },
       );
       dispatch(removeUser());
       await persistor.purge();
@@ -45,16 +45,16 @@ export default function Header() {
 
         {/* Desktop Nav */}
         <div className="hidden md:flex items-center space-x-6">
-          <Link to="/dashboard" className="hover:text-primary">
+          <Link to="/" className="hover:text-primary">
             Dashboard
           </Link>
           <Link to="/orders" className="hover:text-primary">
             Orders
           </Link>
-          <Link to="/products" className="hover:text-primary">
+          <Link to="/" className="hover:text-primary">
             Products
           </Link>
-          <Link to="/analytics" className="hover:text-primary">
+          <Link to="/" className="hover:text-primary">
             Analytics
           </Link>
           {user ? (
