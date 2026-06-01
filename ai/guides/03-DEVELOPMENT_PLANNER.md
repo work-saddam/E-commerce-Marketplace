@@ -85,6 +85,4 @@ Focus areas:
 ## Useful References
 
 - Architecture -> `ai/guides/01-ARCHITECTURE.md`
-- API patterns -> `ai/skills/api-development.md`
-- Database patterns -> `ai/skills/database-optimization.md`
 - Domain rules -> `ai/agents/`

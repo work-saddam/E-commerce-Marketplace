@@ -19,8 +19,6 @@ Use the AI documentation in `ai/` as the source of truth for this repository.
 - Architecture: `ai/guides/01-ARCHITECTURE.md`
 - Quick start: `ai/guides/00-QUICK_START.md`
 - Planning: `ai/guides/03-DEVELOPMENT_PLANNER.md`
-- API patterns: `ai/skills/api-development.md`
-- Database patterns: `ai/skills/database-optimization.md`
 
 ## Skills
 

@@ -15,8 +15,6 @@
 
 ## Reference Files
 
-- API patterns -> `ai/skills/api-development.md`
-- Database patterns -> `ai/skills/database-optimization.md`
 - Planning -> `ai/guides/03-DEVELOPMENT_PLANNER.md`
 - Business context -> `ai/context/domain.md`
 - Stack details -> `ai/context/stack.md`
@@ -27,8 +25,7 @@
 ### Build an API endpoint
 
 1. Load `ai/agents/backend.agent.md`
-2. Reference `ai/skills/api-development.md`
-3. Follow existing controller, middleware, and response conventions
+2. Follow existing controller, middleware, and response conventions
 
 ### Build a React component
 
@@ -39,8 +36,7 @@
 ### Improve a slow query
 
 1. Load `ai/agents/db.agent.md`
-2. Reference `ai/skills/database-optimization.md`
-3. Check indexes, query shape, field selection, and pagination
+2. Check indexes, query shape, field selection, and pagination
 
 ### Plan a larger change
 

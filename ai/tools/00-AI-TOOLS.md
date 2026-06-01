@@ -41,8 +41,6 @@ Please follow the project pattern and explain the change briefly.
 | Frontend/UI pattern | `ai/agents/frontend.agent.md` |
 | Database/query pattern | `ai/agents/db.agent.md` |
 | Security/payment pattern | `ai/agents/security.agent.md` |
-| Endpoint examples | `ai/skills/api-development.md` |
-| Query and index examples | `ai/skills/database-optimization.md` |
 | Project structure | `ai/guides/01-ARCHITECTURE.md` |
 | Planning larger work | `ai/guides/03-DEVELOPMENT_PLANNER.md` |
 

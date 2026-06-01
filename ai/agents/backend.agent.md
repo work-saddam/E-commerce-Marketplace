@@ -30,7 +30,7 @@ This agent activates when working on:
 2. `ai/context/conventions.md` - Code Style, Error Handling
 3. `ai/context/domain.md` - Business Domain, API Layers
 
-**For implementation:** 4. `ai/prompts/api-route.prompt.md` - Endpoint patterns 5. `ai/skills/api-development.md` - Deep patterns 6. `ai/guides/03-DEVELOPMENT_PLANNER.md` - Planning workflow
+**For implementation:** 4. `ai/prompts/api-route.prompt.md` - Endpoint patterns 5. `ai/guides/03-DEVELOPMENT_PLANNER.md` - Planning workflow
 
 ---
 
@@ -394,8 +394,8 @@ return res.status(401).json({ message: "Authentication failed" });
 - **Frontend code needed?** → `frontend.agent.md`
 - **Schema design needed?** → `db.agent.md`
 - **Security concern?** → `security.agent.md`
-- **Database optimization?** → `db.agent.md` + ai/skills/database-optimization.md
-- **Payment issues?** → `security.agent.md` + ai/agents/security.agent.md
+- **Database optimization?** → `db.agent.md`
+- **Payment issues?** → `security.agent.md`
 
 ---
 

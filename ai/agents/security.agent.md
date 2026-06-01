@@ -36,7 +36,7 @@ This agent activates when working on:
 2. `ai/context/conventions.md` - Security Conventions
 3. `ai/context/domain.md` - Compliance & Security
 
-**For implementation:** 4. `ai/agents/security.agent.md` - Payment security 5. `ai/skills/api-development.md` - Validation and response patterns 6. `AGENTS.md` - Repository defaults
+**For implementation:** 4. `ai/context/agent-principles.md` - Working principles 5. `AGENTS.md` - Repository defaults
 
 ---
 

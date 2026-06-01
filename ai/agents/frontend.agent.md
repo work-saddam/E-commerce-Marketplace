@@ -33,7 +33,7 @@ This agent activates when working on:
 2. `ai/context/conventions.md` - Code Style, React patterns
 3. `ai/context/domain.md` - Business logic overview
 
-**For implementation:** 4. `ai/prompts/component.prompt.md` - React patterns 5. `ai/guides/00-QUICK_START.md` - Common patterns 6. `ai/skills/api-development.md` - API integration
+**For implementation:** 4. `ai/prompts/component.prompt.md` - React patterns 5. `ai/guides/00-QUICK_START.md` - Common patterns
 
 ---
 

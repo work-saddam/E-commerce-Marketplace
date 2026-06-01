@@ -19,8 +19,6 @@ Use the `ai/` folder as the source of truth for project-specific guidance.
 
 - Architecture: `ai/guides/01-ARCHITECTURE.md`
 - Planning: `ai/guides/03-DEVELOPMENT_PLANNER.md`
-- API patterns: `ai/skills/api-development.md`
-- Database patterns: `ai/skills/database-optimization.md`
 - Project context: `ai/context/domain.md`, `ai/context/stack.md`, `ai/context/conventions.md`
 - Templates: `ai/prompts/api-route.prompt.md`, `ai/prompts/component.prompt.md`, `ai/prompts/schema.prompt.md`
 

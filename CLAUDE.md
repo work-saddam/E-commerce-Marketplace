@@ -15,8 +15,6 @@ Use this file as the default instruction entry point for Claude-style agents in 
 - `ai/context/conventions.md`
 - `ai/guides/01-ARCHITECTURE.md`
 - `ai/guides/03-DEVELOPMENT_PLANNER.md`
-- `ai/skills/api-development.md`
-- `ai/skills/database-optimization.md`
 
 ## Skills
 

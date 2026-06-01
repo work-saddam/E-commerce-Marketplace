@@ -39,10 +39,7 @@ The `ai/` folder is the documentation hub for repository-aware AI tools and huma
 
 ## Skill Registry
 
-**Built-in Skills** (`ai/skills/`)
-
-- `api-development.md` — Endpoint design and request handling
-- `database-optimization.md` — Query tuning and index strategy
+**Built-in Skills** — *Merged into agents* (see agents/ for full guidance)
 
 **Installed Skills** (registered in `skills-lock.json`)
 
@@ -57,11 +54,12 @@ The `ai/` folder is the documentation hub for repository-aware AI tools and huma
 
 ## Common Routing
 
-- Building an endpoint -> `agents/backend.agent.md` + `skills/api-development.md`
-- Improving a query -> `agents/db.agent.md` + `skills/database-optimization.md`
-- Working on auth or payments -> `agents/security.agent.md`
-- Planning a larger change -> `guides/03-DEVELOPMENT_PLANNER.md`
-- Understanding project structure -> `guides/01-ARCHITECTURE.md`
+- Building an endpoint → `agents/backend.agent.md`
+- Improving a query → `agents/db.agent.md`
+- Working on auth or payments → `agents/security.agent.md`
+- Building React components → `agents/frontend.agent.md`
+- Planning a larger change → `guides/03-DEVELOPMENT_PLANNER.md`
+- Understanding project structure → `guides/01-ARCHITECTURE.md`
 
 ## Tool Entry Points
 

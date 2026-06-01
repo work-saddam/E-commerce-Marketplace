@@ -32,7 +32,7 @@ This agent activates when working on:
 2. `ai/context/conventions.md` - Database Field naming
 3. `ai/context/domain.md` - Entity relationships
 
-**For implementation:** 4. `ai/prompts/schema.prompt.md` - Schema patterns 5. `ai/skills/database-optimization.md` - Query patterns 6. `ai/guides/03-DEVELOPMENT_PLANNER.md` - Execution workflow
+**For implementation:** 4. `ai/prompts/schema.prompt.md` - Schema patterns 5. `ai/guides/03-DEVELOPMENT_PLANNER.md` - Execution workflow
 
 ---
 
@@ -484,7 +484,6 @@ const orders = await Order.find().skip(skip).limit(20);
 ## 📖 When to Reference Other Agents
 
 - **Endpoint needs new schema?** → Include backend.agent.md
-- **Query optimization needed?** → Reference ai/skills/database-optimization.md
 - **Performance issues?** → Check indexing strategy first
 
 ---
@@ -496,7 +495,6 @@ Real implementations to study:
 - `backend/src/models/user.js` - User schema with virtuals
 - `backend/src/models/order.js` - Order with transaction pattern
 - `backend/src/models/product.js` - Product with inventory logic
-- `ai/skills/database-optimization.md` - Deep dive on queries
 
 **Key takeaway**: Database design is about data integrity, query performance, and scalability.
 Always use proper types, index frequently-searched fields, and optimize for the access patterns you use most.
