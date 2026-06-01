@@ -4,40 +4,72 @@
 **Applies To**: Copilot, Cursor, Claude-style agents, AGENTS-aware agents, and any tool that reads the repo instructions.
 
 These principles are adapted from the Karpathy-inspired guidelines collected in the `andrej-karpathy-skills` project:
-https://github.com/forrestchang/andrej-karpathy-skills/blob/main/README.md
+https://github.com/forrestchang/andrej-karpathy-skills/blob/main/CLAUDE.md
 
 ---
 
 ## The Four Principles
 
-### 1. Think Before Coding
+## 1. Think Before Coding
 
-- State assumptions explicitly instead of silently guessing.
-- If multiple interpretations are plausible, surface them before implementation.
-- Push back when a simpler or safer approach is better than the requested shape.
-- If confusion remains, stop and clarify rather than coding through uncertainty.
+**Don't assume. Don't hide confusion. Surface tradeoffs.**
 
-### 2. Simplicity First
+Before implementing:
 
-- Implement the minimum code that solves the stated problem.
-- Do not add speculative flexibility, abstractions, flags, or features.
-- Avoid overengineering for single-use code paths.
-- Prefer the version a senior engineer would consider obviously simple.
+- State your assumptions explicitly. If uncertain, ask.
+- If multiple interpretations exist, present them - don't pick silently.
+- If a simpler approach exists, say so. Push back when warranted.
+- If something is unclear, stop. Name what's confusing. Ask.
 
-### 3. Surgical Changes
+## 2. Simplicity First
 
-- Touch only the code required for the request.
-- Do not refactor adjacent code unless the task requires it.
-- Match the existing style and patterns of the surrounding code.
-- Remove only the dead code made obsolete by your own change.
-- If unrelated problems are noticed, mention them instead of changing them by default.
+**Minimum code that solves the problem. Nothing speculative.**
 
-### 4. Goal-Driven Execution
+- No features beyond what was asked.
+- No abstractions for single-use code.
+- No "flexibility" or "configurability" that wasn't requested.
+- No error handling for impossible scenarios.
+- If you write 200 lines and it could be 50, rewrite it.
 
-- Convert requests into clear success criteria with a verification step.
-- For non-trivial tasks, state a brief plan before making substantial changes.
-- Verify outcomes with tests, checks, or concrete inspection whenever possible.
-- Do not stop at code changes alone; confirm the requested goal was actually met.
+Ask yourself: "Would a senior engineer say this is overcomplicated?" If yes, simplify.
+
+## 3. Surgical Changes
+
+**Touch only what you must. Clean up only your own mess.**
+
+When editing existing code:
+
+- Don't "improve" adjacent code, comments, or formatting.
+- Don't refactor things that aren't broken.
+- Match existing style, even if you'd do it differently.
+- If you notice unrelated dead code, mention it - don't delete it.
+
+When your changes create orphans:
+
+- Remove imports/variables/functions that YOUR changes made unused.
+- Don't remove pre-existing dead code unless asked.
+
+The test: Every changed line should trace directly to the user's request.
+
+## 4. Goal-Driven Execution
+
+**Define success criteria. Loop until verified.**
+
+Transform tasks into verifiable goals:
+
+- "Add validation" → "Write tests for invalid inputs, then make them pass"
+- "Fix the bug" → "Write a test that reproduces it, then make it pass"
+- "Refactor X" → "Ensure tests pass before and after"
+
+For multi-step tasks, state a brief plan:
+
+```
+1. [Step] → verify: [check]
+2. [Step] → verify: [check]
+3. [Step] → verify: [check]
+```
+
+Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
 
 ---
 

@@ -4,25 +4,25 @@ Use the `ai/` folder as the source of truth for project-specific guidance.
 
 ## Required Read Order
 
-1. `ai/context/agent-principles.md`
+1. `ai/context/agent-principles.md` - Apply these principles before every code generation.
 2. `ai/README.md`
 3. The matching domain guide in `ai/agents/`
 
 ## Domain Routing
 
-- Backend/API work -> `ai/agents/backend.agent.md`
-- Frontend/React work -> `ai/agents/frontend.agent.md`
-- Database work -> `ai/agents/db.agent.md`
-- Security work -> `ai/agents/security.agent.md`
+- Backend/API work → `ai/agents/backend.agent.md`
+- Frontend/React work → `ai/agents/frontend.agent.md`
+- Database work → `ai/agents/db.agent.md`
+- Security work → `ai/agents/security.agent.md`
 
-## Supporting Material
+## Core References
 
 - Architecture: `ai/guides/01-ARCHITECTURE.md`
 - Planning: `ai/guides/03-DEVELOPMENT_PLANNER.md`
 - API patterns: `ai/skills/api-development.md`
 - Database patterns: `ai/skills/database-optimization.md`
-- Business and conventions: `ai/context/domain.md`, `ai/context/stack.md`, `ai/context/conventions.md`
-- Templates: `ai/prompts/`
+- Project context: `ai/context/domain.md`, `ai/context/stack.md`, `ai/context/conventions.md`
+- Templates: `ai/prompts/api-route.prompt.md`, `ai/prompts/component.prompt.md`, `ai/prompts/schema.prompt.md`
 
 ## Always
 

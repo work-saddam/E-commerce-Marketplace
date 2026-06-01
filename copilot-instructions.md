@@ -2,15 +2,11 @@
 
 Use the `ai/` folder as the documentation hub for this repository.
 
-## Start Here
+## Required Read Order
 
-1. Read `ai/context/agent-principles.md`
-2. Read `ai/README.md`
-3. Load the best matching domain guide:
-   - Backend/API: `ai/agents/backend.agent.md`
-   - Frontend/React: `ai/agents/frontend.agent.md`
-   - Database: `ai/agents/db.agent.md`
-   - Security: `ai/agents/security.agent.md`
+1. `ai/context/agent-principles.md` - Apply these principles before every code generation.
+2. `ai/README.md`
+3. The matching domain guide in `ai/agents/`
 
 ## Core References
 
