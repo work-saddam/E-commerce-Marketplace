@@ -5,16 +5,6 @@ const generateOTP = () => {
   return crypto.randomInt(100000, 1000000).toString();
 };
 
-const buildPurposeQuery = (purpose) => {
-  if (purpose === "password-reset") {
-    return {
-      $or: [{ purpose }, { purpose: { $exists: false } }],
-    };
-  }
-
-  return { purpose };
-};
-
 const createOtpRecord = async (
   email,
   userType,
@@ -27,7 +17,7 @@ const createOtpRecord = async (
   const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
   await OTP.findOneAndUpdate(
-    { email, userType, ...buildPurposeQuery(purpose) },
+    { email, userType, purpose },
     { otp, attempts: 0, expiresAt, purpose },
     { upsert: true, new: true, session },
   );
@@ -47,14 +37,13 @@ const verifyOTP = async (
   const query = {
     email,
     userType,
+    purpose,
     expiresAt: { $gt: now },
     attempts: { $lt: 3 },
   };
-  const purposeQuery = buildPurposeQuery(purpose);
 
   const verifiedOtp = await OTP.findOneAndDelete({
     ...query,
-    ...purposeQuery,
     otp: enteredOtp,
   }).session(session || null);
 
@@ -65,7 +54,6 @@ const verifyOTP = async (
   const attemptedOtp = await OTP.findOneAndUpdate(
     {
       ...query,
-      ...purposeQuery,
     },
     { $inc: { attempts: 1 } },
     { new: true, session },
@@ -87,7 +75,7 @@ const verifyOTP = async (
   const otpRecord = await OTP.findOne({
     email,
     userType,
-    ...buildPurposeQuery(purpose),
+    purpose,
   })
     .select("_id expiresAt attempts")
     .session(session || null);
@@ -119,7 +107,7 @@ const deleteOtpRecord = async (
   const query = OTP.deleteOne({
     email,
     userType,
-    ...buildPurposeQuery(purpose),
+    purpose,
   });
   if (session) {
     query.session(session);
@@ -137,7 +125,7 @@ const getOtpRecord = async (
   const query = OTP.findOne({
     email,
     userType,
-    ...buildPurposeQuery(purpose),
+    purpose,
   });
   if (session) {
     query.session(session);
