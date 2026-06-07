@@ -24,6 +24,11 @@ const REGISTRATION_SUCCESS_MESSAGE =
   "Registration verified successfully. You can now log in.";
 const normalizeEmail = (value) =>
   typeof value === "string" ? value.toLowerCase().trim() : undefined;
+const isRegistrationOtpError = (message = "") =>
+  message.includes("OTP") ||
+  message.includes("attempt") ||
+  message.includes("expired") ||
+  message.includes("Maximum attempts exceeded");
 
 exports.sellerRegister = async (req, res) => {
   try {
@@ -132,16 +137,15 @@ exports.verifySellerRegistrationOtp = async (req, res) => {
       return res.status(400).json({ message: "OTP must be 6 digits" });
     }
 
-    session = await mongoose.startSession();
-    session.startTransaction();
-
     await otpService.verifyOTP(
       normalizedEmail,
       "seller",
       otp,
       REGISTRATION_OTP_PURPOSE,
-      session,
     );
+
+    session = await mongoose.startSession();
+    session.startTransaction();
 
     const account = await finalizeRegistration({
       email: normalizedEmail,
@@ -163,13 +167,13 @@ exports.verifySellerRegistrationOtp = async (req, res) => {
       await session.abortTransaction();
     }
 
-    if (normalizedEmail) {
+    const message =
+      error.message ||
+      "Registration verification failed. Please try again later.";
+    const isVerificationError = isRegistrationOtpError(message);
+
+    if (normalizedEmail && !isVerificationError) {
       await cleanupPendingRegistration(normalizedEmail, "seller");
-      await otpService.deleteOtpRecord(
-        normalizedEmail,
-        "seller",
-        REGISTRATION_OTP_PURPOSE,
-      );
     }
 
     if (error.code === 11000) {
@@ -179,12 +183,8 @@ exports.verifySellerRegistrationOtp = async (req, res) => {
       });
     }
 
-    const message =
-      error.message || "Registration verification failed. Please try again later.";
     const status =
-      message.includes("expired") ||
-      message.includes("attempt") ||
-      message.includes("OTP") ||
+      isVerificationError ||
       message.includes("Registration session expired")
         ? 400
         : 500;
