@@ -17,6 +17,12 @@ const otpSchema = new mongoose.Schema(
       enum: ["buyer", "seller"],
       required: true,
     },
+    purpose: {
+      type: String,
+      enum: ["registration", "password-reset"],
+      required: true,
+      default: "password-reset",
+    },
     attempts: {
       type: Number,
       default: 0,
@@ -34,7 +40,7 @@ const otpSchema = new mongoose.Schema(
 otpSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
 // Compound index for fast lookups
-otpSchema.index({ email: 1, userType: 1 }, { unique: true });
+otpSchema.index({ email: 1, userType: 1, purpose: 1 }, { unique: true });
 
 const OTP = mongoose.model("OTP", otpSchema);
 module.exports = OTP;
