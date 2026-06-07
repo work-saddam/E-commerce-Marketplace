@@ -7,7 +7,7 @@
 
 <!-- [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) -->
 
-TrustKart is a multi-tenant e-commerce marketplace with separate buyer and seller experiences, real-time inventory handling, secure Razorpay payments, OTP-based password reset, and event-driven background processing.
+TrustKart is a multi-tenant e-commerce marketplace with separate buyer and seller experiences, real-time inventory handling, secure Razorpay payments, OTP-gated registration and password reset, and event-driven background processing using BullMQ.
 
 ## 🚀 Live Project
 
@@ -22,6 +22,7 @@ TrustKart is a multi-tenant e-commerce marketplace with separate buyer and selle
 - **Inventory Reservation System**: Atomic MongoDB operations with optimistic locking prevent overselling. Reservations auto-expire, triggering inventory release jobs via BullMQ.
 - **Payment Retry Mechanism**: Failed payments can be retried within 15 minutes of initial attempt. Idempotent via unique order receipts and webhook deduplication.
 - **Multi-tenant Seller Isolation**: JWT-based stateless auth + role-based access control. Each seller operates independently; shared backend handles all business logic.
+- **OTP-Gated Registration**: Buyer and seller signup is a 2-step flow with email OTP verification before account creation.
 - **Password Reset Flow**: Buyer and seller users can reset forgotten passwords using OTP email verification.
 - **Real-time Razorpay Integration**: Webhook signature verification (HMAC-SHA256), automatic payment settlement, transaction idempotency tracking.
 - **Optimized Media Pipeline**: Cloudinary auto-compression, responsive image transformation, reduces bandwidth by 60%+.
@@ -204,7 +205,8 @@ VITE_API_URL=http://localhost:5000/api
 | Method | Endpoint                                   | Auth   | Purpose              |
 | ------ | ------------------------------------------ | ------ | -------------------- |
 | POST   | `/api/auth/login`                          | Public | Login                |
-| POST   | `/api/auth/register`                       | Public | Signup               |
+| POST   | `/api/auth/register`                       | Public | Request buyer OTP    |
+| POST   | `/api/auth/register/verify-otp`            | Public | Verify buyer OTP     |
 | POST   | `/api/auth/forgot-password/request-otp`    | Public | Send reset OTP       |
 | POST   | `/api/auth/forgot-password/verify-otp`     | Public | Verify reset OTP     |
 | POST   | `/api/auth/forgot-password/reset-password` | Public | Reset password       |
