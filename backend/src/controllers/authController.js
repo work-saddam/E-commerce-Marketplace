@@ -386,6 +386,8 @@ const verifyOtp = async (req, res) => {
 };
 
 const resetPassword = async (req, res) => {
+  let session;
+
   try {
     const { resetToken, newPassword } = req.body;
 
@@ -423,18 +425,20 @@ const resetPassword = async (req, res) => {
       });
     }
 
-    const storedResetToken = await PasswordResetToken.findOneAndUpdate(
-      {
-        token: resetToken,
-        userType: resetTokenUserType,
-        used: false,
-        expiresAt: { $gt: new Date() },
-      },
-      { $set: { used: true } },
-      { new: false },
-    ).select("_id userId");
+    session = await mongoose.startSession();
+    session.startTransaction();
+
+    const storedResetToken = await PasswordResetToken.findOne({
+      token: resetToken,
+      userType: resetTokenUserType,
+      used: false,
+      expiresAt: { $gt: new Date() },
+    })
+      .select("_id userId")
+      .session(session);
 
     if (!storedResetToken) {
+      await session.abortTransaction();
       return res.status(401).json({
         message: "Invalid, expired, or already used reset token",
       });
@@ -442,17 +446,19 @@ const resetPassword = async (req, res) => {
 
     let user;
     if (validUserType === "seller") {
-      user = await Seller.findById(storedResetToken.userId);
+      user = await Seller.findById(storedResetToken.userId).session(session);
     } else {
-      user = await User.findById(storedResetToken.userId);
+      user = await User.findById(storedResetToken.userId).session(session);
     }
 
     if (!user) {
+      await session.abortTransaction();
       return res.status(404).json({ message: "User not found" });
     }
 
     const isSamePassword = await bcrypt.compare(newPassword, user.password);
     if (isSamePassword) {
+      await session.abortTransaction();
       return res
         .status(400)
         .json({ message: "New password cannot be the same as old password" });
@@ -460,15 +466,30 @@ const resetPassword = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     user.password = hashedPassword;
-    await user.save();
+    await user.save({ session });
+
+    await PasswordResetToken.updateOne(
+      { _id: storedResetToken._id },
+      { $set: { used: true } },
+      { session },
+    );
+
+    await session.commitTransaction();
 
     res.status(200).json({
       message: "Password reset successfully.",
     });
   } catch (error) {
+    if (session?.inTransaction()) {
+      await session.abortTransaction();
+    }
     res.status(500).json({
       message: "Password reset failed. Please try again later.",
     });
+  } finally {
+    if (session) {
+      session.endSession();
+    }
   }
 };
 
