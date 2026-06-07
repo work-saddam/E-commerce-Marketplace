@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
 import {
@@ -390,6 +390,16 @@ const Register = () => {
                 </button>
               </form>
             )}
+
+            <p className="mt-6 text-center text-sm text-slate-400">
+              Already have an account?{" "}
+              <Link
+                to="/login"
+                className="font-medium text-amber-300 transition hover:text-amber-200 hover:underline"
+              >
+                Login
+              </Link>
+            </p>
           </div>
         </div>
       </div>
