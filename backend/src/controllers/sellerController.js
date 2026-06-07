@@ -1,5 +1,6 @@
 const Order = require("../models/order");
 const Seller = require("../models/seller");
+const validator = require("validator");
 const {
   validateSellerRegisterData,
   validateSellerLoginData,
@@ -9,6 +10,20 @@ const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
 const TransactionalMailService = require("../services/transactionalMail.service");
 const { getAuthCookieOptions } = require("../config/security");
+const otpService = require("../services/otp.service");
+const {
+  createPendingRegistration,
+  finalizeRegistration,
+  cleanupPendingRegistration,
+} = require("../services/registration.service");
+
+const REGISTRATION_OTP_PURPOSE = "registration";
+const REGISTRATION_RESPONSE_MESSAGE =
+  "If the details are valid, an OTP has been sent to your email.";
+const REGISTRATION_SUCCESS_MESSAGE =
+  "Registration verified successfully. You can now log in.";
+const normalizeEmail = (value) =>
+  typeof value === "string" ? value.toLowerCase().trim() : undefined;
 
 exports.sellerRegister = async (req, res) => {
   try {
@@ -26,44 +41,159 @@ exports.sellerRegister = async (req, res) => {
       gstNumber,
       panNumber,
     } = req.body;
+    const normalizedEmail = email.toLowerCase().trim();
+    const normalizedPhone = phone.trim();
 
     const existingSeller = await Seller.findOne({
-      $or: [{ email }, { phone }],
+      $or: [{ email: normalizedEmail }, { phone: normalizedPhone }],
     });
     if (existingSeller) {
-      const field = existingSeller.email == email ? "Email" : "Phone Number";
-      return res
-        .status(400)
-        .json({ message: `${field} is already Registered!` });
+      await cleanupPendingRegistration(normalizedEmail, "seller");
+      await otpService.deleteOtpRecord(
+        normalizedEmail,
+        "seller",
+        REGISTRATION_OTP_PURPOSE,
+      );
+      return res.status(200).json({
+        message: REGISTRATION_RESPONSE_MESSAGE,
+      });
     }
 
     const hashPassword = await bcrypt.hash(password, 10);
 
-    const seller = new Seller({
-      sellerName,
-      shopName,
-      email,
-      password: hashPassword,
-      phone,
-      gstNumber,
-      panNumber,
+    await createPendingRegistration({
+      userType: "seller",
+      registrationData: {
+        sellerName,
+        shopName,
+        email: normalizedEmail,
+        phone: normalizedPhone,
+        gstNumber,
+        panNumber,
+      },
+      passwordHash: hashPassword,
     });
-    const savedSeller = await seller.save();
 
-    res
-      .status(201)
-      .json({ message: "Register Successfully!", data: savedSeller });
+    const otp = await otpService.createOtpRecord(
+      normalizedEmail,
+      "seller",
+      REGISTRATION_OTP_PURPOSE,
+    );
+
+    await TransactionalMailService.queueRegistrationOtpEmail({
+      email: normalizedEmail,
+      otp,
+      userName: sellerName,
+      accountType: "seller",
+    });
+
+    res.status(200).json({
+      message: REGISTRATION_RESPONSE_MESSAGE,
+    });
   } catch (error) {
-    if (error.code === 11000) {
-      const duplicateField = Object.keys(error.keyPattern || {})[0];
-      const fieldMessage =
-        duplicateField === "phone" ? "Phone Number is already Registered!" : "Email is already Registered!";
-      return res.status(409).json({ message: fieldMessage });
+    const normalizedEmail = normalizeEmail(req.body.email);
+
+    if (normalizedEmail) {
+      await cleanupPendingRegistration(normalizedEmail, "seller");
+      await otpService.deleteOtpRecord(
+        normalizedEmail,
+        "seller",
+        REGISTRATION_OTP_PURPOSE,
+      );
     }
 
-    res
-      .status(500)
-      .json({ message: "Registration Failed!", error: error.message });
+    if (error.code === 11000) {
+      return res.status(409).json({
+        message:
+          "Registration failed. Try logging in or resetting your password.",
+      });
+    }
+
+    res.status(500).json({ message: "Registration failed. Please try again later." });
+  }
+};
+
+exports.verifySellerRegistrationOtp = async (req, res) => {
+  const normalizedEmail = normalizeEmail(req.body.email);
+  let session;
+
+  try {
+    const { email, otp } = req.body;
+
+    if (!email || !otp) {
+      return res.status(400).json({ message: "Email and OTP are required" });
+    }
+
+    if (!validator.isEmail(email)) {
+      return res.status(400).json({ message: "Invalid email format" });
+    }
+
+    if (!/^\d{6}$/.test(otp)) {
+      return res.status(400).json({ message: "OTP must be 6 digits" });
+    }
+
+    session = await mongoose.startSession();
+    session.startTransaction();
+
+    await otpService.verifyOTP(
+      normalizedEmail,
+      "seller",
+      otp,
+      REGISTRATION_OTP_PURPOSE,
+      session,
+    );
+
+    const account = await finalizeRegistration({
+      email: normalizedEmail,
+      userType: "seller",
+      session,
+    });
+
+    await session.commitTransaction();
+
+    return res.status(200).json({
+      message: REGISTRATION_SUCCESS_MESSAGE,
+      data: {
+        _id: account._id,
+        email: account.email,
+      },
+    });
+  } catch (error) {
+    if (session?.inTransaction()) {
+      await session.abortTransaction();
+    }
+
+    if (normalizedEmail) {
+      await cleanupPendingRegistration(normalizedEmail, "seller");
+      await otpService.deleteOtpRecord(
+        normalizedEmail,
+        "seller",
+        REGISTRATION_OTP_PURPOSE,
+      );
+    }
+
+    if (error.code === 11000) {
+      return res.status(409).json({
+        message:
+          "Registration failed. Try logging in or resetting your password.",
+      });
+    }
+
+    const message =
+      error.message || "Registration verification failed. Please try again later.";
+    const status =
+      message.includes("expired") ||
+      message.includes("attempt") ||
+      message.includes("OTP") ||
+      message.includes("Registration session expired")
+        ? 400
+        : 500;
+
+    return res.status(status).json({ message });
+  } finally {
+    if (session) {
+      session.endSession();
+    }
   }
 };
 
