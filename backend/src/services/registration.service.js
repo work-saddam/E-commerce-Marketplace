@@ -128,6 +128,13 @@ const finalizeRegistration = async ({ email, userType, session }) => {
     throw new Error("Registration session expired. Please start again.");
   }
 
+  const expiresAt =
+    pendingRegistration.expiresAt || pendingRegistration.expires;
+  if (expiresAt && new Date(expiresAt).getTime() <= Date.now()) {
+    await deletePendingRegistration(email, userType, session);
+    throw new Error("Registration session expired. Please start again.");
+  }
+
   const AccountModel = getAccountModel(userType);
   const defaults = getRegistrationDefaults(userType);
   const registrationData = pendingRegistration.registrationData || {};
