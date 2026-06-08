@@ -207,6 +207,8 @@ VITE_API_URL=http://localhost:5000/api
 | POST   | `/api/auth/login`                          | Public | Login                |
 | POST   | `/api/auth/register`                       | Public | Request buyer OTP    |
 | POST   | `/api/auth/register/verify-otp`            | Public | Verify buyer OTP     |
+| POST   | `/api/seller/register`                     | Public | Request seller OTP   |
+| POST   | `/api/seller/register/verify-otp`          | Public | Verify seller OTP    |
 | POST   | `/api/auth/forgot-password/request-otp`    | Public | Send reset OTP       |
 | POST   | `/api/auth/forgot-password/verify-otp`     | Public | Verify reset OTP     |
 | POST   | `/api/auth/forgot-password/reset-password` | Public | Reset password       |

@@ -343,7 +343,8 @@ const queueRegistrationOtpEmail = async ({
       subject: template.subject,
       html: template.html,
       text: template.text,
-      idempotencyKey: `registration-otp-${email.toLowerCase()}-${new Date().getTime()}`,
+      // idempotencyKey: `registration-otp-${email.toLowerCase()}-${new Date().getTime()}`,
+      idempotencyKey: `registration-otp-${email.toLowerCase()}-${accountType}-${otp}`,
       tags: [
         { name: "template", value: "registration-otp" },
         { name: "email", value: email.toLowerCase() },
