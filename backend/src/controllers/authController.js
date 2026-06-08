@@ -102,12 +102,16 @@ const register = async (req, res) => {
     const normalizedEmail = normalizeEmail(req.body.email);
 
     if (normalizedEmail) {
-      await cleanupPendingRegistration(normalizedEmail, "buyer");
-      await otpService.deleteOtpRecord(
-        normalizedEmail,
-        "buyer",
-        REGISTRATION_OTP_PURPOSE,
-      );
+      try {
+        await cleanupPendingRegistration(normalizedEmail, "buyer");
+        await otpService.deleteOtpRecord(
+          normalizedEmail,
+          "buyer",
+          REGISTRATION_OTP_PURPOSE,
+        );
+      } catch (cleanupError) {
+        console.error("Buyer registration cleanup failed:", cleanupError);
+      }
     }
 
     if (error.code === 11000) {
