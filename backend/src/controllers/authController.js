@@ -13,12 +13,32 @@ const {
   getAuthClearCookieOptions,
 } = require("../config/security");
 const otpService = require("../services/otp.service");
+const mongoose = require("mongoose");
 const {
+  createPendingRegistration,
+  finalizeRegistration,
+  cleanupPendingRegistration,
+} = require("../services/registration.service");
+const {
+  queueRegistrationOtpEmail,
   queueForgotPasswordOtpEmail,
 } = require("../services/transactionalMail.service");
 
 const RESET_TOKEN_EXPIRY_MS = 15 * 60 * 1000;
 const RESET_TOKEN_JWT_EXPIRY = "15m";
+const REGISTRATION_OTP_PURPOSE = "registration";
+const PASSWORD_RESET_OTP_PURPOSE = "password-reset";
+const REGISTRATION_RESPONSE_MESSAGE =
+  "If the details are valid, an OTP has been sent to your email.";
+const REGISTRATION_SUCCESS_MESSAGE =
+  "Registration verified successfully. You can now log in.";
+const normalizeEmail = (value) =>
+  typeof value === "string" ? value.toLowerCase().trim() : undefined;
+const isRegistrationOtpError = (message = "") =>
+  message.includes("OTP") ||
+  message.includes("attempt") ||
+  message.includes("expired") ||
+  message.includes("Maximum attempts exceeded");
 
 const getResetTokenUserType = (userType) =>
   userType === "seller" ? "Seller" : "User";
@@ -31,27 +51,69 @@ const register = async (req, res) => {
     }
 
     const { name, email, password, phone } = req.body;
+    const normalizedEmail = email.toLowerCase().trim();
+    const normalizedPhone = phone.trim();
 
-    const existingUser = await User.findOne({ $or: [{ email }, { phone }] });
+    const existingUser = await User.findOne({
+      $or: [{ email: normalizedEmail }, { phone: normalizedPhone }],
+    });
     if (existingUser) {
-      const field = existingUser.email == email ? "Email" : "Phone number";
-      return res.status(400).json({ message: `${field} already registered!` });
+      await cleanupPendingRegistration(normalizedEmail, "buyer");
+      await otpService.deleteOtpRecord(
+        normalizedEmail,
+        "buyer",
+        REGISTRATION_OTP_PURPOSE,
+      );
+      return res.status(400).json({
+        message:
+          "Email or phone already in use. Try logging in or resetting your password.",
+      });
     }
 
     const hashPassword = await bcrypt.hash(password, 10);
 
-    const user = new User({
-      name,
-      email,
-      password: hashPassword,
-      phone,
+    await createPendingRegistration({
+      userType: "buyer",
+      registrationData: {
+        name,
+        email: normalizedEmail,
+        phone: normalizedPhone,
+      },
+      passwordHash: hashPassword,
     });
-    const savedUser = await user.save();
 
-    res
-      .status(201)
-      .json({ message: "Registration Successful!", data: savedUser });
+    const otp = await otpService.createOtpRecord(
+      normalizedEmail,
+      "buyer",
+      REGISTRATION_OTP_PURPOSE,
+    );
+
+    await queueRegistrationOtpEmail({
+      email: normalizedEmail,
+      otp,
+      userName: name,
+      accountType: "buyer",
+    });
+
+    res.status(200).json({
+      message: REGISTRATION_RESPONSE_MESSAGE,
+    });
   } catch (error) {
+    const normalizedEmail = normalizeEmail(req.body.email);
+
+    if (normalizedEmail) {
+      try {
+        await cleanupPendingRegistration(normalizedEmail, "buyer");
+        await otpService.deleteOtpRecord(
+          normalizedEmail,
+          "buyer",
+          REGISTRATION_OTP_PURPOSE,
+        );
+      } catch (cleanupError) {
+        console.error("Buyer registration cleanup failed:", cleanupError);
+      }
+    }
+
     if (error.code === 11000) {
       return res.status(409).json({
         message:
@@ -61,7 +123,86 @@ const register = async (req, res) => {
 
     res
       .status(500)
-      .json({ message: "Registration Failed! Please try again later." });
+      .json({ message: "Registration failed. Please try again later." });
+  }
+};
+
+const verifyRegistrationOtp = async (req, res) => {
+  const normalizedEmail = normalizeEmail(req.body.email);
+  let session;
+
+  try {
+    const { email, otp } = req.body;
+
+    if (!email || !otp) {
+      return res.status(400).json({ message: "Email and OTP are required" });
+    }
+
+    if (!validator.isEmail(email)) {
+      return res.status(400).json({ message: "Invalid email format" });
+    }
+
+    if (!/^\d{6}$/.test(otp)) {
+      return res.status(400).json({ message: "OTP must be 6 digits" });
+    }
+
+    await otpService.verifyOTP(
+      normalizedEmail,
+      "buyer",
+      otp,
+      REGISTRATION_OTP_PURPOSE,
+    );
+
+    session = await mongoose.startSession();
+    session.startTransaction();
+
+    const account = await finalizeRegistration({
+      email: normalizedEmail,
+      userType: "buyer",
+      session,
+    });
+
+    await session.commitTransaction();
+
+    return res.status(200).json({
+      message: REGISTRATION_SUCCESS_MESSAGE,
+      data: {
+        _id: account._id,
+        email: account.email,
+      },
+    });
+  } catch (error) {
+    if (session?.inTransaction()) {
+      await session.abortTransaction();
+    }
+
+    const message =
+      error.message ||
+      "Registration verification failed. Please try again later.";
+    const isVerificationError = isRegistrationOtpError(message);
+
+    if (normalizedEmail && !isVerificationError) {
+      await cleanupPendingRegistration(normalizedEmail, "buyer");
+    }
+
+    if (error.code === 11000) {
+      return res.status(409).json({
+        message:
+          "Registration failed. Try logging in or resetting your password.",
+      });
+    }
+
+    const status =
+      isVerificationError ||
+      message.includes("Registration session expired")
+        ? 400
+        : 500;
+
+    return res.status(status).json({ message });
+  } finally {
+    if (session) {
+      session.endSession();
+    }
   }
 };
 
@@ -150,6 +291,7 @@ const requestOtp = async (req, res) => {
     const otp = await otpService.createOtpRecord(
       normalizedEmail,
       validUserType,
+      PASSWORD_RESET_OTP_PURPOSE,
     );
     const userName =
       validUserType === "seller"
@@ -193,7 +335,12 @@ const verifyOtp = async (req, res) => {
       userType && ["buyer", "seller"].includes(userType) ? userType : "buyer";
     const resetTokenUserType = getResetTokenUserType(validUserType);
 
-    await otpService.verifyOTP(normalizedEmail, validUserType, otp);
+    await otpService.verifyOTP(
+      normalizedEmail,
+      validUserType,
+      otp,
+      PASSWORD_RESET_OTP_PURPOSE,
+    );
 
     let user;
     if (validUserType === "seller") {
@@ -243,6 +390,8 @@ const verifyOtp = async (req, res) => {
 };
 
 const resetPassword = async (req, res) => {
+  let session;
+
   try {
     const { resetToken, newPassword } = req.body;
 
@@ -280,18 +429,20 @@ const resetPassword = async (req, res) => {
       });
     }
 
-    const storedResetToken = await PasswordResetToken.findOneAndUpdate(
-      {
-        token: resetToken,
-        userType: resetTokenUserType,
-        used: false,
-        expiresAt: { $gt: new Date() },
-      },
-      { $set: { used: true } },
-      { new: false },
-    ).select("_id userId");
+    session = await mongoose.startSession();
+    session.startTransaction();
+
+    const storedResetToken = await PasswordResetToken.findOne({
+      token: resetToken,
+      userType: resetTokenUserType,
+      used: false,
+      expiresAt: { $gt: new Date() },
+    })
+      .select("_id userId")
+      .session(session);
 
     if (!storedResetToken) {
+      await session.abortTransaction();
       return res.status(401).json({
         message: "Invalid, expired, or already used reset token",
       });
@@ -299,17 +450,19 @@ const resetPassword = async (req, res) => {
 
     let user;
     if (validUserType === "seller") {
-      user = await Seller.findById(storedResetToken.userId);
+      user = await Seller.findById(storedResetToken.userId).session(session);
     } else {
-      user = await User.findById(storedResetToken.userId);
+      user = await User.findById(storedResetToken.userId).session(session);
     }
 
     if (!user) {
+      await session.abortTransaction();
       return res.status(404).json({ message: "User not found" });
     }
 
     const isSamePassword = await bcrypt.compare(newPassword, user.password);
     if (isSamePassword) {
+      await session.abortTransaction();
       return res
         .status(400)
         .json({ message: "New password cannot be the same as old password" });
@@ -317,20 +470,36 @@ const resetPassword = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     user.password = hashedPassword;
-    await user.save();
+    await user.save({ session });
+
+    await PasswordResetToken.updateOne(
+      { _id: storedResetToken._id },
+      { $set: { used: true } },
+      { session },
+    );
+
+    await session.commitTransaction();
 
     res.status(200).json({
       message: "Password reset successfully.",
     });
   } catch (error) {
+    if (session?.inTransaction()) {
+      await session.abortTransaction();
+    }
     res.status(500).json({
       message: "Password reset failed. Please try again later.",
     });
+  } finally {
+    if (session) {
+      session.endSession();
+    }
   }
 };
 
 module.exports = {
   register,
+  verifyRegistrationOtp,
   login,
   logout,
   requestOtp,

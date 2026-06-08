@@ -227,7 +227,8 @@ When extending the system, prioritize:
 ### Authentication (`/api/auth`)
 
 ```
-POST   /register           Register new user/seller
+POST   /register           Request registration OTP
+POST   /register/verify-otp Verify registration OTP and create account
 POST   /login              Authenticate & set token
 POST   /logout             Clear token
 GET    /verify             Check auth status

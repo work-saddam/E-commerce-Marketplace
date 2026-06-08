@@ -1,6 +1,7 @@
 const express = require("express");
 const {
   sellerRegister,
+  verifySellerRegistrationOtp,
   sellerLogin,
   getSellerProfile,
   getSellerOrders,
@@ -14,12 +15,21 @@ const {
   editProduct,
 } = require("../controllers/productControllers");
 const checkSellerStatus = require("../middlewares/checkSellerStatus");
-const { loginLimiter, registerLimiter } = require("../middlewares/authRateLimit");
+const {
+  loginLimiter,
+  registrationRequestLimiter,
+  registrationVerifyLimiter,
+} = require("../middlewares/authRateLimit");
 const { singleImageUpload } = require("../middlewares/multer");
 const { getOrderbyId } = require("../controllers/orderController");
 const router = express.Router();
 
-router.post("/register", registerLimiter, sellerRegister);
+router.post("/register", registrationRequestLimiter, sellerRegister);
+router.post(
+  "/register/verify-otp",
+  registrationVerifyLimiter,
+  verifySellerRegistrationOtp,
+);
 router.post("/login", loginLimiter, sellerLogin);
 router.get("/profile", userAuth, getSellerProfile);
 

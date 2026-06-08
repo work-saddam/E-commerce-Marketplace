@@ -1,6 +1,7 @@
 const express = require("express");
 const {
   register,
+  verifyRegistrationOtp,
   login,
   logout,
   requestOtp,
@@ -9,7 +10,8 @@ const {
 } = require("../controllers/authController");
 const {
   loginLimiter,
-  registerLimiter,
+  registrationRequestLimiter,
+  registrationVerifyLimiter,
 } = require("../middlewares/authRateLimit");
 const {
   validateForgotPasswordEmail,
@@ -17,7 +19,8 @@ const {
 } = require("../middlewares/forgotPasswordRateLimit");
 const router = express.Router();
 
-router.post("/register", registerLimiter, register);
+router.post("/register", registrationRequestLimiter, register);
+router.post("/register/verify-otp", registrationVerifyLimiter, verifyRegistrationOtp);
 router.post("/login", loginLimiter, login);
 router.post("/logout", logout);
 router.post(

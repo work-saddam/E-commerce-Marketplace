@@ -52,10 +52,21 @@ const loginLimiter = createAuthLimiter("rl:auth:login:", {
   skipSuccessfulRequests: true,
 });
 
-const registerLimiter = createAuthLimiter("rl:auth:register:");
+const registrationRequestLimiter = createAuthLimiter(
+  "rl:auth:registration-request:",
+);
+const registrationVerifyLimiter = createAuthLimiter(
+  "rl:auth:registration-verify:",
+  {
+    skipSuccessfulRequests: true,
+  },
+);
+const registerLimiter = registrationRequestLimiter;
 
 module.exports = {
   loginLimiter,
+  registrationRequestLimiter,
+  registrationVerifyLimiter,
   registerLimiter,
   AUTH_WINDOW_MS,
   AUTH_MAX_REQUESTS,

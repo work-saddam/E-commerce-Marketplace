@@ -430,11 +430,52 @@ const buildForgotPasswordOtpTemplate = ({ otp, userName }) => {
   };
 };
 
+const buildRegistrationOtpTemplate = ({ otp, userName, accountType }) => {
+  const subject = `Verify your ${accountType} registration`;
+  const intro = `Hi ${userName}, welcome to ${BRAND_NAME}.`;
+  const detailsHtml = `
+    <p style="margin: 0 0 20px;">Use this one-time password (OTP) to verify your email address and complete your registration:</p>
+    <div style="margin: 0 0 20px; padding: 16px; background: #f3f4f6; border-radius: 8px; text-align: center;">
+      <p style="margin: 0; font-size: 32px; font-weight: 700; letter-spacing: 4px; font-family: monospace; color: #111827;">${escapeHtml(otp)}</p>
+    </div>
+    <p style="margin: 0 0 12px;"><strong>Valid for:</strong> 10 minutes</p>
+    <p style="margin: 0;">Do not share this OTP with anyone. If you didn't request this registration, ignore this email.</p>
+  `;
+  const detailsText = [
+    "Use this one-time password (OTP) to verify your email address and complete your registration:",
+    "",
+    otp,
+    "",
+    "Valid for: 10 minutes",
+    "",
+    "Do not share this OTP with anyone. If you didn't request this registration, ignore this email.",
+  ].join("\n");
+
+  return {
+    subject,
+    html: renderEmailShell({
+      title: "Verify your email",
+      intro,
+      detailsHtml,
+      footerText:
+        "If you didn't request this registration, you can safely ignore this email.",
+    }),
+    text: renderTextShell({
+      title: "Verify your email",
+      intro,
+      detailsText,
+      footerText:
+        "If you didn't request this registration, you can safely ignore this email.",
+    }),
+  };
+};
+
 module.exports = {
   buildBuyerOrderConfirmedTemplate,
   buildBuyerPaymentFailedTemplate,
   buildBuyerOrderStatusUpdatedTemplate,
   buildSellerApprovedTemplate,
   buildSellerRejectedTemplate,
+  buildRegistrationOtpTemplate,
   buildForgotPasswordOtpTemplate,
 };

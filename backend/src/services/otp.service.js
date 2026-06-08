@@ -5,32 +5,47 @@ const generateOTP = () => {
   return crypto.randomInt(100000, 1000000).toString();
 };
 
-const createOtpRecord = async (email, userType) => {
+const createOtpRecord = async (
+  email,
+  userType,
+  purpose = "password-reset",
+  session,
+) => {
   email = email.toLowerCase().trim();
 
   const otp = generateOTP();
   const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
   await OTP.findOneAndUpdate(
-    { email, userType },
-    { otp, attempts: 0, expiresAt },
-    { upsert: true, new: true },
+    { email, userType, purpose },
+    { otp, attempts: 0, expiresAt, purpose },
+    { upsert: true, new: true, session },
   );
 
   return otp;
 };
 
-const verifyOTP = async (email, userType, enteredOtp) => {
+const verifyOTP = async (
+  email,
+  userType,
+  enteredOtp,
+  purpose = "password-reset",
+  session,
+) => {
   email = email.toLowerCase().trim();
   const now = new Date();
-
-  const verifiedOtp = await OTP.findOneAndDelete({
+  const query = {
     email,
     userType,
-    otp: enteredOtp,
+    purpose,
     expiresAt: { $gt: now },
     attempts: { $lt: 3 },
-  });
+  };
+
+  const verifiedOtp = await OTP.findOneAndDelete({
+    ...query,
+    otp: enteredOtp,
+  }).session(session || null);
 
   if (verifiedOtp) {
     return { verified: true };
@@ -38,13 +53,10 @@ const verifyOTP = async (email, userType, enteredOtp) => {
 
   const attemptedOtp = await OTP.findOneAndUpdate(
     {
-      email,
-      userType,
-      expiresAt: { $gt: now },
-      attempts: { $lt: 3 },
+      ...query,
     },
     { $inc: { attempts: 1 } },
-    { new: true },
+    { new: true, session },
   );
 
   if (attemptedOtp) {
@@ -60,9 +72,13 @@ const verifyOTP = async (email, userType, enteredOtp) => {
     );
   }
 
-  const otpRecord = await OTP.findOne({ email, userType }).select(
-    "_id expiresAt attempts",
-  );
+  const otpRecord = await OTP.findOne({
+    email,
+    userType,
+    purpose,
+  })
+    .select("_id expiresAt attempts")
+    .session(session || null);
 
   if (!otpRecord) {
     throw new Error("OTP not found. Please request a new OTP.");
@@ -81,14 +97,40 @@ const verifyOTP = async (email, userType, enteredOtp) => {
   throw new Error("Invalid OTP. Please try again.");
 };
 
-const deleteOtpRecord = async (email, userType) => {
+const deleteOtpRecord = async (
+  email,
+  userType,
+  purpose = "password-reset",
+  session,
+) => {
   email = email.toLowerCase().trim();
-  await OTP.deleteOne({ email, userType });
+  const query = OTP.deleteOne({
+    email,
+    userType,
+    purpose,
+  });
+  if (session) {
+    query.session(session);
+  }
+  await query;
 };
 
-const getOtpRecord = async (email, userType) => {
+const getOtpRecord = async (
+  email,
+  userType,
+  purpose = "password-reset",
+  session,
+) => {
   email = email.toLowerCase().trim();
-  return OTP.findOne({ email, userType });
+  const query = OTP.findOne({
+    email,
+    userType,
+    purpose,
+  });
+  if (session) {
+    query.session(session);
+  }
+  return query;
 };
 
 module.exports = {
