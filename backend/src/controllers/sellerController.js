@@ -96,15 +96,19 @@ exports.sellerRegister = async (req, res) => {
       message: REGISTRATION_RESPONSE_MESSAGE,
     });
   } catch (error) {
-    const normalizedEmail = normalizeEmail(req.body.email);
+    try {
+      const normalizedEmail = normalizeEmail(req.body.email);
 
-    if (normalizedEmail) {
-      await cleanupPendingRegistration(normalizedEmail, "seller");
-      await otpService.deleteOtpRecord(
-        normalizedEmail,
-        "seller",
-        REGISTRATION_OTP_PURPOSE,
-      );
+      if (normalizedEmail) {
+        await cleanupPendingRegistration(normalizedEmail, "seller");
+        await otpService.deleteOtpRecord(
+          normalizedEmail,
+          "seller",
+          REGISTRATION_OTP_PURPOSE,
+        );
+      }
+    } catch (cleanupError) {
+      console.error("Seller registration cleanup failed:", cleanupError);
     }
 
     if (error.code === 11000) {
