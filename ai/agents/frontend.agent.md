@@ -56,7 +56,7 @@ Computed values (useMemo)
   ↓
 JSX Markup
   ↓
-Export with memo()
+Default Export
 ```
 
 **Every component must follow this structure!**
@@ -75,11 +75,12 @@ Export with memo()
 - ✅ Loading flags
 - ✅ Accordion/tab visibility
 - ✅ Temporary UI state
+- ✅ Component-specific transient state
 
 **Pattern:**
 
 ```jsx
-function MyComponent() {
+function MyComponent({ title = "Default" }) {
   // Global state
   const user = useSelector(state => state.user.data);
   const dispatch = useDispatch();
@@ -102,7 +103,7 @@ function MyComponent() {
   );
 }
 
-export default memo(MyComponent);
+export default MyComponent;
 ```
 
 ### Redux Integration
@@ -396,8 +397,26 @@ Before submitting any frontend code:
 - [ ] Error messages user-friendly
 - [ ] Form validation implemented
 - [ ] Loading spinner shown during requests
-- [ ] Component exported with memo()
 - [ ] No prop drilling (use Redux for global state)
+
+---
+
+## ⚡ Vercel React Performance Best Practices
+
+Adhere to Vercel's performance guidelines to ensure maximum speed and optimal loading:
+
+### 1. Re-render Optimization
+* **Avoid over-memoization**: Do NOT wrap components in `React.memo` or use `useMemo`/`useCallback` unless they perform expensive computations, render heavy sub-trees, or are rendered in long lists.
+* **Derive state during render**: Do not run effects (`useEffect`) to set state derived from props or other state variables. Derive them directly in the body of the function.
+* **Hoist static objects**: Extract static objects, arrays, and regular expressions outside the component to prevent recreating them on every render.
+* **Stable effect dependencies**: Prefer primitive values (strings, numbers, booleans) in effect dependency arrays rather than objects or arrays.
+
+### 2. Eliminating Waterfalls
+* **Parallel data fetching**: Initiate independent API requests concurrently using `Promise.all` or start promises early and await them late.
+
+### 3. Bundle Optimization
+* **Avoid unnecessary barrel files**: Import components directly from their source paths in performance-sensitive routing paths.
+* **Dynamic imports**: Use lazy loading (`React.lazy`) or dynamic imports for large, heavy components that are not visible on initial load.
 
 ---
 
