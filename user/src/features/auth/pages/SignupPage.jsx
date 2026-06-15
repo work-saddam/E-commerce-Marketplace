@@ -3,39 +3,52 @@ import SignupForm from "../components/SignupForm";
 function SignupPage() {
   return (
     <main className="flex min-h-screen flex-col md:flex-row bg-surface-container-low font-body-md overflow-x-hidden">
-      {/* Brand/Photography Sidebar (Hidden on Mobile) */}
-      <section className="hidden md:flex relative w-1/2 bg-surface-container-lowest overflow-hidden">
-        {/* Ghost Text */}
-        <div className="absolute -left-12 top-1/4 opacity-5 select-none pointer-events-none">
+      {/* Brand/Typography Sidebar (Hidden on Mobile) */}
+      <section className="hidden md:flex relative w-1/2 bg-surface-dim overflow-hidden">
+        {/* Ghost Text Background */}
+        <div className="absolute -left-12 top-1/4 opacity-10 select-none pointer-events-none">
           <span className="font-display-bg-ghost text-display-bg-ghost text-on-surface">
-            TRUSTKART
+            FUTURE
           </span>
         </div>
-        <div className="absolute -right-12 bottom-1/4 opacity-5 select-none pointer-events-none">
+        <div className="absolute -right-12 bottom-1/4 opacity-10 select-none pointer-events-none">
           <span className="font-display-bg-ghost text-display-bg-ghost text-on-surface">
-            PREMIUM
+            LUXURY
           </span>
         </div>
 
-        {/* Main Imagery & Content */}
-        <div className="relative z-10 w-full h-full flex flex-col items-center justify-center p-margin-edge">
-          <div className="relative w-full max-w-lg aspect-square">
-            <img
-              alt="Sophisticated Designer Product"
-              className="w-full h-full object-cover rounded-lg shadow-2xl scale-110 -rotate-3 transition-transform duration-500 hover:rotate-0 hover:scale-105"
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuCdypoNJxnm--qs7gGlwdpoS4FMAoVGbgISF71MJMtl6dG8gzfcQjhKbpAhlBT7VQuEg2-0Vrkh5MB_keLw-zOqlIy_3HdoynpoSVH1RGo1YKWKIV4DNY7UiEjXRQupiI6TTl_uh3HOCsH_bzR3ogPNLNODOBRewJ7z6XasC0s2a6RD6grmQSQsAs3uwm53gycsJEn127gUAbj4gHpAoJWgg4u1ns_Yr6Yn8eUyhzeZifoBQK80G--2ObeeDwe9R0WzlmlWRDH6UFG3"
-            />
-            {/* Decorative Ambient blur glow */}
-            <div className="absolute -top-10 -right-10 w-48 h-48 bg-primary rounded-full blur-3xl opacity-10 pointer-events-none"></div>
-          </div>
-          <div className="mt-section-gap text-center max-w-md">
-            <h2 className="font-headline-lg text-headline-lg text-on-surface mb-4">
-              Elevate Your Everyday.
+        {/* Bold Typography Content */}
+        <div className="relative z-10 w-full h-full flex flex-col items-start justify-center p-margin-edge max-w-2xl mx-auto">
+          <div className="space-y-4">
+            <span className="font-label-bold text-label-bold text-primary tracking-[0.3em] uppercase block">
+              Established 2026
+            </span>
+            <h2 className="font-display-xl text-[64px] md:text-[80px] leading-[0.95] text-on-surface font-black uppercase">
+              The Future <br />
+              <span class="text-primary">of Commerce</span>
             </h2>
-            <p className="font-body-lg text-body-lg text-secondary">
-              Join the Trustkart community for a curated experience of premium tech, lifestyle essentials, and exclusive seasonal collections.
+            <div className="w-24 h-2 bg-primary rounded-full mt-8 mb-12"></div>
+            <p className="font-headline-md text-headline-md text-on-surface-variant max-w-md">
+              TRUSTKART PREMIUM
+            </p>
+            <p className="font-body-lg text-body-lg text-secondary max-w-md mt-4 leading-relaxed">
+              Experience the intersection of{" "}
+              <span className="text-on-surface font-semibold">
+                Curated Luxury
+              </span>{" "}
+              and{" "}
+              <span className="text-on-surface font-semibold">
+                Precision Tech
+              </span>
+              . Our seasonal collections are crafted for those who demand
+              excellence in every detail.
             </p>
           </div>
+        </div>
+
+        {/* Corner Decorative Element */}
+        <div className="absolute bottom-0 right-0 p-12">
+          <div className="w-16 h-16 border-r-4 border-b-4 border-primary opacity-20"></div>
         </div>
       </section>
 
