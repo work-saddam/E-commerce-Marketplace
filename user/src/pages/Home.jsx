@@ -30,7 +30,7 @@ export default function Home() {
             </p>
             <p className="text-sm font-label-bold text-on-surface">
               Role:{" "}
-              <span className="font-normal text-secondary uppercase text-xs px-2 py-0.5 rounded bg-primary-fixed text-on-primary-fixed">
+              <span className="font-normal uppercase text-xs px-2 py-0.5 rounded bg-primary-fixed text-on-primary-fixed">
                 {user.role}
               </span>
             </p>

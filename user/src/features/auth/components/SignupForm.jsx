@@ -6,7 +6,7 @@ import { useRegistrationOtp } from "../hooks/useRegistrationOtp";
 import Button from "../../../shared/components/ui/Button";
 import { validateEmail } from "../../../shared/utils/validators/emailValidator";
 import { validatePassword } from "../../../shared/utils/validators/passwordValidator";
-import { User, Phone, Mail, LockKeyhole, KeyRound } from "lucide-react";
+import { User, Phone, Mail, LockKeyhole, KeyRound, Eye, EyeOff } from "lucide-react";
 import { routePaths } from "../../../app/router/routePaths";
 
 function SignupForm() {
@@ -14,6 +14,7 @@ function SignupForm() {
   const { signup, verifyOtp } = useAuth();
 
   const [step, setStep] = useState(1);
+  const [showPassword, setShowPassword] = useState(false);
   const [fields, setFields] = useState({
     name: "",
     phone: "",
@@ -226,16 +227,30 @@ function SignupForm() {
               <LockKeyhole className="w-4 h-4 text-secondary" />
               Password
             </label>
-            <input
-              className={`w-full px-6 py-4 rounded-full bg-surface-container-lowest border-0 ring-1 focus:ring-2 focus:ring-primary transition-all text-body-md font-body-md outline-none ${
-                fieldErrors.password ? "ring-error" : "ring-outline-variant"
-              }`}
-              id="password"
-              placeholder="••••••••"
-              type="password"
-              value={fields.password}
-              onChange={handleFieldChange("password")}
-            />
+            <div className="relative">
+              <input
+                className={`w-full pl-6 pr-12 py-4 rounded-full bg-surface-container-lowest border-0 ring-1 focus:ring-2 focus:ring-primary transition-all text-body-md font-body-md outline-none ${
+                  fieldErrors.password ? "ring-error" : "ring-outline-variant"
+                }`}
+                id="password"
+                placeholder="••••••••"
+                type={showPassword ? "text" : "password"}
+                value={fields.password}
+                onChange={handleFieldChange("password")}
+              />
+              <button
+                type="button"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-secondary hover:text-primary transition-colors focus:outline-none cursor-pointer flex items-center justify-center"
+                onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? (
+                  <EyeOff className="w-5 h-5" />
+                ) : (
+                  <Eye className="w-5 h-5" />
+                )}
+              </button>
+            </div>
             {fieldErrors.password ? (
               <span className="text-error text-xs ml-4 mt-1 block">
                 {fieldErrors.password}

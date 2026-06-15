@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import Button from "../../../shared/components/ui/Button";
-import { Mail, LockKeyhole } from "lucide-react";
+import { Mail, LockKeyhole, Eye, EyeOff } from "lucide-react";
 
 function LoginForm() {
   const {
@@ -13,6 +13,7 @@ function LoginForm() {
   } = useAuth();
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({});
 
   const validate = () => {
@@ -140,21 +141,35 @@ function LoginForm() {
                 Forgot?
               </Link>
             </div>
-            <input
-              className={`w-full px-6 py-4 rounded-full bg-surface-container-lowest border-0 ring-1 focus:ring-2 focus:ring-primary transition-all text-body-md font-body-md outline-none ${
-                fieldErrors.password ? "ring-error" : "ring-outline-variant"
-              }`}
-              id="password"
-              placeholder="••••••••"
-              type="password"
-              value={password}
-              onChange={(e) => {
-                setPassword(e.target.value);
-                if (fieldErrors.password) {
-                  setFieldErrors((prev) => ({ ...prev, password: null }));
-                }
-              }}
-            />
+            <div className="relative">
+              <input
+                className={`w-full pl-6 pr-12 py-4 rounded-full bg-surface-container-lowest border-0 ring-1 focus:ring-2 focus:ring-primary transition-all text-body-md font-body-md outline-none ${
+                  fieldErrors.password ? "ring-error" : "ring-outline-variant"
+                }`}
+                id="password"
+                placeholder="••••••••"
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  if (fieldErrors.password) {
+                    setFieldErrors((prev) => ({ ...prev, password: null }));
+                  }
+                }}
+              />
+              <button
+                type="button"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-secondary hover:text-primary transition-colors focus:outline-none cursor-pointer flex items-center justify-center"
+                onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? (
+                  <EyeOff className="w-5 h-5" />
+                ) : (
+                  <Eye className="w-5 h-5" />
+                )}
+              </button>
+            </div>
             {fieldErrors.password ? (
               <span className="text-error text-xs ml-4 mt-1 block">
                 {fieldErrors.password}
