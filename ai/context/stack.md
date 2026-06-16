@@ -109,7 +109,7 @@
 ### Backend .env
 
 ```
-PORT=4000
+PORT=5000
 NODE_ENV=development|production
 MONGODB_URI=mongodb+srv://...
 REDIS_URL=redis://localhost:6379
@@ -126,7 +126,7 @@ CORS_ORIGINS=http://localhost:5173,https://trustkart-lemon.vercel.app
 ### Frontend .env
 
 ```
-VITE_BASE_URL=http://localhost:4000/api
+VITE_BASE_URL=http://localhost:5000/api
 VITE_API_TIMEOUT=10000
 ```
 
