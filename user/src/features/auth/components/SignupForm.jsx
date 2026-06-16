@@ -237,7 +237,7 @@ function SignupForm() {
                 />
                 <button
                   type="button"
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-secondary hover:text-charcoal transition-colors focus:outline-none cursor-pointer flex items-center justify-center"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-secondary hover:text-charcoal transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-charcoal focus-visible:ring-offset-2 focus-visible:ring-offset-surface-container cursor-pointer flex items-center justify-center"
                   onClick={() => setShowPassword(!showPassword)}
                   aria-label={showPassword ? "Hide password" : "Show password"}
                 >
