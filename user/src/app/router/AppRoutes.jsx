@@ -1,5 +1,5 @@
 import { Routes, Route } from "react-router-dom";
-import { LoginPage, SignupPage } from "../../features/auth";
+import { LoginPage, SignupPage, ForgotPasswordPage } from "../../features/auth";
 import PrivateRoute from "./PrivateRoute";
 import { routePaths } from "./routePaths";
 import Home from "../../pages/Home";
@@ -11,6 +11,7 @@ export default function AppRoutes() {
       {/* Public Routes */}
       <Route path={routePaths.LOGIN} element={<LoginPage />} />
       <Route path={routePaths.SIGNUP} element={<SignupPage />} />
+      <Route path={routePaths.FORGOT_PASSWORD} element={<ForgotPasswordPage />} />
 
       {/* Protected Routes */}
       <Route element={<PrivateRoute />}>

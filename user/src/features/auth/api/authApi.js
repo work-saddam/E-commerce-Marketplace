@@ -43,3 +43,42 @@ export const verifyOtpRequest = async (email, otp) => {
   });
   return response.data;
 };
+
+/**
+ * Requests a password reset OTP code
+ * @param {string} email
+ */
+export const requestForgotPasswordOtpRequest = async (email) => {
+  const response = await apiClient.post("/api/auth/forgot-password/request-otp", {
+    email,
+    userType: "buyer",
+  });
+  return response.data;
+};
+
+/**
+ * Verifies a password reset OTP code
+ * @param {string} email
+ * @param {string} otp
+ */
+export const verifyForgotPasswordOtpRequest = async (email, otp) => {
+  const response = await apiClient.post("/api/auth/forgot-password/verify-otp", {
+    email,
+    otp,
+    userType: "buyer",
+  });
+  return response.data;
+};
+
+/**
+ * Resets password using token
+ * @param {string} resetToken
+ * @param {string} newPassword
+ */
+export const resetPasswordRequest = async (resetToken, newPassword) => {
+  const response = await apiClient.post("/api/auth/forgot-password/reset-password", {
+    resetToken,
+    newPassword,
+  });
+  return response.data;
+};

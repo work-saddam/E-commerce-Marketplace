@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import Button from "../../../shared/components/ui/Button";
-import { Eye, EyeOff, Grid } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 
 function LoginForm() {
   const {
