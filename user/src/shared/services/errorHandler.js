@@ -40,7 +40,13 @@ export const getRetrySeconds = (error) => {
   if (!retryAfter) return 60; // default 60s
   
   const parsed = Number(retryAfter);
-  if (Number.isFinite(parsed) && parsed > 0) return Math.ceil(parsed);
+  if (Number.isFinite(parsed) && parsed > 0) {
+    if (parsed > 1_000_000_000) {
+      return Math.max(1, Math.ceil(parsed - Date.now() / 1000));
+    }
+
+    return Math.ceil(parsed);
+  }
   
   const dateParsed = new Date(retryAfter);
   if (!Number.isNaN(dateParsed.getTime())) {
