@@ -1,4 +1,3 @@
-
 function Loader({ size = "md", color = "primary", className = "" }) {
   const sizes = {
     sm: "h-6 w-6 stroke-[3px]",
@@ -16,7 +15,11 @@ function Loader({ size = "md", color = "primary", className = "" }) {
   const colorClass = colors[color] || colors.primary;
 
   return (
-    <div className={`flex items-center justify-center ${className}`}>
+    <div
+      className={`flex items-center justify-center ${className}`}
+      role="status"
+      aria-label="Page is loading"
+    >
       <svg
         className={`animate-spin ${sizeClass} ${colorClass}`}
         xmlns="http://www.w3.org/2000/svg"
