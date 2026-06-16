@@ -50,9 +50,9 @@ State management (useState)
   ↓
 Effects (useEffect with cleanup)
   ↓
-Event handlers (useCallback)
+Event handlers & functions (no useCallback unless strictly necessary)
   ↓
-Computed values (useMemo)
+Derived/computed values (useMemo only if perform-intensive)
   ↓
 JSX Markup
   ↓
@@ -385,8 +385,8 @@ Before submitting any frontend code:
 - [ ] Uses `.lean()` for read-only data where possible
 - [ ] Pagination implemented for lists
 - [ ] No N+1 API calls (batch requests)
-- [ ] useCallback used for event handlers
-- [ ] useMemo used for expensive computations
+- [ ] Do not over-memoize: event handlers do not need useCallback unless passed to optimized child components
+- [ ] useMemo only used for expensive calculations or heavy sub-trees
 - [ ] useEffect cleanup performed (cancel requests)
 - [ ] Redux dispatch/selectors properly used
 - [ ] Tailwind CSS only (no inline styles)

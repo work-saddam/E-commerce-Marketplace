@@ -6,7 +6,7 @@ import { useRegistrationOtp } from "../hooks/useRegistrationOtp";
 import Button from "../../../shared/components/ui/Button";
 import { validateEmail } from "../../../shared/utils/validators/emailValidator";
 import { validatePassword } from "../../../shared/utils/validators/passwordValidator";
-import { User, Phone, Mail, LockKeyhole, KeyRound, Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import { routePaths } from "../../../app/router/routePaths";
 
 function SignupForm() {
@@ -124,166 +124,163 @@ function SignupForm() {
   };
 
   return (
-    <div className="w-full max-w-md space-y-8">
+    <div className="w-full max-w-md space-y-8" id="form-container">
       <div className="text-center md:text-left">
-        <h1 className="font-headline-lg text-headline-lg text-on-surface mb-2">
-          {step === 1 ? "Join Trustkart" : "Verify Email"}
+        <h1 className="font-headline-lg text-headline-lg text-charcoal mb-2">
+          {step === 1 ? "Create Account" : "Verify Email"}
         </h1>
-        <p className="font-body-md text-body-md text-secondary">
+        <p className="font-body-md text-body-md text-on-surface-variant">
           {step === 1
             ? "Start your curated performance experience."
-            : `Enter the 6-digit OTP code sent to your inbox.`}
+            : "Enter the 6-digit OTP code sent to your inbox."}
         </p>
       </div>
 
       {error ? (
-        <div className="rounded-2xl border border-error/30 bg-error-container/20 px-4 py-3 text-sm text-error">
+        <div className="rounded border border-error/30 bg-error-container/20 px-4 py-3 text-sm text-error">
           {error}
         </div>
       ) : null}
 
       {step === 1 ? (
-        <form onSubmit={handleRequestOtp} className="space-y-4">
-          <div>
-            <label
-              className="flex items-center gap-2 font-label-bold text-label-bold text-on-surface mb-2 ml-4"
-              htmlFor="name"
-            >
-              <User className="w-4 h-4 text-secondary" />
-              Full Name
-            </label>
-            <input
-              className={`w-full px-6 py-4 rounded-full bg-surface-container-lowest border-0 ring-1 focus:ring-2 focus:ring-primary transition-all text-body-md font-body-md outline-none ${
-                fieldErrors.name ? "ring-error" : "ring-outline-variant"
-              }`}
-              id="name"
-              placeholder="John Doe"
-              type="text"
-              value={fields.name}
-              onChange={handleFieldChange("name")}
-            />
-            {fieldErrors.name ? (
-              <span className="text-error text-xs ml-4 mt-1 block">
-                {fieldErrors.name}
-              </span>
-            ) : null}
-          </div>
-
-          <div>
-            <label
-              className="flex items-center gap-2 font-label-bold text-label-bold text-on-surface mb-2 ml-4"
-              htmlFor="phone"
-            >
-              <Phone className="w-4 h-4 text-secondary" />
-              Phone Number
-            </label>
-            <input
-              className={`w-full px-6 py-4 rounded-full bg-surface-container-lowest border-0 ring-1 focus:ring-2 focus:ring-primary transition-all text-body-md font-body-md outline-none ${
-                fieldErrors.phone ? "ring-error" : "ring-outline-variant"
-              }`}
-              id="phone"
-              placeholder="e.g. 9876543210"
-              type="text"
-              value={fields.phone}
-              onChange={handleFieldChange("phone")}
-            />
-            {fieldErrors.phone ? (
-              <span className="text-error text-xs ml-4 mt-1 block">
-                {fieldErrors.phone}
-              </span>
-            ) : null}
-          </div>
-
-          <div>
-            <label
-              className="flex items-center gap-2 font-label-bold text-label-bold text-on-surface mb-2 ml-4"
-              htmlFor="email"
-            >
-              <Mail className="w-4 h-4 text-secondary" />
-              Email Address
-            </label>
-            <input
-              className={`w-full px-6 py-4 rounded-full bg-surface-container-lowest border-0 ring-1 focus:ring-2 focus:ring-primary transition-all text-body-md font-body-md outline-none ${
-                fieldErrors.email ? "ring-error" : "ring-outline-variant"
-              }`}
-              id="email"
-              placeholder="name@company.com"
-              type="email"
-              value={fields.email}
-              onChange={handleFieldChange("email")}
-            />
-            {fieldErrors.email ? (
-              <span className="text-error text-xs ml-4 mt-1 block">
-                {fieldErrors.email}
-              </span>
-            ) : null}
-          </div>
-
-          <div>
-            <label
-              className="flex items-center gap-2 font-label-bold text-label-bold text-on-surface mb-2 ml-4"
-              htmlFor="password"
-            >
-              <LockKeyhole className="w-4 h-4 text-secondary" />
-              Password
-            </label>
-            <div className="relative">
-              <input
-                className={`w-full pl-6 pr-12 py-4 rounded-full bg-surface-container-lowest border-0 ring-1 focus:ring-2 focus:ring-primary transition-all text-body-md font-body-md outline-none ${
-                  fieldErrors.password ? "ring-error" : "ring-outline-variant"
-                }`}
-                id="password"
-                placeholder="••••••••"
-                type={showPassword ? "text" : "password"}
-                value={fields.password}
-                onChange={handleFieldChange("password")}
-              />
-              <button
-                type="button"
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-secondary hover:text-primary transition-colors focus:outline-none cursor-pointer flex items-center justify-center"
-                onClick={() => setShowPassword(!showPassword)}
-                aria-label={showPassword ? "Hide password" : "Show password"}
+        <form onSubmit={handleRequestOtp} className="space-y-6">
+          <div className="space-y-4">
+            <div>
+              <label
+                className="block font-label-caps text-label-caps text-charcoal mb-2"
+                htmlFor="name"
               >
-                {showPassword ? (
-                  <EyeOff className="w-5 h-5" />
-                ) : (
-                  <Eye className="w-5 h-5" />
-                )}
-              </button>
+                FULL NAME
+              </label>
+              <input
+                className={`w-full px-4 py-4 rounded-none bg-surface-container border-0 border-b focus:border-charcoal focus:ring-0 transition-all text-body-md font-body-md outline-none ${
+                  fieldErrors.name ? "border-error" : "border-outline-variant"
+                }`}
+                id="name"
+                placeholder="JOHN DOE"
+                type="text"
+                value={fields.name}
+                onChange={handleFieldChange("name")}
+              />
+              {fieldErrors.name ? (
+                <span className="text-error text-xs mt-1 block">
+                  {fieldErrors.name}
+                </span>
+              ) : null}
             </div>
-            {fieldErrors.password ? (
-              <span className="text-error text-xs ml-4 mt-1 block">
-                {fieldErrors.password}
-              </span>
-            ) : null}
+
+            <div>
+              <label
+                className="block font-label-caps text-label-caps text-charcoal mb-2"
+                htmlFor="phone"
+              >
+                PHONE NUMBER
+              </label>
+              <input
+                className={`w-full px-4 py-4 rounded-none bg-surface-container border-0 border-b focus:border-charcoal focus:ring-0 transition-all text-body-md font-body-md outline-none ${
+                  fieldErrors.phone ? "border-error" : "border-outline-variant"
+                }`}
+                id="phone"
+                placeholder="E.G. 9876543210"
+                type="text"
+                value={fields.phone}
+                onChange={handleFieldChange("phone")}
+              />
+              {fieldErrors.phone ? (
+                <span className="text-error text-xs mt-1 block">
+                  {fieldErrors.phone}
+                </span>
+              ) : null}
+            </div>
+
+            <div>
+              <label
+                className="block font-label-caps text-label-caps text-charcoal mb-2"
+                htmlFor="email"
+              >
+                EMAIL ADDRESS
+              </label>
+              <input
+                className={`w-full px-4 py-4 rounded-none bg-surface-container border-0 border-b focus:border-charcoal focus:ring-0 transition-all text-body-md font-body-md outline-none ${
+                  fieldErrors.email ? "border-error" : "border-outline-variant"
+                }`}
+                id="email"
+                placeholder="name@company.com"
+                type="email"
+                value={fields.email}
+                onChange={handleFieldChange("email")}
+              />
+              {fieldErrors.email ? (
+                <span className="text-error text-xs mt-1 block">
+                  {fieldErrors.email}
+                </span>
+              ) : null}
+            </div>
+
+            <div>
+              <label
+                className="block font-label-caps text-label-caps text-charcoal mb-2"
+                htmlFor="password"
+              >
+                PASSWORD
+              </label>
+              <div className="relative">
+                <input
+                  className={`w-full pl-4 pr-12 py-4 rounded-none bg-surface-container border-0 border-b focus:border-charcoal focus:ring-0 transition-all text-body-md font-body-md outline-none ${
+                    fieldErrors.password ? "border-error" : "border-outline-variant"
+                  }`}
+                  id="password"
+                  placeholder="••••••••"
+                  type={showPassword ? "text" : "password"}
+                  value={fields.password}
+                  onChange={handleFieldChange("password")}
+                />
+                <button
+                  type="button"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-secondary hover:text-charcoal transition-colors focus:outline-none cursor-pointer flex items-center justify-center"
+                  onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? (
+                    <EyeOff className="w-4 h-4" />
+                  ) : (
+                    <Eye className="w-4 h-4" />
+                  )}
+                </button>
+              </div>
+              {fieldErrors.password ? (
+                <span className="text-error text-xs mt-1 block">
+                  {fieldErrors.password}
+                </span>
+              ) : null}
+            </div>
           </div>
 
           <Button
             type="submit"
             variant="primary"
             isLoading={loading}
-            className="w-full py-4 tracking-wide shadow-lg mt-2 cursor-pointer"
+            className="w-full py-5 cursor-pointer font-bold tracking-[0.2em] uppercase"
           >
-            Send OTP
+            SEND OTP
           </Button>
         </form>
       ) : (
         <form onSubmit={handleVerifyOtp} className="space-y-6">
-          <div className="rounded-2xl border border-outline-variant bg-surface-container-low p-4 text-sm text-secondary">
-            <p className="font-semibold text-on-surface">OTP sent to email</p>
-            <p className="mt-1 break-all">{fields.email}</p>
+          <div className="rounded border border-outline-variant bg-surface-container p-4 text-sm text-on-surface-variant">
+            <p className="font-bold text-charcoal uppercase tracking-widest text-xs">OTP SENT TO EMAIL</p>
+            <p className="mt-1 break-all font-body-md">{fields.email}</p>
           </div>
 
           <div>
             <label
-              className="flex items-center gap-2 font-label-bold text-label-bold text-on-surface mb-2 ml-4"
+              className="block font-label-caps text-label-caps text-charcoal mb-2"
               htmlFor="otp"
             >
-              <KeyRound className="w-4 h-4 text-secondary" />
-              6-digit OTP Code
+              6-DIGIT OTP CODE
             </label>
             <input
-              className="w-full rounded-full border-0 ring-1 ring-outline-variant bg-surface-container-lowest py-4 text-center text-2xl tracking-[0.35em] text-on-surface outline-none transition focus:ring-2 focus:ring-primary"
+              className="w-full rounded-none border-0 border-b border-outline-variant bg-surface-container py-4 text-center text-2xl tracking-[0.35em] text-charcoal outline-none transition focus:border-charcoal focus:ring-0"
               id="otp"
               maxLength={6}
               placeholder="••••••"
@@ -291,7 +288,7 @@ function SignupForm() {
               value={otp}
               onChange={(e) => setOtp(sanitizeOtp(e.target.value))}
             />
-            <p className="mt-2 text-xs text-secondary ml-4">
+            <p className="mt-2 text-xs text-on-surface-variant">
               Enter the OTP code from your email (e.g. 123456 in mock mode).
             </p>
           </div>
@@ -301,17 +298,17 @@ function SignupForm() {
               type="button"
               variant="secondary"
               onClick={handleBack}
-              className="flex-1 py-4 cursor-pointer"
+              className="flex-1 py-4 cursor-pointer font-bold uppercase tracking-widest text-xs"
             >
-              Back
+              BACK
             </Button>
             <Button
               type="submit"
               variant="primary"
               isLoading={loading}
-              className="flex-1 py-4 cursor-pointer"
+              className="flex-1 py-4 cursor-pointer font-bold uppercase tracking-[0.2em] text-sm"
             >
-              Verify OTP
+              VERIFY OTP
             </Button>
           </div>
 
@@ -319,22 +316,22 @@ function SignupForm() {
             type="button"
             onClick={handleRequestOtp}
             disabled={loading || isRateLimited}
-            className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-full border border-outline-variant hover:bg-surface-container transition-colors font-label-bold text-label-bold text-on-surface cursor-pointer disabled:opacity-50"
+            className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded border border-outline-variant hover:bg-surface-container transition-colors font-button text-button text-charcoal cursor-pointer disabled:opacity-50 uppercase font-bold tracking-widest"
           >
             {isRateLimited
-              ? `Resend OTP in ${remainingSeconds}s`
-              : "Resend OTP"}
+              ? `RESEND OTP IN ${remainingSeconds}S`
+              : "RESEND OTP"}
           </button>
         </form>
       )}
 
-      <p className="text-center font-body-md text-body-md text-secondary">
+      <p className="text-center font-body-md text-body-md text-on-surface-variant">
         Already have an account?
         <Link
-          className="font-label-bold text-on-surface hover:text-primary transition-colors underline ml-1"
+          className="text-charcoal hover:text-secondary transition-colors underline underline-offset-4 ml-1 uppercase font-semibold"
           to="/login"
         >
-          Sign In
+          SIGN IN
         </Link>
       </p>
     </div>

@@ -1,4 +1,3 @@
-
 function Button({
   children,
   type = "button",
@@ -10,24 +9,24 @@ function Button({
   ...props
 }) {
   const baseStyles =
-    "inline-flex items-center justify-center font-semibold tracking-wide transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed disabled:active:scale-100";
+    "inline-flex items-center justify-center font-button font-bold transition-all duration-300 focus:outline-none focus:ring-1 focus:ring-offset-1 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed";
 
   const variants = {
     primary:
-      "rounded-full bg-primary text-on-primary shadow-lg hover:bg-primary-container focus:ring-primary",
+      "rounded-none bg-charcoal text-on-primary font-button text-button tracking-[0.2em] uppercase shadow-md hover:bg-black focus:ring-charcoal",
     secondary:
-      "rounded-full border border-outline-variant bg-transparent text-on-surface hover:bg-surface-container focus:ring-outline",
+      "rounded border border-outline-variant bg-transparent text-charcoal hover:bg-surface-container focus:ring-outline font-button text-button uppercase",
     ghost:
-      "rounded-full bg-transparent text-on-surface hover:bg-surface-container focus:ring-outline",
+      "rounded bg-transparent text-charcoal hover:bg-surface-container focus:ring-outline font-button text-button uppercase",
     tertiary:
-      "bg-transparent text-primary hover:underline underline-offset-4 focus:ring-primary p-0",
+      "bg-transparent text-secondary hover:text-charcoal underline underline-offset-4 decoration-1 focus:ring-outline font-button text-button uppercase p-0",
   };
 
   const sizes = {
-    primary: "px-8 py-4 text-base",
-    secondary: "px-6 py-3 text-sm",
-    ghost: "px-6 py-3 text-sm",
-    tertiary: "text-sm",
+    primary: "px-8 py-5",
+    secondary: "px-4 py-3",
+    ghost: "px-4 py-3",
+    tertiary: "",
   };
 
   const variantStyle = variants[variant] || variants.primary;
@@ -43,7 +42,7 @@ function Button({
     >
       {isLoading ? (
         <svg
-          className="mr-2 h-5 w-5 animate-spin text-current"
+          className="mr-2 h-4 w-4 animate-spin text-current"
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
