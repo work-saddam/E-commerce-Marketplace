@@ -1,10 +1,12 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import Button from "../../../shared/components/ui/Button";
 import { Eye, EyeOff } from "lucide-react";
+import { routePaths } from "../../../app/router/routePaths";
 
 function LoginForm() {
+  const navigate = useNavigate();
   const {
     login,
     isLoading,
@@ -40,7 +42,10 @@ function LoginForm() {
       return;
     }
 
-    await login(identifier, password);
+    const result = await login(identifier, password);
+    if (result && result.success) {
+      navigate(routePaths.HOME);
+    }
   };
 
   return (
