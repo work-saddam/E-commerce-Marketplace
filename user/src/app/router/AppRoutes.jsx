@@ -4,6 +4,7 @@ import PrivateRoute from "./PrivateRoute";
 import { routePaths } from "./routePaths";
 import Home from "../../pages/Home";
 import NotFound from "../../pages/NotFound";
+import UserLayout from "../../shared/components/layout/UserLayout";
 
 export default function AppRoutes() {
   return (
@@ -15,8 +16,10 @@ export default function AppRoutes() {
 
       {/* Protected Routes */}
       <Route element={<PrivateRoute />}>
-        <Route path={routePaths.HOME} element={<Home />} />
-        {/* We can add more protected pages here, like cart checkout, profile editing, etc. */}
+        <Route element={<UserLayout />}>
+          <Route path={routePaths.HOME} element={<Home />} />
+          {/* We can add more protected pages here, like cart checkout, profile editing, etc. */}
+        </Route>
       </Route>
 
       {/* Fallback 404 Route */}
