@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { addUser, removeUser } from "../store/authSlice";
-import { loginRequest, registerRequest, verifyOtpRequest } from "../api/authApi";
+import { loginRequest, registerRequest, verifyOtpRequest, logoutRequest } from "../api/authApi";
 import { extractErrorMessage } from "../../../shared/services/errorHandler";
 
 export const useAuth = () => {
@@ -59,8 +59,14 @@ export const useAuth = () => {
     }
   }, []);
 
-  const logout = useCallback(() => {
-    dispatch(removeUser());
+  const logout = useCallback(async () => {
+    try {
+      await logoutRequest();
+    } catch (err) {
+      console.error("Logout API failed:", err);
+    } finally {
+      dispatch(removeUser());
+    }
   }, [dispatch]);
 
   return {
