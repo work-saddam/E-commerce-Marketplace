@@ -46,11 +46,12 @@ export default function ForgotPasswordPage() {
     lowercase: /[a-z]/.test(newPassword),
     uppercase: /[A-Z]/.test(newPassword),
     number: /\d/.test(newPassword),
-    symbol: /[!@#$%^&*(),.?":{}|<>_+\-`~]/.test(newPassword) ||
-            newPassword.includes("[") ||
-            newPassword.includes("]") ||
-            newPassword.includes("\\") ||
-            newPassword.includes("/"),
+    symbol:
+      /[!@#$%^&*(),.?":{}|<>_+\-`~]/.test(newPassword) ||
+      newPassword.includes("[") ||
+      newPassword.includes("]") ||
+      newPassword.includes("\\") ||
+      newPassword.includes("/"),
   };
 
   const isPasswordValid = Object.values(criteria).every(Boolean);
@@ -80,7 +81,7 @@ export default function ForgotPasswordPage() {
     } catch (err) {
       setLoading(false);
       setError(
-        err.response?.data?.message || "Failed to send OTP. Please try again."
+        err.response?.data?.message || "Failed to send OTP. Please try again.",
       );
     }
   };
@@ -110,7 +111,7 @@ export default function ForgotPasswordPage() {
     } catch (err) {
       setLoading(false);
       setError(
-        err.response?.data?.message || "Invalid or expired OTP. Try again."
+        err.response?.data?.message || "Invalid or expired OTP. Try again.",
       );
     }
   };
@@ -143,7 +144,8 @@ export default function ForgotPasswordPage() {
     } catch (err) {
       setLoading(false);
       setError(
-        err.response?.data?.message || "Password reset failed. Please try again."
+        err.response?.data?.message ||
+          "Password reset failed. Please try again.",
       );
     }
   };
@@ -189,8 +191,8 @@ export default function ForgotPasswordPage() {
               Experience the intersection of{" "}
               <span className="text-charcoal font-bold">Curated Luxury</span>{" "}
               and{" "}
-              <span className="text-charcoal font-bold">Precision Tech</span>
-              . Our seasonal collections are crafted for those who demand
+              <span className="text-charcoal font-bold">Precision Tech</span>.
+              Our seasonal collections are crafted for those who demand
               excellence in every detail.
             </p>
           </div>
@@ -240,7 +242,9 @@ export default function ForgotPasswordPage() {
                 </label>
                 <input
                   className={`w-full px-4 py-4 rounded-none bg-surface-container border-0 border-b focus:border-charcoal focus:ring-0 transition-all text-body-md font-body-md outline-none ${
-                    fieldErrors.email ? "border-error" : "border-outline-variant"
+                    fieldErrors.email
+                      ? "border-error"
+                      : "border-outline-variant"
                   }`}
                   id="email"
                   placeholder="name@company.com"
@@ -348,7 +352,9 @@ export default function ForgotPasswordPage() {
                 <div className="relative">
                   <input
                     className={`w-full pl-4 pr-12 py-4 rounded-none bg-surface-container border-0 border-b focus:border-charcoal focus:ring-0 transition-all text-body-md font-body-md outline-none ${
-                      fieldErrors.newPassword ? "border-error" : "border-outline-variant"
+                      fieldErrors.newPassword
+                        ? "border-error"
+                        : "border-outline-variant"
                     }`}
                     id="new-password"
                     placeholder="••••••••"
@@ -357,7 +363,10 @@ export default function ForgotPasswordPage() {
                     onChange={(e) => {
                       setNewPassword(e.target.value);
                       if (fieldErrors.newPassword) {
-                        setFieldErrors((prev) => ({ ...prev, newPassword: null }));
+                        setFieldErrors((prev) => ({
+                          ...prev,
+                          newPassword: null,
+                        }));
                       }
                     }}
                   />
@@ -390,7 +399,9 @@ export default function ForgotPasswordPage() {
                 <div className="relative">
                   <input
                     className={`w-full pl-4 pr-12 py-4 rounded-none bg-surface-container border-0 border-b focus:border-charcoal focus:ring-0 transition-all text-body-md font-body-md outline-none ${
-                      fieldErrors.confirmPassword ? "border-error" : "border-outline-variant"
+                      fieldErrors.confirmPassword
+                        ? "border-error"
+                        : "border-outline-variant"
                     }`}
                     id="confirm-password"
                     placeholder="••••••••"
@@ -399,7 +410,10 @@ export default function ForgotPasswordPage() {
                     onChange={(e) => {
                       setConfirmPassword(e.target.value);
                       if (fieldErrors.confirmPassword) {
-                        setFieldErrors((prev) => ({ ...prev, confirmPassword: null }));
+                        setFieldErrors((prev) => ({
+                          ...prev,
+                          confirmPassword: null,
+                        }));
                       }
                     }}
                   />
@@ -433,14 +447,22 @@ export default function ForgotPasswordPage() {
                       criteria.length ? "bg-secondary" : "bg-outline"
                     }`}
                   ></span>
-                  <span className={criteria.length ? "text-charcoal" : "text-on-surface-variant"}>
+                  <span
+                    className={
+                      criteria.length
+                        ? "text-charcoal"
+                        : "text-on-surface-variant"
+                    }
+                  >
                     At least 8 characters
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span
                     className={`h-2 w-2 rounded-full ${
-                      criteria.lowercase && criteria.uppercase ? "bg-secondary" : "bg-outline"
+                      criteria.lowercase && criteria.uppercase
+                        ? "bg-secondary"
+                        : "bg-outline"
                     }`}
                   ></span>
                   <span
@@ -459,7 +481,13 @@ export default function ForgotPasswordPage() {
                       criteria.number ? "bg-secondary" : "bg-outline"
                     }`}
                   ></span>
-                  <span className={criteria.number ? "text-charcoal" : "text-on-surface-variant"}>
+                  <span
+                    className={
+                      criteria.number
+                        ? "text-charcoal"
+                        : "text-on-surface-variant"
+                    }
+                  >
                     At least one number
                   </span>
                 </div>
@@ -469,7 +497,13 @@ export default function ForgotPasswordPage() {
                       criteria.symbol ? "bg-secondary" : "bg-outline"
                     }`}
                   ></span>
-                  <span className={criteria.symbol ? "text-charcoal" : "text-on-surface-variant"}>
+                  <span
+                    className={
+                      criteria.symbol
+                        ? "text-charcoal"
+                        : "text-on-surface-variant"
+                    }
+                  >
                     At least one symbol (e.g. !@#$)
                   </span>
                 </div>
@@ -490,7 +524,7 @@ export default function ForgotPasswordPage() {
             Remember your password?
             <Link
               className="text-charcoal hover:text-secondary transition-colors underline underline-offset-4 ml-1 uppercase font-semibold"
-              to="/login"
+              to={routePaths.LOGIN}
             >
               SIGN IN
             </Link>

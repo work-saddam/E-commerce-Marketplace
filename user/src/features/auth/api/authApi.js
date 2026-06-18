@@ -82,3 +82,12 @@ export const resetPasswordRequest = async (resetToken, newPassword) => {
   });
   return response.data;
 };
+
+/**
+ * Sends a logout request to the server to clear session/cookies
+ */
+export const logoutRequest = async () => {
+  const response = await apiClient.post("/api/auth/logout", {});
+  return response.data;
+};
+
