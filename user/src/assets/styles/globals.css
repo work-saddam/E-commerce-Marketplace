@@ -54,6 +54,9 @@
   --color-charcoal: #1b1c1c;
   --color-champagne: #e9c349;
   --color-champagne-light: #fef5d8;
+  --color-warm-white: #f9f7f2;
+  --color-cool-gray-light: #f5f5f3;
+  --color-warm-gray-light: #f4f1e8;
 
   --radius-DEFAULT: 0.25rem;
   --radius-lg: 0.5rem;
