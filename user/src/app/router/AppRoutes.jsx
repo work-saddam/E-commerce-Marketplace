@@ -12,12 +12,18 @@ export default function AppRoutes() {
       {/* Public Routes */}
       <Route path={routePaths.LOGIN} element={<LoginPage />} />
       <Route path={routePaths.SIGNUP} element={<SignupPage />} />
-      <Route path={routePaths.FORGOT_PASSWORD} element={<ForgotPasswordPage />} />
+      <Route
+        path={routePaths.FORGOT_PASSWORD}
+        element={<ForgotPasswordPage />}
+      />
 
-      {/* Protected Routes */}
-      <Route element={<PrivateRoute />}>
-        <Route element={<UserLayout />}>
-          <Route path={routePaths.HOME} element={<Home />} />
+      {/* Routes inside UserLayout */}
+      <Route element={<UserLayout />}>
+        {/* Public Routes with Layout */}
+        <Route path={routePaths.HOME} element={<Home />} />
+
+        {/* Protected Routes */}
+        <Route element={<PrivateRoute />}>
           {/* We can add more protected pages here, like cart checkout, profile editing, etc. */}
         </Route>
       </Route>

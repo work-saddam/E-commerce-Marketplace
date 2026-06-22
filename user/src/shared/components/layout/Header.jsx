@@ -10,6 +10,7 @@ import {
   ChevronDown,
   User,
   LogOut,
+  LogIn,
   Menu,
   X,
   Store,
@@ -321,7 +322,7 @@ export default function Header() {
           </div>
 
           {/* Profile Action (Mobile dropdown equivalent) */}
-          {isAuthenticated && user && (
+          {isAuthenticated && user ? (
             <div className="flex flex-col gap-4 border-t border-outline-variant/10 pt-4">
               <p className="text-[10px] text-secondary font-bold font-label-caps tracking-wider uppercase">
                 Account Settings
@@ -361,6 +362,20 @@ export default function Header() {
                   Log Out
                 </button>
               </div>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-4 border-t border-outline-variant/10 pt-4">
+              <p className="text-[10px] text-secondary font-bold font-label-caps tracking-wider uppercase">
+                Account
+              </p>
+              <Link
+                to={routePaths.LOGIN}
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-bold text-champagne bg-secondary hover:bg-charcoal rounded-xl transition-all font-label-caps uppercase tracking-wider cursor-pointer text-center w-full"
+              >
+                <LogIn className="w-3.5 h-3.5" />
+                Log In
+              </Link>
             </div>
           )}
         </div>
