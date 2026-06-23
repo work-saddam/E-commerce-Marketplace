@@ -567,10 +567,9 @@ export default function Home() {
                   alt={item.name}
                 />
 
-                {/* Add to Cart Overlay */}
                 <button
                   onClick={() => handleAddToCart(item.name)}
-                  className="absolute bottom-0 inset-x-0 w-full bg-champagne text-charcoal py-3 text-xs font-bold font-label-caps tracking-widest uppercase transition-all duration-300 translate-y-full group-hover:translate-y-0 flex items-center justify-center gap-2 cursor-pointer z-10"
+                  className="absolute bottom-0 inset-x-0 w-full bg-champagne text-charcoal py-3 text-xs font-bold font-label-caps tracking-widest uppercase transition-all duration-300 translate-y-0 lg:translate-y-full lg:group-hover:translate-y-0 flex items-center justify-center gap-2 cursor-pointer z-10"
                 >
                   <ShoppingBag className="w-4 h-4" />
                   Add To Cart
