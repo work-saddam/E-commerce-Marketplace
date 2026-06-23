@@ -97,7 +97,7 @@ export default function Home() {
       tagColor: "text-champagne/80",
       titleColor: "text-surface-container-lowest",
       hoverBorder: "hover:border-champagne",
-      imageClass: "grayscale brightness-125 group-hover:grayscale-0",
+      imageClass: "md:grayscale brightness-125 md:group-hover:grayscale-0",
     },
     {
       tag: "New",
@@ -108,7 +108,7 @@ export default function Home() {
       tagColor: "text-charcoal/90",
       titleColor: "text-charcoal",
       hoverBorder: "hover:border-charcoal",
-      imageClass: "grayscale group-hover:grayscale-0",
+      imageClass: "md:grayscale md:group-hover:grayscale-0",
     },
     {
       tag: "Modern Style",
@@ -119,7 +119,7 @@ export default function Home() {
       tagColor: "text-secondary",
       titleColor: "text-charcoal",
       hoverBorder: "hover:border-champagne",
-      imageClass: "grayscale group-hover:grayscale-0 object-cover",
+      imageClass: "md:grayscale md:group-hover:grayscale-0 object-cover",
       colSpan: "lg:col-span-2",
     },
     {
@@ -143,7 +143,7 @@ export default function Home() {
       tagColor: "text-secondary",
       titleColor: "text-charcoal",
       hoverBorder: "hover:border-champagne",
-      imageClass: "grayscale group-hover:grayscale-0 object-cover",
+      imageClass: "md:grayscale md:group-hover:grayscale-0 object-cover",
     },
     {
       tag: "Premium Tech",
@@ -155,7 +155,7 @@ export default function Home() {
       titleColor: "text-surface-container-lowest",
       hoverBorder: "hover:border-champagne",
       imageClass:
-        "grayscale brightness-110 group-hover:grayscale-0 object-cover",
+        "md:grayscale brightness-110 md:group-hover:grayscale-0 object-cover",
     },
   ];
 
