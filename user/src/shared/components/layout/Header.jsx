@@ -10,6 +10,7 @@ import {
   ChevronDown,
   User,
   LogOut,
+  LogIn,
   Menu,
   X,
   Store,
@@ -49,11 +50,6 @@ export default function Header() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-
-  // Close mobile menu on route change
-  useEffect(() => {
-    setMobileMenuOpen(false);
-  }, [location]);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -291,8 +287,11 @@ export default function Header() {
               return link.isPlaceholder ? (
                 <button
                   key={index}
-                  onClick={() => handleFeaturePlaceholder(link.label)}
-                  className="font-label-caps text-xs text-secondary hover:text-champagne transition-all duration-300 font-bold uppercase tracking-wider text-left py-1"
+                  onClick={() => {
+                    handleFeaturePlaceholder(link.label);
+                    setMobileMenuOpen(false);
+                  }}
+                  className="font-label-caps text-xs text-secondary hover:text-champagne transition-all duration-300 font-bold uppercase tracking-wider text-left py-1 cursor-pointer"
                 >
                   {link.label}
                 </button>
@@ -300,6 +299,7 @@ export default function Header() {
                 <Link
                   key={index}
                   to={link.path}
+                  onClick={() => setMobileMenuOpen(false)}
                   className={`font-label-caps text-xs hover:text-champagne transition-all duration-300 font-bold uppercase tracking-wider py-1 ${
                     isActive ? "text-charcoal font-black" : "text-secondary"
                   }`}
@@ -313,6 +313,7 @@ export default function Header() {
               href="https://seller.trustkart.saddamcodes.online"
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => setMobileMenuOpen(false)}
               className="flex items-center gap-2 font-label-caps text-xs text-secondary hover:text-champagne font-bold uppercase tracking-wider py-1"
             >
               <Store className="w-4 h-4" />
@@ -321,7 +322,7 @@ export default function Header() {
           </div>
 
           {/* Profile Action (Mobile dropdown equivalent) */}
-          {isAuthenticated && user && (
+          {isAuthenticated && user ? (
             <div className="flex flex-col gap-4 border-t border-outline-variant/10 pt-4">
               <p className="text-[10px] text-secondary font-bold font-label-caps tracking-wider uppercase">
                 Account Settings
@@ -341,20 +342,40 @@ export default function Header() {
               </div>
               <div className="grid grid-cols-2 gap-2 mt-2">
                 <button
-                  onClick={() => handleFeaturePlaceholder("Profile")}
-                  className="flex items-center justify-center gap-2 px-4 py-2 text-xs font-bold text-secondary border border-outline-variant/30 rounded-xl hover:bg-surface-container-low transition-all font-label-caps uppercase tracking-wider"
+                  onClick={() => {
+                    handleFeaturePlaceholder("Profile");
+                    setMobileMenuOpen(false);
+                  }}
+                  className="flex items-center justify-center gap-2 px-4 py-2 text-xs font-bold text-secondary border border-outline-variant/30 rounded-xl hover:bg-surface-container-low transition-all font-label-caps uppercase tracking-wider cursor-pointer"
                 >
                   <User className="w-3.5 h-3.5" />
                   Profile
                 </button>
                 <button
-                  onClick={logout}
-                  className="flex items-center justify-center gap-2 px-4 py-2 text-xs font-bold text-red-600 border border-red-100 rounded-xl hover:bg-red-50 transition-all font-label-caps uppercase tracking-wider"
+                  onClick={() => {
+                    logout();
+                    setMobileMenuOpen(false);
+                  }}
+                  className="flex items-center justify-center gap-2 px-4 py-2 text-xs font-bold text-red-600 border border-red-100 rounded-xl hover:bg-red-50 transition-all font-label-caps uppercase tracking-wider cursor-pointer"
                 >
                   <LogOut className="w-3.5 h-3.5" />
                   Log Out
                 </button>
               </div>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-4 border-t border-outline-variant/10 pt-4">
+              <p className="text-[10px] text-secondary font-bold font-label-caps tracking-wider uppercase">
+                Account
+              </p>
+              <Link
+                to={routePaths.LOGIN}
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-bold text-champagne bg-secondary hover:bg-charcoal rounded-xl transition-all font-label-caps uppercase tracking-wider cursor-pointer text-center w-full"
+              >
+                <LogIn className="w-3.5 h-3.5" />
+                Log In
+              </Link>
             </div>
           )}
         </div>

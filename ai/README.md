@@ -39,12 +39,13 @@ The `ai/` folder is the documentation hub for repository-aware AI tools and huma
 
 ## Skill Registry
 
-**Built-in Skills** — *Merged into agents* (see agents/ for full guidance)
+**Built-in Skills** — _Merged into agents_ (see agents/ for full guidance)
 
 **Installed Skills** (registered in `skills-lock.json`)
 
 - `frontend-design` — Production-grade UI/UX and React components
 - `vercel-react-best-practices` — React/Next.js performance optimization patterns
+- `ui-ux-pro-max` — Production-grade UI/UX
 
 **How to Add Skills**
 
