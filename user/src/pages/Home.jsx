@@ -24,6 +24,22 @@ export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAutoplay, setIsAutoplay] = useState(true);
 
+  // Generate dynamic promo dates: today to 7 days from today
+  const formatDate = (date) => {
+    const day = date.getDate();
+    const monthNames = [
+      "JAN", "FEB", "MAR", "APR", "MAY", "JUN",
+      "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"
+    ];
+    const month = monthNames[date.getMonth()];
+    return `${day} ${month}`;
+  };
+
+  const today = new Date();
+  const futureDate = new Date();
+  futureDate.setDate(today.getDate() + 7);
+  const promoDateRange = `${formatDate(today)} TO ${formatDate(futureDate)}`;
+
   const slides = [
     {
       subtitle: "Beats Solo",
@@ -470,7 +486,7 @@ export default function Home() {
               SMILE
             </h2>
             <p className="text-champagne/80 font-label-caps text-[11px] tracking-[0.35em] uppercase font-bold">
-              15 NOV TO 7 DEC
+              {promoDateRange}
             </p>
           </div>
 
