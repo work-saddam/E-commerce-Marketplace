@@ -28,8 +28,18 @@ export default function Home() {
   const formatDate = (date) => {
     const day = date.getDate();
     const monthNames = [
-      "JAN", "FEB", "MAR", "APR", "MAY", "JUN",
-      "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"
+      "JAN",
+      "FEB",
+      "MAR",
+      "APR",
+      "MAY",
+      "JUN",
+      "JUL",
+      "AUG",
+      "SEP",
+      "OCT",
+      "NOV",
+      "DEC",
     ];
     const month = monthNames[date.getMonth()];
     return `${day} ${month}`;
