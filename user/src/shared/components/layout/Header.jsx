@@ -72,7 +72,7 @@ export default function Header() {
 
   const navLinks = [
     { label: "Home", path: routePaths.HOME },
-    { label: "Shop", path: routePaths.HOME, isPlaceholder: true },
+    { label: "Shop", path: routePaths.SHOP },
     { label: "About Us", path: routePaths.HOME, isPlaceholder: true },
     { label: "Blog", path: routePaths.HOME, isPlaceholder: true },
     { label: "Contact Us", path: routePaths.HOME, isPlaceholder: true },
