@@ -13,3 +13,27 @@
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
+
+/* Hide scrollbar utility */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Product card hover transitions */
+.product-card-hover .overlay {
+  opacity: 0;
+  transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.product-card-hover:hover .overlay {
+  opacity: 1;
+}
+.product-card-hover img {
+  transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.product-card-hover:hover img {
+  transform: scale(1.05);
+}

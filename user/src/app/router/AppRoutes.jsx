@@ -3,6 +3,7 @@ import { LoginPage, SignupPage, ForgotPasswordPage } from "../../features/auth";
 import PrivateRoute from "./PrivateRoute";
 import { routePaths } from "./routePaths";
 import Home from "../../pages/Home";
+import Shop from "../../pages/Shop";
 import NotFound from "../../pages/NotFound";
 import UserLayout from "../../shared/components/layout/UserLayout";
 
@@ -21,6 +22,7 @@ export default function AppRoutes() {
       <Route element={<UserLayout />}>
         {/* Public Routes with Layout */}
         <Route path={routePaths.HOME} element={<Home />} />
+        <Route path={routePaths.SHOP} element={<Shop />} />
 
         {/* Protected Routes */}
         <Route element={<PrivateRoute />}>
