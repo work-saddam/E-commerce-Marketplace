@@ -17,7 +17,8 @@ export default function ShopHeader({
     { value: "price_high", label: "Price: High to Low" },
   ];
 
-  const activeOption = sortOptions.find((opt) => opt.value === currentSort) || sortOptions[0];
+  const activeOption =
+    sortOptions.find((opt) => opt.value === currentSort) || sortOptions[0];
 
   const handleSelect = (val) => {
     onSortChange(val);
@@ -28,7 +29,10 @@ export default function ShopHeader({
     <section className="mb-12">
       {/* Breadcrumbs */}
       <div className="flex items-center gap-2 text-[10px] sm:text-xs uppercase tracking-[0.2em] font-label-caps text-on-surface-variant/40 mb-6 select-none">
-        <Link to={routePaths.HOME} className="hover:text-champagne transition-colors duration-300">
+        <Link
+          to={routePaths.HOME}
+          className="hover:text-champagne transition-colors duration-300"
+        >
           Home
         </Link>
         <span className="text-on-surface-variant/20">/</span>
@@ -44,8 +48,9 @@ export default function ShopHeader({
             Shop All Essentials
           </h2>
           <p className="text-body-md text-on-surface-variant/70 max-w-xl text-sm md:text-base leading-relaxed">
-            Explore our signature range of artisanal products, where timeless craft meets modern luxury.
-            Every piece is selected for its quiet confidence and premium quality.
+            Explore our signature range of artisanal products, where timeless
+            craft meets modern luxury. Every piece is selected for its quiet
+            confidence and premium quality.
           </p>
         </div>
 
@@ -58,10 +63,12 @@ export default function ShopHeader({
           <div className="relative shrink-0">
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="flex items-center gap-4 text-button font-bold border border-charcoal/10 bg-surface-container-lowest px-5 py-3.5 rounded-lg hover:border-champagne/45 hover:bg-charcoal hover:text-surface-container-lowest transition-all duration-300 tracking-wider focus:outline-none min-w-[220px] justify-between shadow-[0_2px_8px_rgba(0,0,0,0.02)] cursor-pointer select-none"
+              className="flex items-center gap-4 text-button font-bold border border-charcoal/10 bg-surface-container-lowest px-5 py-3.5 rounded-lg hover:border-champagne/45 hover:bg-charcoal hover:text-surface-container-lowest transition-all duration-300 tracking-wider focus:outline-none min-w-55 justify-between shadow-[0_2px_8px_rgba(0,0,0,0.02)] cursor-pointer select-none"
             >
               <span>SORT BY: {activeOption.label.toUpperCase()}</span>
-              <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`} />
+              <ChevronDown
+                className={`w-4 h-4 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`}
+              />
             </button>
 
             {isOpen && (
