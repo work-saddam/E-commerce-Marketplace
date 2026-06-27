@@ -30,7 +30,7 @@ export default function ProductCard({ product }) {
           <div className="overlay absolute inset-0 bg-primary/10 flex flex-col justify-end p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
             <button
               onClick={handleAddToCart}
-              className="bg-charcoal text-surface-container-lowest font-label-caps text-xs py-3.5 w-full transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500 uppercase tracking-widest font-semibold flex items-center justify-center gap-2 hover:bg-champagne hover:text-charcoal transition-all cursor-pointer shadow-lg rounded-lg"
+              className="bg-charcoal text-surface-container-lowest font-label-caps text-xs py-3.5 w-full transform translate-y-4 group-hover:translate-y-0 transition-[transform,background-color,color] duration-500 uppercase tracking-widest font-semibold flex items-center justify-center gap-2 hover:bg-champagne hover:text-charcoal cursor-pointer shadow-lg rounded-lg"
             >
               <ShoppingBag className="w-4 h-4" />
               <span>Add to Bag</span>
