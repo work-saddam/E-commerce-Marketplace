@@ -49,6 +49,12 @@ export default function Shop() {
     fetchProducts();
   }, [sort, currentPage, limit, retryTrigger]);
 
+  // Reset page and scroll to top when any filter changes
+  useEffect(() => {
+    setCurrentPage(1);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [selectedCategory, maxPrice, selectedMaterials, selectedColors]);
+
   // Derived filter categories list dynamically from loaded products
   const categories = Array.from(
     new Set(products.map((p) => p.category?.name).filter(Boolean)),
