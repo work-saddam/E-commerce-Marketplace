@@ -54,16 +54,13 @@ export default function ShopFilters({
                 onCategoryChange("");
                 setIsMobileOpen(false);
               }}
-              className={`w-full text-left text-body-md text-sm transition-all duration-300 flex justify-between items-center hover:text-champagne cursor-pointer select-none py-1 ${
+              className={`w-full text-left text-body-md text-sm transition-all duration-300 hover:text-champagne cursor-pointer select-none py-1 ${
                 selectedCategory === ""
                   ? "text-champagne font-bold pl-2 border-l-2 border-champagne"
                   : "text-on-surface-variant/80 hover:pl-1"
               }`}
             >
-              <span>All Products</span>
-              <span className="text-[10px] font-bold bg-surface-container px-2.5 py-0.5 rounded-full text-charcoal/50">
-                {Object.values(categoryCounts).reduce((a, b) => a + b, 0)}
-              </span>
+              All Products
             </button>
           </li>
           {categories.map((cat) => (
@@ -73,16 +70,13 @@ export default function ShopFilters({
                   onCategoryChange(cat);
                   setIsMobileOpen(false);
                 }}
-                className={`w-full text-left text-body-md text-sm transition-all duration-300 flex justify-between items-center hover:text-champagne cursor-pointer select-none py-1 ${
+                className={`w-full text-left text-body-md text-sm transition-all duration-300 hover:text-champagne cursor-pointer select-none py-1 ${
                   selectedCategory === cat
                     ? "text-champagne font-bold pl-2 border-l-2 border-champagne"
                     : "text-on-surface-variant/80 hover:pl-1"
                 }`}
               >
-                <span>{cat}</span>
-                <span className="text-[10px] font-bold bg-surface-container px-2.5 py-0.5 rounded-full text-charcoal/50">
-                  {categoryCounts[cat] || 0}
-                </span>
+                {cat}
               </button>
             </li>
           ))}
