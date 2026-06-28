@@ -277,12 +277,12 @@ export default function ProductDetail() {
         </div>
 
         {/* Info Column */}
-        <div className="lg:col-span-5 flex flex-col justify-center pt-4 lg:pt-12 space-y-6">
-          <div className="space-y-4">
+        <div className="lg:col-span-5 flex flex-col justify-center pt-4 lg:pt-12 space-y-5">
+          <div className="space-y-3">
             <span className="text-[10px] font-black text-champagne uppercase tracking-[0.25em] bg-champagne/10 border border-champagne/15 px-3.5 py-1.5 rounded-full w-fit block shadow-sm select-none">
               {categoryLabel}
             </span>
-            <h1 className="text-4xl md:text-5xl lg:text-[56px] font-black text-charcoal tracking-tight leading-[0.95] uppercase">
+            <h1 className="text-2xl md:text-3xl font-bold text-charcoal tracking-tight leading-snug">
               {product.title}
             </h1>
           </div>
@@ -301,11 +301,11 @@ export default function ProductDetail() {
           </div>
 
           {/* Price Callout */}
-          <div className="bg-surface-container/30 border border-outline-variant/10 rounded-2xl p-6 space-y-1.5 shadow-sm">
-            <div className="text-4xl md:text-5xl font-black text-charcoal tracking-tight flex items-baseline gap-1">
+          <div className="bg-surface-container/30 border border-outline-variant/10 rounded-2xl p-5 space-y-1.5 shadow-sm">
+            <div className="text-2xl md:text-3xl font-black text-charcoal tracking-tight flex items-baseline gap-1">
               {formattedPrice}
             </div>
-            <p className="text-[9px] font-extrabold text-on-surface-variant/40 tracking-[0.15em] uppercase leading-none">
+            <p className="text-[10px] font-extrabold text-on-surface-variant/40 tracking-[0.15em] uppercase leading-none">
               Inclusive of all taxes & complimentary priority shipping
             </p>
           </div>
@@ -316,22 +316,22 @@ export default function ProductDetail() {
           </p>
 
           {/* Actions & Buttons */}
-          <div className="flex items-center gap-4 pt-6 border-t border-outline-variant/10">
+          <div className="flex items-center gap-3 pt-5 border-t border-outline-variant/10">
             <button
               onClick={handleAddToCart}
               disabled={isOutOfStock}
-              className={`grow font-label-caps text-xs py-5 px-10 uppercase tracking-[0.2em] font-black flex items-center justify-center gap-3 transition-all duration-500 rounded-2xl shadow-[0_10px_35px_rgba(27,28,28,0.15)] cursor-pointer active:scale-[0.98] animate-shimmer-btn ${
+              className={`grow font-label-caps text-xs py-4 px-8 uppercase tracking-[0.2em] font-black flex items-center justify-center gap-3 transition-all duration-500 rounded-xl shadow-[0_10px_35px_rgba(27,28,28,0.15)] cursor-pointer active:scale-[0.98] animate-shimmer-btn ${
                 isOutOfStock
                   ? "bg-charcoal/10 text-charcoal/30 cursor-not-allowed shadow-none border border-charcoal/5"
                   : "bg-charcoal text-surface-container-lowest hover:bg-champagne hover:text-charcoal hover:shadow-[0_15px_40px_rgba(233,195,73,0.25)] border border-charcoal hover:border-champagne"
               }`}
             >
-              <ShoppingBag className="w-4.5 h-4.5" />
+              <ShoppingBag className="w-4 h-4" />
               <span>{isOutOfStock ? "Sold Out" : "Add to Bag"}</span>
             </button>
             <button
               onClick={handleToggleFavorite}
-              className={`flex items-center justify-center border border-outline-variant/35 rounded-2xl w-16 h-16 transition-all duration-300 group cursor-pointer hover:border-champagne/45 bg-surface-container-lowest shadow-md active:scale-95 ${
+              className={`flex items-center justify-center border border-outline-variant/35 rounded-xl w-14 h-14 transition-all duration-300 group cursor-pointer hover:border-champagne/45 bg-surface-container-lowest shadow-md active:scale-95 ${
                 isFavorite
                   ? "text-red-500 border-red-500 bg-red-50/20"
                   : "text-charcoal"
@@ -345,13 +345,13 @@ export default function ProductDetail() {
           </div>
 
           {/* Shipping and warranty policies */}
-          <div className="flex flex-col sm:flex-row gap-4 sm:gap-8 items-start sm:items-center border-t border-outline-variant/10 pt-6 text-[9px] font-label-caps tracking-[0.18em] text-on-surface-variant/50">
-            <div className="flex items-center gap-2.5 font-bold">
-              <Truck className="w-4.5 h-4.5 text-champagne shrink-0" />
+          <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-start sm:items-center border-t border-outline-variant/10 pt-5 text-[9px] font-label-caps tracking-[0.18em] text-on-surface-variant/50">
+            <div className="flex items-center gap-2 font-bold">
+              <Truck className="w-4 h-4 text-champagne shrink-0" />
               <span>COMPLIMENTARY SHIPPING</span>
             </div>
-            <div className="flex items-center gap-2.5 font-bold">
-              <ShieldCheck className="w-4.5 h-4.5 text-champagne shrink-0" />
+            <div className="flex items-center gap-2 font-bold">
+              <ShieldCheck className="w-4 h-4 text-champagne shrink-0" />
               <span>SECURE TRANSACTION</span>
             </div>
           </div>
@@ -369,7 +369,7 @@ export default function ProductDetail() {
             <span className="text-[10px] font-black text-champagne uppercase tracking-[0.25em] block">
               Architectural Detail
             </span>
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-champagne leading-none uppercase">
+            <h2 className="text-3xl md:text-4xl font-black text-champagne leading-none uppercase">
               {specTitle}
             </h2>
             <p className="text-body-md text-surface-container-high/70 text-sm md:text-base leading-relaxed">
