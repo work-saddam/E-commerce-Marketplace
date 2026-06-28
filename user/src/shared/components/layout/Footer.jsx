@@ -33,6 +33,7 @@ export default function Footer() {
           <div className="flex gap-4">
             <a
               href="#"
+              aria-label="Open globe link"
               onClick={(e) => {
                 e.preventDefault();
                 toast("Opening Social Link...");
@@ -43,6 +44,7 @@ export default function Footer() {
             </a>
             <a
               href="#"
+              aria-label="Open email link"
               onClick={(e) => {
                 e.preventDefault();
                 toast("Opening Social Link...");
@@ -116,6 +118,7 @@ export default function Footer() {
             />
             <button
               type="submit"
+              aria-label="Subscribe to newsletter"
               className="bg-champagne text-charcoal px-6 py-3 text-xs font-bold hover:bg-surface-container-lowest transition-all duration-300 font-label-caps flex items-center justify-center gap-1 cursor-pointer"
             >
               <Send className="w-3.5 h-3.5" />
