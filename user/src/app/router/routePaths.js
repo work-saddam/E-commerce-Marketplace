@@ -6,4 +6,5 @@ export const routePaths = {
   LOGIN: "/login",
   SIGNUP: "/signup",
   FORGOT_PASSWORD: "/forgot-password",
+  SHOP: "/shop",
 };

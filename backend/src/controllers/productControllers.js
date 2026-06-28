@@ -172,7 +172,12 @@ const getAllProducts = async (req, res) => {
     const sortCriteria = sortOptions[sort] || sortOptions.newest;
 
     const [products, total] = await Promise.all([
-      Product.find({}).sort(sortCriteria).skip(skip).limit(limit),
+      Product.find({})
+        .populate("category", "name")
+        .sort(sortCriteria)
+        .skip(skip)
+        .limit(limit)
+        .lean(),
       Product.countDocuments({}),
     ]);
 
