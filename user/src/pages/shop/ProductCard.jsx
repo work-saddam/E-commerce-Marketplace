@@ -1,9 +1,11 @@
 import toast from "react-hot-toast";
 import { PackageX, ShoppingBag } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useCart } from "../../features/cart/hooks/useCart";
 
 export default function ProductCard({ product }) {
   const isOutOfStock = product.stock === 0;
+  const { addItem } = useCart();
 
   const handleAddToCart = (e) => {
     e.preventDefault();
@@ -12,7 +14,9 @@ export default function ProductCard({ product }) {
       return;
     }
 
-    toast.success(`Added "${product.title}" to cart!`, {
+    addItem(product);
+
+    toast.success(`Added to cart!`, {
       style: {
         borderRadius: "8px",
         background: "#1b1c1c",

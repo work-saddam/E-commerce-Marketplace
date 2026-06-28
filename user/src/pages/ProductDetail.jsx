@@ -16,6 +16,7 @@ import apiClient from "../shared/services/apiClient";
 import Loader from "../shared/components/feedback/Loader";
 import { routePaths } from "../app/router/routePaths";
 import ProductCard from "./shop/ProductCard";
+import { useCart } from "../features/cart/hooks/useCart";
 
 export default function ProductDetail() {
   const { slug } = useParams();
@@ -25,6 +26,7 @@ export default function ProductDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isFavorite, setIsFavorite] = useState(false);
+  const { addItem } = useCart();
 
   // Fetch product detail and similar products
   useEffect(() => {
@@ -58,7 +60,8 @@ export default function ProductDetail() {
 
   const handleAddToCart = () => {
     if (!product || product.stock === 0) return;
-    toast.success(`Added "${product.title}" to cart!`, {
+    addItem(product);
+    toast.success(`Added to cart!`, {
       style: {
         borderRadius: "12px",
         background: "#1b1c1c",
