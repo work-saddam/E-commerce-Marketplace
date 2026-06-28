@@ -17,7 +17,7 @@ const persistStorage = storage?.default || storage;
 const persistConfig = {
   key: "root",
   storage: persistStorage,
-  whitelist: ["user"], // Persist only user/auth state for now
+  whitelist: ["user", "cart"], // Persist user and cart state
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
