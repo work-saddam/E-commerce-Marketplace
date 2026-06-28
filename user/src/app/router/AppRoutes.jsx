@@ -4,6 +4,7 @@ import PrivateRoute from "./PrivateRoute";
 import { routePaths } from "./routePaths";
 import Home from "../../pages/Home";
 import Shop from "../../pages/Shop";
+import ProductDetail from "../../pages/ProductDetail";
 import NotFound from "../../pages/NotFound";
 import UserLayout from "../../shared/components/layout/UserLayout";
 
@@ -23,6 +24,7 @@ export default function AppRoutes() {
         {/* Public Routes with Layout */}
         <Route path={routePaths.HOME} element={<Home />} />
         <Route path={routePaths.SHOP} element={<Shop />} />
+        <Route path={routePaths.PRODUCT_DETAIL} element={<ProductDetail />} />
 
         {/* Protected Routes */}
         <Route element={<PrivateRoute />}>

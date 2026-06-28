@@ -112,7 +112,7 @@ const editProduct = async (req, res) => {
         stock: Number(stock),
         image: { url: imageURL, public_id: imagePublicId },
       },
-      { new: true }
+      { new: true },
     );
 
     res
@@ -200,7 +200,10 @@ const getAllProducts = async (req, res) => {
 
 const getProductbyId = async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id);
+    const product = await Product.findById(req.params.id).populate(
+      "category",
+      "name",
+    );
     if (!product) {
       return res.status(404).json({ message: "Product not found!" });
     }
@@ -224,7 +227,7 @@ const getProductbyIds = async (req, res) => {
     }
 
     const products = await Product.find({ _id: { $in: ids } }).select(
-      "title price image stock slug"
+      "title price image stock slug",
     );
     res.status(200).json({
       message: "Successfully fetch product details!",
