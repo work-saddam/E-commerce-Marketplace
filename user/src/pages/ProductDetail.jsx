@@ -18,7 +18,8 @@ import { routePaths } from "../app/router/routePaths";
 import ProductCard from "./shop/ProductCard";
 
 export default function ProductDetail() {
-  const { id } = useParams();
+  const { slug } = useParams();
+  const id = slug && slug.includes("-") ? slug.split("-").pop() : slug;
   const [product, setProduct] = useState(null);
   const [similarProducts, setSimilarProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -53,7 +54,7 @@ export default function ProductDetail() {
 
     fetchPDPData();
     window.scrollTo({ top: 0, behavior: "instant" });
-  }, [id]);
+  }, [slug]);
 
   const handleAddToCart = () => {
     if (!product || product.stock === 0) return;

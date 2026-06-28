@@ -26,7 +26,7 @@ export default function ProductCard({ product }) {
 
   return (
     <Link
-      to={`/product/${product._id}`}
+      to={`/product/${product.slug || product._id}`}
       className="product-card-hover group cursor-pointer relative overflow-hidden bg-surface-container-lowest border border-outline-variant/10 rounded-2xl p-4 transition-all duration-500 hover:shadow-[0_20px_50px_rgba(0,0,0,0.04)] hover:border-champagne/35 flex flex-col justify-between h-full"
     >
       <div>
