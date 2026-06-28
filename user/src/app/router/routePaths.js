@@ -7,4 +7,5 @@ export const routePaths = {
   SIGNUP: "/signup",
   FORGOT_PASSWORD: "/forgot-password",
   SHOP: "/shop",
+  PRODUCT_DETAIL: "/product/:id",
 };
