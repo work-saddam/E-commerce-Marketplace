@@ -1,9 +1,15 @@
 import toast from "react-hot-toast";
-import { ShoppingBag } from "lucide-react";
+import { PackageX, ShoppingBag } from "lucide-react";
 
 export default function ProductCard({ product }) {
+  const isOutOfStock = product.stock === 0;
+
   const handleAddToCart = (e) => {
     e.stopPropagation(); // Prevent navigating if a detail page is set up
+    if (isOutOfStock) {
+      return;
+    }
+
     toast.success(`Added "${product.title}" to cart!`, {
       style: {
         borderRadius: "8px",
@@ -27,17 +33,36 @@ export default function ProductCard({ product }) {
             loading="lazy"
           />
           {/* Overlay with Add to Bag button */}
-          <div className="overlay absolute inset-0 bg-primary/10 flex flex-col justify-end p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <button
-              onClick={handleAddToCart}
-              className="bg-charcoal text-surface-container-lowest font-label-caps text-xs py-3.5 w-full transform translate-y-4 group-hover:translate-y-0 transition-[transform,background-color,color] duration-500 uppercase tracking-widest font-semibold flex items-center justify-center gap-2 hover:bg-champagne hover:text-charcoal cursor-pointer shadow-lg rounded-lg"
-            >
-              <ShoppingBag className="w-4 h-4" />
-              <span>Add to Bag</span>
-            </button>
+          <div className="overlay absolute inset-0 bg-linear-to-t from-charcoal/80 via-charcoal/20 to-transparent flex flex-col justify-end p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            {isOutOfStock ? (
+              <div className="w-full rounded-xl border border-white/10 bg-white/10 backdrop-blur-md px-4 py-3 shadow-[0_18px_40px_rgba(0,0,0,0.18)]">
+                <div className="flex items-center gap-3">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-500/15 text-red-100 ring-1 ring-inset ring-red-400/20">
+                    <PackageX className="h-5 w-5" />
+                  </span>
+                  <div className="min-w-0">
+                    <p className="font-label-caps text-[9px] uppercase tracking-[0.24em] text-white/60 font-bold">
+                      Unavailable
+                    </p>
+                    <p className="text-sm font-semibold text-white">
+                      Sold out for now
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={handleAddToCart}
+                className="bg-charcoal text-surface-container-lowest font-label-caps text-xs py-3.5 w-full transform translate-y-4 group-hover:translate-y-0 transition-[transform,background-color,color] duration-500 uppercase tracking-widest font-semibold flex items-center justify-center gap-2 hover:bg-champagne hover:text-charcoal cursor-pointer shadow-lg rounded-lg"
+              >
+                <ShoppingBag className="w-4 h-4" />
+                <span>Add to Bag</span>
+              </button>
+            )}
           </div>
           {/* Badges */}
-          {product.stock === 0 ? (
+          {isOutOfStock ? (
             <span className="absolute top-3 left-3 font-label-caps text-[9px] bg-red-600 px-2.5 py-1 text-white tracking-widest rounded font-bold shadow-md">
               OUT OF STOCK
             </span>
