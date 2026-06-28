@@ -1,10 +1,12 @@
 import toast from "react-hot-toast";
 import { PackageX, ShoppingBag } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export default function ProductCard({ product }) {
   const isOutOfStock = product.stock === 0;
 
   const handleAddToCart = (e) => {
+    e.preventDefault();
     e.stopPropagation(); // Prevent navigating if a detail page is set up
     if (isOutOfStock) {
       return;
@@ -23,7 +25,10 @@ export default function ProductCard({ product }) {
   const imageUrl = product.image?.url || "/images/placeholder.png";
 
   return (
-    <div className="product-card-hover group cursor-pointer relative overflow-hidden bg-surface-container-lowest border border-outline-variant/10 rounded-2xl p-4 transition-all duration-500 hover:shadow-[0_20px_50px_rgba(0,0,0,0.04)] hover:border-champagne/35 flex flex-col justify-between h-full">
+    <Link
+      to={`/product/${product._id}`}
+      className="product-card-hover group cursor-pointer relative overflow-hidden bg-surface-container-lowest border border-outline-variant/10 rounded-2xl p-4 transition-all duration-500 hover:shadow-[0_20px_50px_rgba(0,0,0,0.04)] hover:border-champagne/35 flex flex-col justify-between h-full"
+    >
       <div>
         <div className="relative aspect-square overflow-hidden bg-surface-container rounded-xl">
           <img
@@ -93,6 +98,6 @@ export default function ProductCard({ product }) {
           </span>
         )}
       </div>
-    </div>
+    </Link>
   );
 }
