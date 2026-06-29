@@ -271,15 +271,15 @@ export default function Cart() {
                       {/* Product Details */}
                       <div className="flex-1 min-w-0">
                         {/* Top row: Title + Price */}
-                        <div className="flex justify-between items-start gap-3">
+                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1 sm:gap-3">
                           <div className="min-w-0 flex-1">
                             <Link
                               to={`/product/${item.slug || item._id}`}
-                              className="font-semibold text-sm sm:text-base text-charcoal hover:text-champagne transition-colors duration-300 line-clamp-2 leading-snug block"
+                              className="font-semibold text-sm sm:text-base text-charcoal hover:text-champagne transition-colors duration-300 line-clamp-2 leading-snug"
                             >
                               {item.title}
                             </Link>
-                            <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                            <div className="flex items-center gap-2 mt-1 flex-wrap">
                               {isOutOfStock ? (
                                 <span className="text-[9px] font-bold text-red-500 bg-red-50 border border-red-100 px-2 py-0.5 rounded uppercase tracking-wider">
                                   Out of Stock
@@ -297,7 +297,7 @@ export default function Cart() {
                               </span>
                             </div>
                           </div>
-                          <p className="font-bold text-base sm:text-lg text-charcoal shrink-0 tabular-nums">
+                          <p className="font-bold text-sm sm:text-lg text-charcoal shrink-0 tabular-nums">
                             ₹{lineTotal.toLocaleString()}
                           </p>
                         </div>
@@ -396,7 +396,7 @@ export default function Cart() {
                         key={item._id}
                         className="flex justify-between text-on-surface-variant/70"
                       >
-                        <span className="truncate max-w-[60%] text-xs">
+                        <span className="line-clamp-1 max-w-[60%] text-xs">
                           {item.title}{" "}
                           <span className="text-on-surface-variant/40">
                             × {item.quantity}
