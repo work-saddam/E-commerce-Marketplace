@@ -12,6 +12,7 @@ import {
   Truck,
   PackageOpen,
   CalendarDays,
+  ShieldCheck,
 } from "lucide-react";
 import { useCart } from "../features/cart";
 import apiClient from "../shared/services/apiClient";
@@ -169,23 +170,46 @@ export default function Cart() {
   return (
     <div className="w-full bg-surface-container-low min-h-screen text-on-background selection:bg-secondary-fixed selection:text-on-secondary-fixed">
       <main className="max-w-container-max mx-auto px-margin-edge py-10 md:py-14 min-h-[80vh]">
+        {/* Breadcrumbs */}
+        <div className="flex items-center gap-2 text-[10px] sm:text-xs uppercase tracking-[0.2em] font-label-caps text-on-surface-variant/40 select-none mb-8">
+          <Link
+            to={routePaths.HOME}
+            className="hover:text-champagne transition-colors duration-300"
+          >
+            Home
+          </Link>
+          <span className="text-on-surface-variant/20">/</span>
+          <Link
+            to={routePaths.SHOP}
+            className="hover:text-champagne transition-colors duration-300"
+          >
+            Shop
+          </Link>
+          <span className="text-on-surface-variant/20">/</span>
+          <span className="text-champagne font-bold">Shopping Bag</span>
+        </div>
+
         {/* Header section */}
-        <header className="mb-12 border-b border-outline-variant/10 pb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
-          <div className="space-y-2">
-            <span className="text-[10px] font-black text-champagne uppercase tracking-[0.2em] bg-champagne/10 border border-champagne/15 px-3 py-1 rounded-full w-fit block select-none">
-              ATELIER SHOPPING
-            </span>
-            <h1 className="text-4xl md:text-5xl font-black text-charcoal tracking-tight leading-none uppercase">
-              Your Bag
+        <header className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-3">
+          <div className="space-y-1">
+            <h1 className="text-2xl md:text-3xl font-bold text-charcoal tracking-tight leading-snug">
+              Your Shopping Bag
             </h1>
+            <p className="text-xs font-bold font-label-caps text-on-surface-variant/50 uppercase tracking-[0.15em] select-none">
+              {items.length === 0
+                ? "Your bag is empty"
+                : `${items.length} ${items.length === 1 ? "item" : "items"} in your bag`}
+            </p>
           </div>
-          <p className="text-xs font-bold font-label-caps text-on-surface-variant/50 uppercase tracking-[0.15em] select-none">
-            {items.length === 0
-              ? "Your bag is empty"
-              : `${items.length} Premium ${
-                  items.length === 1 ? "Item" : "Items"
-                } Selected`}
-          </p>
+          {items.length > 0 && (
+            <Link
+              to={routePaths.SHOP}
+              className="text-xs font-bold text-secondary hover:text-champagne transition-colors uppercase tracking-wider flex items-center gap-1.5 group"
+            >
+              <span>Continue Shopping</span>
+              <ArrowRight className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-0.5" />
+            </Link>
+          )}
         </header>
 
         {items.length === 0 ? (
@@ -199,197 +223,231 @@ export default function Cart() {
                 Your Bag is Empty
               </h3>
               <p className="text-on-surface-variant/75 text-sm max-w-sm mx-auto leading-relaxed">
-                Add premium selections from our curated digital watches and cell
-                phone collections to fill your atelier inventory.
+                Explore our curated collections and add premium selections to
+                your bag.
               </p>
             </div>
             <Link
               to={routePaths.SHOP}
-              className="bg-charcoal text-surface-container-lowest font-label-caps text-xs px-10 py-5 tracking-widest hover:bg-champagne hover:text-charcoal transition-all shadow-lg rounded-2xl border border-charcoal hover:border-champagne font-bold uppercase active:scale-[0.98]"
+              className="bg-charcoal text-surface-container-lowest font-label-caps text-xs px-10 py-4 tracking-widest hover:bg-champagne hover:text-charcoal transition-all shadow-lg rounded-xl border border-charcoal hover:border-champagne font-bold uppercase active:scale-[0.98]"
             >
               Explore Collections
             </Link>
           </div>
         ) : (
           /* Main Cart Content Grid */
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
             {/* Left Column: Items List */}
-            <div className="lg:col-span-8 space-y-10">
-              <div className="flex flex-col">
-                {hydratedItems.map((item, index) => (
+            <div className="lg:col-span-8 space-y-5">
+              {hydratedItems.map((item) => {
+                const isOutOfStock = item.stock === 0;
+                const lineTotal = item.price * item.quantity;
+
+                return (
                   <div
                     key={item._id}
-                    className={`flex flex-col md:flex-row gap-8 pb-10 group transition-all duration-500 ${
-                      index > 0
-                        ? "pt-10 border-t border-outline-variant/10"
-                        : ""
-                    }`}
+                    className={`bg-surface-container-lowest border border-outline-variant/10 rounded-2xl p-4 sm:p-5 transition-all duration-500 hover:shadow-[0_8px_30px_rgba(0,0,0,0.03)] hover:border-outline-variant/20 ${isOutOfStock ? "opacity-75" : ""}`}
                   >
-                    {/* Item Image */}
-                    <Link
-                      to={`/product/${item.slug || item._id}`}
-                      className="w-full md:w-44 aspect-square md:aspect-3/4 overflow-hidden bg-surface-container-lowest border border-outline-variant/10 rounded-2xl group-hover:shadow-md transition-all duration-500 relative shrink-0"
-                    >
-                      <div className="absolute inset-0 bg-linear-to-tr from-champagne/5 via-transparent to-transparent pointer-events-none z-10 opacity-70" />
-                      <img
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                        src={item.imageUrl}
-                        alt={item.title}
-                      />
-                    </Link>
+                    <div className="flex gap-4 sm:gap-5">
+                      {/* Product Image */}
+                      <Link
+                        to={`/product/${item.slug || item._id}`}
+                        className="w-24 h-24 sm:w-28 sm:h-28 overflow-hidden bg-surface-container rounded-xl shrink-0 relative group"
+                      >
+                        <img
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                          src={item.imageUrl}
+                          alt={item.title}
+                        />
+                        {isOutOfStock && (
+                          <div className="absolute inset-0 bg-charcoal/50 flex items-center justify-center">
+                            <span className="text-[8px] font-black text-white uppercase tracking-wider">
+                              Unavailable
+                            </span>
+                          </div>
+                        )}
+                      </Link>
 
-                    {/* Item Information */}
-                    <div className="flex-1 flex flex-col justify-between">
-                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
-                        <div className="space-y-1.5">
-                          <Link
-                            to={`/product/${item.slug || item._id}`}
-                            className="font-bold text-lg text-charcoal hover:text-champagne transition-colors duration-300 line-clamp-2 leading-snug"
-                          >
-                            {item.title}
-                          </Link>
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <span className="text-[10px] font-black text-on-surface-variant/40 uppercase tracking-widest font-label-caps">
-                              Premium Selection
-                            </span>
-                            <span className="text-outline-variant/30 text-[10px] font-black">
-                              |
-                            </span>
-                            {item.stock > 0 ? (
-                              <span className="inline-flex items-center gap-1 bg-green-500/10 border border-green-500/20 text-green-600 font-label-caps text-[9px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider">
-                                In Stock
-                              </span>
-                            ) : (
-                              <span className="inline-flex items-center gap-1 bg-red-500/10 border border-red-500/20 text-red-600 font-label-caps text-[9px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider">
-                                Out of Stock
-                              </span>
-                            )}
-                          </div>
-                          <div className="flex items-center gap-4 pt-3 text-[11px] font-bold">
-                            <button
-                              onClick={() => handleMoveToWishlist(item)}
-                              className="text-secondary hover:text-champagne underline decoration-outline-variant/40 hover:decoration-champagne transition-all py-0.5 cursor-pointer uppercase tracking-wider"
+                      {/* Product Details */}
+                      <div className="flex-1 min-w-0">
+                        {/* Top row: Title + Price */}
+                        <div className="flex justify-between items-start gap-3">
+                          <div className="min-w-0 flex-1">
+                            <Link
+                              to={`/product/${item.slug || item._id}`}
+                              className="font-semibold text-sm sm:text-base text-charcoal hover:text-champagne transition-colors duration-300 line-clamp-2 leading-snug block"
                             >
-                              Move to Wishlist
-                            </button>
-                            <span className="text-outline-variant/30">|</span>
-                            <button
-                              onClick={() => handleRemove(item._id)}
-                              className="text-red-600 hover:text-red-500 underline decoration-red-100 hover:decoration-red-400 transition-all py-0.5 cursor-pointer uppercase tracking-wider"
-                            >
-                              Remove
-                            </button>
+                              {item.title}
+                            </Link>
+                            <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                              {isOutOfStock ? (
+                                <span className="text-[9px] font-bold text-red-500 bg-red-50 border border-red-100 px-2 py-0.5 rounded uppercase tracking-wider">
+                                  Out of Stock
+                                </span>
+                              ) : (
+                                <span className="text-[9px] font-bold text-green-600 bg-green-50 border border-green-100 px-2 py-0.5 rounded uppercase tracking-wider">
+                                  In Stock
+                                </span>
+                              )}
+                              <span className="text-[9px] text-on-surface-variant/30">
+                                •
+                              </span>
+                              <span className="text-[10px] text-on-surface-variant/40 font-medium">
+                                ₹{item.price.toLocaleString()} each
+                              </span>
+                            </div>
                           </div>
+                          <p className="font-bold text-base sm:text-lg text-charcoal shrink-0 tabular-nums">
+                            ₹{lineTotal.toLocaleString()}
+                          </p>
                         </div>
 
-                        {/* Item Price */}
-                        <span className="font-bold text-lg text-charcoal shrink-0">
-                          ₹{(item.price * item.quantity).toLocaleString()}
-                        </span>
-                      </div>
+                        {/* Bottom row: Quantity + Actions */}
+                        <div className="flex items-center justify-between mt-4 pt-3 border-t border-outline-variant/8">
+                          {/* Quantity Controls */}
+                          <div className="flex items-center gap-3">
+                            <div className="flex items-center bg-surface-container-low border border-outline-variant/15 rounded-lg">
+                              <button
+                                onClick={() =>
+                                  handleQuantityChange(
+                                    item._id,
+                                    item.quantity,
+                                    item.quantity - 1,
+                                    item.stock,
+                                  )
+                                }
+                                className="w-8 h-8 flex items-center justify-center hover:bg-surface-container rounded-l-lg transition-colors cursor-pointer text-on-surface-variant/60 hover:text-charcoal"
+                              >
+                                <Minus className="w-3 h-3" />
+                              </button>
+                              <span className="w-9 text-center text-xs font-bold text-charcoal border-x border-outline-variant/10 leading-8">
+                                {item.quantity}
+                              </span>
+                              <button
+                                onClick={() =>
+                                  handleQuantityChange(
+                                    item._id,
+                                    item.quantity,
+                                    item.quantity + 1,
+                                    item.stock,
+                                  )
+                                }
+                                disabled={isOutOfStock}
+                                className="w-8 h-8 flex items-center justify-center hover:bg-surface-container rounded-r-lg transition-colors cursor-pointer text-on-surface-variant/60 hover:text-charcoal disabled:opacity-30 disabled:cursor-not-allowed"
+                              >
+                                <Plus className="w-3 h-3" />
+                              </button>
+                            </div>
+                          </div>
 
-                      {/* Quantity Selector */}
-                      <div className="mt-8 md:mt-0 flex items-center gap-4 select-none">
-                        <span className="text-[10px] font-black text-on-surface-variant/40 uppercase tracking-widest font-label-caps">
-                          Quantity
-                        </span>
-                        <div className="flex items-center border border-outline-variant/30 rounded-xl bg-surface-container-lowest/80 p-1">
-                          <button
-                            onClick={() =>
-                              handleQuantityChange(
-                                item._id,
-                                item.quantity,
-                                item.quantity - 1,
-                                item.stock,
-                              )
-                            }
-                            className="w-8 h-8 flex items-center justify-center hover:bg-surface-container-low rounded-lg transition-colors cursor-pointer text-secondary font-bold"
-                          >
-                            <Minus className="w-3.5 h-3.5" />
-                          </button>
-                          <span className="w-8 text-center text-xs font-black text-charcoal">
-                            {item.quantity}
-                          </span>
-                          <button
-                            onClick={() =>
-                              handleQuantityChange(
-                                item._id,
-                                item.quantity,
-                                item.quantity + 1,
-                                item.stock,
-                              )
-                            }
-                            className="w-8 h-8 flex items-center justify-center hover:bg-surface-container-low rounded-lg transition-colors cursor-pointer text-secondary font-bold"
-                          >
-                            <Plus className="w-3.5 h-3.5" />
-                          </button>
+                          {/* Action Buttons */}
+                          <div className="flex items-center gap-1">
+                            <button
+                              onClick={() => handleMoveToWishlist(item)}
+                              className="flex items-center gap-1.5 text-[10px] font-bold text-on-surface-variant/50 hover:text-champagne transition-colors cursor-pointer px-2.5 py-1.5 rounded-lg hover:bg-champagne/5 uppercase tracking-wider"
+                            >
+                              <Heart className="w-3.5 h-3.5" />
+                              <span className="hidden sm:inline">
+                                Wishlist
+                              </span>
+                            </button>
+                            <button
+                              onClick={() => handleRemove(item._id)}
+                              className="flex items-center gap-1.5 text-[10px] font-bold text-on-surface-variant/50 hover:text-red-500 transition-colors cursor-pointer px-2.5 py-1.5 rounded-lg hover:bg-red-50 uppercase tracking-wider"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                              <span className="hidden sm:inline">
+                                Remove
+                              </span>
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                ))}
-              </div>
+                );
+              })}
 
-              {/* Delivery Disclaimer Message */}
-              <div className="p-6 bg-surface-container/40 border border-outline-variant/10 rounded-2xl flex items-start gap-4">
-                <Truck className="w-6 h-6 text-champagne shrink-0 mt-0.5" />
-                <div className="space-y-1">
-                  <p className="font-bold text-sm text-charcoal">
-                    Complimentary Atelier Delivery
-                  </p>
-                  <p className="text-xs text-on-surface-variant/75 leading-relaxed">
-                    Your order qualifies for signature priority shipping,
-                    premium box packing, and complimentary hassle-free returns.
-                  </p>
-                </div>
+              {/* Shipping Info Strip */}
+              <div className="flex items-center gap-3 px-5 py-3.5 bg-champagne/5 border border-champagne/10 rounded-xl">
+                <Truck className="w-4 h-4 text-champagne shrink-0" />
+                <p className="text-xs text-on-surface-variant/70 font-medium">
+                  <span className="font-bold text-charcoal">
+                    Free shipping
+                  </span>{" "}
+                  on all orders — priority delivery with premium packaging.
+                </p>
               </div>
             </div>
 
             {/* Right Column: Sticky Summary Sidebar */}
             <div className="lg:col-span-4">
-              <div className="sticky top-32 flex flex-col gap-8">
+              <div className="sticky top-28 space-y-5">
                 {/* Summary Box */}
-                <div className="bg-surface-container/60 border border-outline-variant/15 rounded-3xl p-6 sm:p-8 space-y-8 backdrop-blur-sm shadow-[0_15px_45px_rgba(0,0,0,0.015)]">
-                  <h2 className="font-black text-sm text-charcoal uppercase tracking-[0.2em] border-b border-outline-variant/15 pb-4 select-none">
+                <div className="bg-surface-container-lowest border border-outline-variant/12 rounded-2xl p-5 sm:p-6 shadow-sm">
+                  <h2 className="font-bold text-sm text-charcoal uppercase tracking-wider pb-4 mb-5 border-b border-outline-variant/12">
                     Order Summary
                   </h2>
 
+                  {/* Line Items */}
+                  <div className="space-y-3 text-sm mb-5">
+                    {hydratedItems.map((item) => (
+                      <div
+                        key={item._id}
+                        className="flex justify-between text-on-surface-variant/70"
+                      >
+                        <span className="truncate max-w-[60%] text-xs">
+                          {item.title}{" "}
+                          <span className="text-on-surface-variant/40">
+                            × {item.quantity}
+                          </span>
+                        </span>
+                        <span className="text-xs font-semibold text-charcoal tabular-nums">
+                          ₹{(item.price * item.quantity).toLocaleString()}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+
                   {/* Pricing Breakdown */}
-                  <div className="space-y-4 text-sm font-medium">
+                  <div className="space-y-3 text-sm border-t border-outline-variant/10 pt-4 mb-5">
                     <div className="flex justify-between">
-                      <span className="text-on-surface-variant/75">
+                      <span className="text-on-surface-variant/60 text-xs">
                         Subtotal
                       </span>
-                      <span className="font-bold text-charcoal">
+                      <span className="font-semibold text-charcoal text-xs tabular-nums">
                         ₹{subtotal.toLocaleString()}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-on-surface-variant/75">
+                      <span className="text-on-surface-variant/60 text-xs">
                         Shipping
                       </span>
-                      <span className="font-bold text-champagne">
-                        Complimentary
+                      <span className="font-semibold text-green-600 text-xs">
+                        Free
                       </span>
                     </div>
                   </div>
 
                   {/* Promo Code Input */}
-                  <form onSubmit={handleApplyPromo} className="space-y-2 pt-2">
-                    <label className="text-[10px] font-black text-on-surface-variant/40 uppercase tracking-widest font-label-caps block">
+                  <form
+                    onSubmit={handleApplyPromo}
+                    className="mb-5 border-t border-outline-variant/10 pt-4"
+                  >
+                    <label className="text-[10px] font-bold text-on-surface-variant/40 uppercase tracking-wider block mb-2">
                       Promo Code
                     </label>
                     <div className="flex gap-2">
                       <input
                         type="text"
-                        placeholder="ENTER CODE"
+                        placeholder="Enter code"
                         value={promoCode}
                         onChange={(e) => setPromoCode(e.target.value)}
-                        className="flex-1 bg-transparent border-b border-outline-variant focus:border-champagne focus:outline-none py-2 text-xs font-bold uppercase tracking-wider text-charcoal transition-all placeholder:text-on-surface-variant/30"
+                        className="flex-1 bg-surface-container-low border border-outline-variant/15 focus:border-champagne focus:outline-none px-3 py-2 text-xs font-medium text-charcoal transition-all placeholder:text-on-surface-variant/30 rounded-lg"
                       />
                       <button
                         type="submit"
-                        className="text-xs font-bold uppercase tracking-wider text-secondary hover:text-champagne border-b border-secondary hover:border-champagne transition-colors cursor-pointer py-1.5"
+                        className="text-[10px] font-bold uppercase tracking-wider bg-charcoal text-surface-container-lowest hover:bg-champagne hover:text-charcoal px-4 py-2 rounded-lg transition-all cursor-pointer"
                       >
                         Apply
                       </button>
@@ -397,49 +455,44 @@ export default function Cart() {
                   </form>
 
                   {/* Grand Total */}
-                  <div className="flex justify-between items-end border-t border-outline-variant/20 pt-6">
-                    <span className="font-black text-sm text-charcoal uppercase tracking-wider">
+                  <div className="flex justify-between items-center border-t border-charcoal/10 pt-4 mb-5">
+                    <span className="font-bold text-sm text-charcoal uppercase tracking-wider">
                       Total
                     </span>
-                    <span className="text-2xl font-black text-charcoal tracking-tight">
+                    <span className="text-xl font-black text-charcoal tracking-tight tabular-nums">
                       ₹{totalAmount.toLocaleString()}
                     </span>
                   </div>
 
-                  {/* CTA Action Buttons */}
-                  <div className="space-y-4">
-                    <button
-                      onClick={handleCheckout}
-                      className="w-full bg-charcoal text-surface-container-lowest py-5 font-button text-xs uppercase tracking-[0.2em] font-black hover:bg-champagne hover:text-charcoal transition-all active:scale-[0.98] rounded-xl cursor-pointer shadow-[0_10px_35px_rgba(27,28,28,0.12)]"
-                    >
-                      Proceed to Checkout
-                    </button>
-                    <div className="flex items-center justify-center gap-2 opacity-50 select-none">
-                      <Lock className="w-3.5 h-3.5" />
-                      <span className="text-[9px] font-bold font-label-caps uppercase tracking-widest">
-                        Secure Checkout Guaranteed
-                      </span>
-                    </div>
+                  {/* CTA Action Button */}
+                  <button
+                    onClick={handleCheckout}
+                    className="w-full bg-charcoal text-surface-container-lowest py-4 font-label-caps text-xs uppercase tracking-[0.2em] font-bold hover:bg-champagne hover:text-charcoal transition-all active:scale-[0.98] rounded-xl cursor-pointer shadow-[0_8px_25px_rgba(27,28,28,0.1)] border border-charcoal hover:border-champagne"
+                  >
+                    Proceed to Checkout
+                  </button>
+                  <div className="flex items-center justify-center gap-2 mt-3 select-none">
+                    <Lock className="w-3 h-3 text-on-surface-variant/30" />
+                    <span className="text-[9px] font-bold text-on-surface-variant/30 uppercase tracking-widest">
+                      Secure Checkout
+                    </span>
                   </div>
                 </div>
 
-                {/* Additional Atelier Concierge Details Card */}
-                <div className="p-6 border border-outline-variant/15 rounded-2xl bg-surface-container/20 space-y-4">
-                  <h4 className="text-[10px] font-black text-charcoal uppercase tracking-wider flex items-center gap-2">
-                    <CalendarDays className="w-4 h-4 text-champagne" />
-                    Private Atelier Service
-                  </h4>
-                  <p className="text-xs text-on-surface-variant/70 leading-relaxed">
-                    Every purchase at Trustkart includes a dedicated style
-                    consultant for life. Reach out via your dashboard for
-                    personalized adjustments or styling advice.
-                  </p>
-                  <Link
-                    to={routePaths.SHOP}
-                    className="text-xs font-bold underline decoration-secondary text-secondary hover:text-champagne transition-colors inline-block"
-                  >
-                    Continue shopping collections
-                  </Link>
+                {/* Trust Badges */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="flex items-center gap-2 p-3 bg-surface-container-lowest border border-outline-variant/10 rounded-xl">
+                    <Truck className="w-4 h-4 text-champagne shrink-0" />
+                    <span className="text-[9px] font-bold text-on-surface-variant/60 uppercase tracking-wider leading-tight">
+                      Free Shipping
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 p-3 bg-surface-container-lowest border border-outline-variant/10 rounded-xl">
+                    <ShieldCheck className="w-4 h-4 text-champagne shrink-0" />
+                    <span className="text-[9px] font-bold text-on-surface-variant/60 uppercase tracking-wider leading-tight">
+                      Secure Payment
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
