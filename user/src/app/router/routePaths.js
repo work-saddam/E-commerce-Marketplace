@@ -8,4 +8,5 @@ export const routePaths = {
   FORGOT_PASSWORD: "/forgot-password",
   SHOP: "/shop",
   PRODUCT_DETAIL: "/product/:slug",
+  CART: "/cart",
 };
