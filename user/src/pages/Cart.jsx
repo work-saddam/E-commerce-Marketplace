@@ -317,6 +317,8 @@ export default function Cart() {
                           <div className="flex items-center gap-3">
                             <div className="flex items-center bg-surface-container-low border border-outline-variant/15 rounded-lg">
                               <button
+                                type="button"
+                                aria-label={`Decrease quantity for ${item.title}`}
                                 onClick={() =>
                                   handleQuantityChange(
                                     item._id,
@@ -333,6 +335,8 @@ export default function Cart() {
                                 {item.quantity}
                               </span>
                               <button
+                                type="button"
+                                aria-label={`Increase quantity for ${item.title}`}
                                 onClick={() =>
                                   handleQuantityChange(
                                     item._id,
@@ -352,6 +356,8 @@ export default function Cart() {
                           {/* Action Buttons */}
                           <div className="flex items-center gap-1">
                             <button
+                              type="button"
+                              aria-label={`Move ${item.title} to wishlist`}
                               onClick={() => handleMoveToWishlist(item)}
                               className="flex items-center gap-1.5 text-[10px] font-bold text-on-surface-variant/50 hover:text-champagne transition-colors cursor-pointer px-2.5 py-1.5 rounded-lg hover:bg-champagne/5 uppercase tracking-wider"
                             >
@@ -359,6 +365,8 @@ export default function Cart() {
                               <span className="hidden sm:inline">Wishlist</span>
                             </button>
                             <button
+                              type="button"
+                              aria-label={`Remove ${item.title} from cart`}
                               onClick={() => handleRemove(item._id)}
                               className="flex items-center gap-1.5 text-[10px] font-bold text-on-surface-variant/50 hover:text-red-500 transition-colors cursor-pointer px-2.5 py-1.5 rounded-lg hover:bg-red-50 uppercase tracking-wider"
                             >
