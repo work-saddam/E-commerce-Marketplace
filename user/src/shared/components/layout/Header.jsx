@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../../features/auth";
+import { useCart } from "../../../features/cart";
 import { routePaths } from "../../../app/router/routePaths";
 import toast from "react-hot-toast";
 import {
@@ -18,6 +19,7 @@ import {
 
 export default function Header() {
   const { user, isAuthenticated, logout } = useAuth();
+  const { totalQuantity } = useCart();
   const navigate = useNavigate();
   const location = useLocation();
   const dropdownRef = useRef(null);
@@ -157,16 +159,16 @@ export default function Header() {
           </button>
 
           {/* Cart Icon */}
-          <button
-            onClick={() => handleFeaturePlaceholder("Cart")}
-            className="text-secondary hover:text-champagne transition-all duration-300 hover:scale-115 cursor-pointer relative p-1"
+          <Link
+            to={routePaths.CART}
+            className="text-secondary hover:text-champagne transition-all duration-300 hover:scale-115 cursor-pointer relative p-1 block"
             aria-label="Shopping Cart"
           >
             <ShoppingBag className="w-5 h-5" />
             <span className="absolute -top-1.5 -right-1.5 bg-champagne text-charcoal text-[9px] w-4.5 h-4.5 rounded-full flex items-center justify-center font-bold shadow-sm border border-surface-container-lowest">
-              0
+              {totalQuantity}
             </span>
-          </button>
+          </Link>
 
           {/* Seller Link (Hidden on mobile) */}
           <a

@@ -5,6 +5,7 @@ import { routePaths } from "./routePaths";
 import Home from "../../pages/Home";
 import Shop from "../../pages/Shop";
 import ProductDetail from "../../pages/ProductDetail";
+import Cart from "../../pages/Cart";
 import NotFound from "../../pages/NotFound";
 import UserLayout from "../../shared/components/layout/UserLayout";
 
@@ -25,6 +26,7 @@ export default function AppRoutes() {
         <Route path={routePaths.HOME} element={<Home />} />
         <Route path={routePaths.SHOP} element={<Shop />} />
         <Route path={routePaths.PRODUCT_DETAIL} element={<ProductDetail />} />
+        <Route path={routePaths.CART} element={<Cart />} />
 
         {/* Protected Routes */}
         <Route element={<PrivateRoute />}>

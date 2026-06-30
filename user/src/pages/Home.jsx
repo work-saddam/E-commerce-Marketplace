@@ -8,13 +8,13 @@ import {
   ShieldCheck,
   Headset,
   Lock,
-  Heart,
   ShoppingBag,
-  Star,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-import { routePaths } from "../app/router/routePaths";
+import apiClient from "../shared/services/apiClient";
+import ProductCard from "./shop/ProductCard";
+import Loader from "../shared/components/feedback/Loader";
 
 export default function Home() {
   const { user } = useAuth();
@@ -182,36 +182,27 @@ export default function Home() {
     },
   ];
 
-  const bestSellers = [
-    {
-      name: "Beats Solo Wireless",
-      price: "₹999",
-      image: "/images/hero-headphones.png",
-      rating: 5,
-      tag: "Best Seller",
-    },
-    {
-      name: "Rocky Mountain Boots",
-      price: "₹2499",
-      image: "/images/product-rocky-mountain.png",
-      rating: 4,
-      tag: "New",
-    },
-    {
-      name: "Smartwatch",
-      price: "₹1200",
-      image: "/images/product-smartwatch.png",
-      rating: 5,
-      tag: "Trending",
-    },
-    {
-      name: "Phlox Organic Skincare Set",
-      price: "₹3500",
-      image: "/images/product-skincare.png",
-      rating: 5,
-      tag: "Luxury",
-    },
-  ];
+  const [bestSellers, setBestSellers] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch Best Seller Products from API
+  useEffect(() => {
+    const fetchBestSellers = async () => {
+      try {
+        setLoading(true);
+        // Fetch top 4 products
+        const response = await apiClient.get(
+          "/api/products?limit=4&sort=newest",
+        );
+        setBestSellers(response.data.data || []);
+      } catch (error) {
+        console.error("Failed to fetch best sellers:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchBestSellers();
+  }, []);
 
   // Carousel Autoplay Logic
   useEffect(() => {
@@ -228,27 +219,6 @@ export default function Home() {
 
   const handlePrevSlide = () => {
     setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
-  };
-
-  const handleAddToCart = (productName) => {
-    toast.success(`Added ${productName} to cart!`, {
-      style: {
-        borderRadius: "8px",
-        background: "#1b1c1c",
-        color: "#fff",
-      },
-    });
-  };
-
-  const handleAddToWishlist = (productName) => {
-    toast(`Added ${productName} to Wishlist!`, {
-      icon: "❤️",
-      style: {
-        borderRadius: "8px",
-        background: "#1b1c1c",
-        color: "#fff",
-      },
-    });
   };
 
   return (
@@ -514,10 +484,7 @@ export default function Home() {
               connoisseur.
             </p>
             <div className="pt-2">
-              <button
-                onClick={() => handleAddToCart("Beats Solo Air (Promo)")}
-                className="border-2 border-champagne text-champagne hover:bg-champagne hover:text-charcoal font-bold px-10 py-3 rounded-none transition-all duration-300 font-label-caps tracking-widest text-xs cursor-pointer"
-              >
+              <button className="border-2 border-champagne text-champagne hover:bg-champagne hover:text-charcoal font-bold px-10 py-3 rounded-none transition-all duration-300 font-label-caps tracking-widest text-xs cursor-pointer">
                 SHOP THE SALE
               </button>
             </div>
@@ -542,60 +509,23 @@ export default function Home() {
         </div>
 
         {/* Product Cards Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {bestSellers.map((item, idx) => (
-            <div key={idx} className="group flex flex-col justify-between">
-              {/* Product Card Box */}
-              <div className="bg-surface-container-lowest border border-outline-variant/15 p-8 mb-4 overflow-hidden relative transition-all duration-300 hover:border-champagne hover:shadow-lg flex flex-col justify-center items-center min-h-72">
-                {/* Product Tag */}
-                <span className="absolute top-4 left-4 bg-charcoal text-champagne text-[9px] font-bold px-2 py-0.5 uppercase tracking-widest font-label-caps">
-                  {item.tag}
-                </span>
-
-                {/* Wishlist Button */}
-                <button
-                  onClick={() => handleAddToWishlist(item.name)}
-                  className="absolute top-4 right-4 text-secondary/40 hover:text-red-500 hover:scale-115 transition-all duration-300 cursor-pointer p-1 z-15"
-                  aria-label="Add to Wishlist"
-                >
-                  <Heart className="w-4.5 h-4.5" />
-                </button>
-
-                <img
-                  className="w-full h-44 object-contain transition-transform duration-500 group-hover:scale-110"
-                  src={item.image}
-                  alt={item.name}
-                />
-
-                <button
-                  onClick={() => handleAddToCart(item.name)}
-                  className="absolute bottom-0 inset-x-0 w-full bg-champagne text-charcoal py-3 text-xs font-bold font-label-caps tracking-widest uppercase transition-all duration-300 translate-y-0 lg:translate-y-full lg:group-hover:translate-y-0 flex items-center justify-center gap-2 cursor-pointer z-10"
-                >
-                  <ShoppingBag className="w-4 h-4" />
-                  Add To Cart
-                </button>
-              </div>
-
-              {/* Product Metadata Info */}
-              <div className="space-y-1">
-                <div className="flex items-center gap-1">
-                  {[...Array(item.rating)].map((_, i) => (
-                    <Star
-                      key={i}
-                      className="w-3.5 h-3.5 fill-champagne text-champagne"
-                    />
-                  ))}
-                </div>
-                <h4 className="font-label-caps text-sm font-bold text-charcoal uppercase tracking-tight group-hover:text-champagne transition-colors duration-300">
-                  {item.name}
-                </h4>
-                <p className="text-secondary font-bold text-sm tracking-wide font-label-caps">
-                  {item.price}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
+        {loading ? (
+          <div className="flex justify-center items-center py-20">
+            <Loader size="lg" color="primary" />
+          </div>
+        ) : bestSellers.length === 0 ? (
+          <div className="text-center py-12 bg-surface-container/10 border border-outline-variant/10 rounded-2xl">
+            <p className="text-sm text-secondary font-semibold">
+              No featured products available.
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {bestSellers.map((product) => (
+              <ProductCard key={product._id} product={product} />
+            ))}
+          </div>
+        )}
       </section>
     </div>
   );
