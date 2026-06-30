@@ -8,13 +8,10 @@ import {
   ShieldCheck,
   Headset,
   Lock,
-  Heart,
   ShoppingBag,
-  Star,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-import { routePaths } from "../app/router/routePaths";
 import apiClient from "../shared/services/apiClient";
 import ProductCard from "./shop/ProductCard";
 import Loader from "../shared/components/feedback/Loader";
@@ -222,16 +219,6 @@ export default function Home() {
 
   const handlePrevSlide = () => {
     setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
-  };
-
-  const handleAddToCart = (productName) => {
-    toast.success(`Added ${productName} to cart!`, {
-      style: {
-        borderRadius: "8px",
-        background: "#1b1c1c",
-        color: "#fff",
-      },
-    });
   };
 
   return (
@@ -497,10 +484,7 @@ export default function Home() {
               connoisseur.
             </p>
             <div className="pt-2">
-              <button
-                onClick={() => handleAddToCart("Beats Solo Air (Promo)")}
-                className="border-2 border-champagne text-champagne hover:bg-champagne hover:text-charcoal font-bold px-10 py-3 rounded-none transition-all duration-300 font-label-caps tracking-widest text-xs cursor-pointer"
-              >
+              <button className="border-2 border-champagne text-champagne hover:bg-champagne hover:text-charcoal font-bold px-10 py-3 rounded-none transition-all duration-300 font-label-caps tracking-widest text-xs cursor-pointer">
                 SHOP THE SALE
               </button>
             </div>

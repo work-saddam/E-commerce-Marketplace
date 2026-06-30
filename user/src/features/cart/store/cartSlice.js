@@ -11,10 +11,11 @@ const cartSlice = createSlice({
     addToCart: (state, action) => {
       const payload = action.payload;
       // Extract ID and quantity supporting raw IDs, objects with _id, or full product objects
-      const _id = typeof payload === "string" ? payload : (payload?._id || payload?.id);
-      const quantity = payload?.quantity || 1;
+      const _id =
+        typeof payload === "string" ? payload : payload?._id || payload?.id;
+      const quantity = Number(payload?.quantity ?? 1);
 
-      if (!_id) return;
+      if (!_id || !Number.isInteger(quantity) || quantity <= 0) return;
 
       const existingItem = state.items.find((item) => item._id === _id);
 
@@ -31,7 +32,7 @@ const cartSlice = createSlice({
     updateQuantity: (state, action) => {
       const { id, quantity } = action.payload;
       const existingItem = state.items.find((item) => item._id === id);
-      
+
       if (existingItem) {
         if (quantity <= 0) {
           state.items = state.items.filter((item) => item._id !== id);
@@ -46,5 +47,6 @@ const cartSlice = createSlice({
   },
 });
 
-export const { addToCart, removeFromCart, updateQuantity, clearCart } = cartSlice.actions;
+export const { addToCart, removeFromCart, updateQuantity, clearCart } =
+  cartSlice.actions;
 export default cartSlice.reducer;
