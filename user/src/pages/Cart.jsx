@@ -311,8 +311,8 @@ export default function Cart() {
                           </p>
                         </div>
 
-                        {/* Bottom row: Quantity + Actions */}
-                        <div className="flex items-center justify-between mt-4 pt-3 border-t border-outline-variant/8">
+                        {/* Desktop Bottom row: Quantity + Actions */}
+                        <div className="hidden sm:flex items-center justify-between mt-4 pt-3 border-t border-outline-variant/8">
                           {/* Quantity Controls */}
                           <div className="flex items-center gap-3">
                             <div className="flex items-center bg-surface-container-low border border-outline-variant/15 rounded-lg">
@@ -367,6 +367,63 @@ export default function Cart() {
                             </button>
                           </div>
                         </div>
+                      </div>
+                    </div>
+
+                    {/* Mobile Bottom row: Quantity + Actions */}
+                    <div className="flex sm:hidden items-center justify-between mt-4 pt-3 border-t border-outline-variant/8">
+                      {/* Quantity Controls */}
+                      <div className="flex items-center gap-3">
+                        <div className="flex items-center bg-surface-container-low border border-outline-variant/15 rounded-lg">
+                          <button
+                            onClick={() =>
+                              handleQuantityChange(
+                                item._id,
+                                item.quantity,
+                                item.quantity - 1,
+                                item.stock,
+                              )
+                            }
+                            className="w-8 h-8 flex items-center justify-center hover:bg-surface-container rounded-l-lg transition-colors cursor-pointer text-on-surface-variant/60 hover:text-charcoal"
+                          >
+                            <Minus className="w-3 h-3" />
+                          </button>
+                          <span className="w-9 text-center text-xs font-bold text-charcoal border-x border-outline-variant/10 leading-8">
+                            {item.quantity}
+                          </span>
+                          <button
+                            onClick={() =>
+                              handleQuantityChange(
+                                item._id,
+                                item.quantity,
+                                item.quantity + 1,
+                                item.stock,
+                              )
+                            }
+                            disabled={isOutOfStock}
+                            className="w-8 h-8 flex items-center justify-center hover:bg-surface-container rounded-r-lg transition-colors cursor-pointer text-on-surface-variant/60 hover:text-charcoal disabled:opacity-30 disabled:cursor-not-allowed"
+                          >
+                            <Plus className="w-3 h-3" />
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Action Buttons */}
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          onClick={() => handleMoveToWishlist(item)}
+                          className="flex items-center justify-center text-on-surface-variant/50 hover:text-champagne transition-colors cursor-pointer w-8 h-8 rounded-lg hover:bg-champagne/5"
+                          aria-label="Add to Wishlist"
+                        >
+                          <Heart className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => handleRemove(item._id)}
+                          className="flex items-center justify-center text-on-surface-variant/50 hover:text-red-500 transition-colors cursor-pointer w-8 h-8 rounded-lg hover:bg-red-50"
+                          aria-label="Remove item"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
                       </div>
                     </div>
                   </div>
