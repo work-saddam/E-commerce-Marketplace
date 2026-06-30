@@ -130,13 +130,12 @@ export default function Cart() {
   };
 
   const handleMoveToWishlist = (item) => {
-    removeItem(item._id);
-    toast.success(`"${item.title}" moved to wishlist!`, {
+    toast("Wishlist support is coming soon.", {
+      icon: "✨",
       style: {
-        borderRadius: "12px",
+        borderRadius: "8px",
         background: "#1b1c1c",
         color: "#fff",
-        border: "1px solid rgba(233, 195, 73, 0.2)",
       },
     });
   };
