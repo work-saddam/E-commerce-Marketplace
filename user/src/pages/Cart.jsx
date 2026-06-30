@@ -30,18 +30,23 @@ export default function Cart() {
 
   // Hydrate cart items from the server when cart item IDs change
   useEffect(() => {
-    if (items.length === 0) {
-      setFetchedProducts([]);
+    if (!cartIds) {
       return;
     }
+
+    const requestCartIds = cartIds;
+    // Slower response for an older cart can win the race and replace newer data, so we use a flag to ensure we only update state if the component is still mounted and the request is relevant.
+    let isActive = true; // Flag to prevent state updates if the component unmounts
 
     const fetchCartDetails = async () => {
       setLoading(true);
       try {
-        const ids = items.map((item) => item._id);
+        const ids = requestCartIds.split(",");
         const response = await apiClient.post("/api/products/bulk", { ids });
+        if (!isActive) return;
         setFetchedProducts(response.data.data || []);
       } catch (err) {
+        if (!isActive) return;
         console.error("Failed to fetch cart details:", err);
         toast.error("Failed to load some item details.", {
           style: {
@@ -51,11 +56,16 @@ export default function Cart() {
           },
         });
       } finally {
-        setLoading(false);
+        if (isActive) {
+          setLoading(false);
+        }
       }
     };
 
     fetchCartDetails();
+    return () => {
+      isActive = false;
+    };
   }, [cartIds]);
 
   // Combine Redux quantity with fetched product details
@@ -347,18 +357,14 @@ export default function Cart() {
                               className="flex items-center gap-1.5 text-[10px] font-bold text-on-surface-variant/50 hover:text-champagne transition-colors cursor-pointer px-2.5 py-1.5 rounded-lg hover:bg-champagne/5 uppercase tracking-wider"
                             >
                               <Heart className="w-3.5 h-3.5" />
-                              <span className="hidden sm:inline">
-                                Wishlist
-                              </span>
+                              <span className="hidden sm:inline">Wishlist</span>
                             </button>
                             <button
                               onClick={() => handleRemove(item._id)}
                               className="flex items-center gap-1.5 text-[10px] font-bold text-on-surface-variant/50 hover:text-red-500 transition-colors cursor-pointer px-2.5 py-1.5 rounded-lg hover:bg-red-50 uppercase tracking-wider"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
-                              <span className="hidden sm:inline">
-                                Remove
-                              </span>
+                              <span className="hidden sm:inline">Remove</span>
                             </button>
                           </div>
                         </div>
@@ -372,9 +378,7 @@ export default function Cart() {
               <div className="flex items-center gap-3 px-5 py-3.5 bg-champagne/5 border border-champagne/10 rounded-xl">
                 <Truck className="w-4 h-4 text-champagne shrink-0" />
                 <p className="text-xs text-on-surface-variant/70 font-medium">
-                  <span className="font-bold text-charcoal">
-                    Free shipping
-                  </span>{" "}
+                  <span className="font-bold text-charcoal">Free shipping</span>{" "}
                   on all orders — priority delivery with premium packaging.
                 </p>
               </div>
