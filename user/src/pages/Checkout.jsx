@@ -211,7 +211,8 @@ export default function Checkout() {
       if (paymentMethod === "COD") {
         toast.success("Order placed successfully!");
         setPlacedOrderDetails({
-          orderId: response?.data?.masterOrderId || response?.data?.data?._id || "N/A",
+          orderId:
+            response?.data?.masterOrderId || response?.data?.data?._id || "N/A",
           amount: totalAmount,
           address: addresses.find((a) => a._id === selectedAddress),
           items: hydratedItems,
@@ -254,7 +255,11 @@ export default function Checkout() {
       }
     } catch (error) {
       console.error("Failed to place order:", error);
-      toast.error(error?.response?.data?.message || error?.message || "Failed to place order.");
+      toast.error(
+        error?.response?.data?.message ||
+          error?.message ||
+          "Failed to place order.",
+      );
     } finally {
       if (paymentMethod === "COD") {
         setLoading(false);
@@ -281,30 +286,47 @@ export default function Checkout() {
               Thank You For Your Order!
             </h1>
             <p className="text-sm text-on-surface-variant/70 max-w-md mx-auto">
-              Your signature purchase has been confirmed. A concierge support representative will verify your delivery details shortly.
+              Your signature purchase has been confirmed. A concierge support
+              representative will verify your delivery details shortly.
             </p>
           </div>
 
           {/* Order Details box */}
           <div className="border border-outline-variant/10 rounded-2xl bg-surface-container/20 p-6 text-left space-y-4">
             <div className="flex justify-between border-b border-outline-variant/10 pb-3">
-              <span className="text-xs font-bold text-on-surface-variant/60 uppercase tracking-wider">Order Reference</span>
-              <span className="text-xs font-bold text-charcoal tabular-nums">{placedOrderDetails.orderId}</span>
+              <span className="text-xs font-bold text-on-surface-variant/60 uppercase tracking-wider">
+                Order Reference
+              </span>
+              <span className="text-xs font-bold text-charcoal tabular-nums">
+                {placedOrderDetails.orderId}
+              </span>
             </div>
 
             <div className="space-y-2">
-              <span className="text-[10px] font-black text-on-surface-variant/40 uppercase tracking-wider block">Shipment Destination</span>
-              <p className="text-xs font-semibold text-charcoal">{placedOrderDetails.address?.name}</p>
-              <p className="text-xs text-on-surface-variant/70">
-                {placedOrderDetails.address?.street}, {placedOrderDetails.address?.city},{" "}
-                {placedOrderDetails.address?.state} - {placedOrderDetails.address?.pincode}
+              <span className="text-[10px] font-black text-on-surface-variant/40 uppercase tracking-wider block">
+                Shipment Destination
+              </span>
+              <p className="text-xs font-semibold text-charcoal">
+                {placedOrderDetails.address?.name}
               </p>
-              <p className="text-xs text-on-surface-variant/70">{placedOrderDetails.address?.phone}</p>
+              <p className="text-xs text-on-surface-variant/70">
+                {placedOrderDetails.address?.street},{" "}
+                {placedOrderDetails.address?.city},{" "}
+                {placedOrderDetails.address?.state} -{" "}
+                {placedOrderDetails.address?.pincode}
+              </p>
+              <p className="text-xs text-on-surface-variant/70">
+                {placedOrderDetails.address?.phone}
+              </p>
             </div>
 
             <div className="border-t border-outline-variant/10 pt-3 flex justify-between items-center">
-              <span className="text-xs font-bold text-charcoal uppercase tracking-wider">Total Amount</span>
-              <span className="text-base font-black text-charcoal">₹{placedOrderDetails.amount.toLocaleString()}</span>
+              <span className="text-xs font-bold text-charcoal uppercase tracking-wider">
+                Total Amount
+              </span>
+              <span className="text-base font-black text-charcoal">
+                ₹{placedOrderDetails.amount.toLocaleString()}
+              </span>
             </div>
           </div>
 
@@ -401,7 +423,10 @@ export default function Checkout() {
                           placeholder="e.g. Julian Thorne"
                           value={newAddress.name}
                           onChange={(e) =>
-                            setNewAddress({ ...newAddress, name: e.target.value })
+                            setNewAddress({
+                              ...newAddress,
+                              name: e.target.value,
+                            })
                           }
                         />
                       </div>
@@ -416,7 +441,10 @@ export default function Checkout() {
                           placeholder="e.g. +91 9876543210"
                           value={newAddress.phone}
                           onChange={(e) =>
-                            setNewAddress({ ...newAddress, phone: e.target.value })
+                            setNewAddress({
+                              ...newAddress,
+                              phone: e.target.value,
+                            })
                           }
                         />
                       </div>
@@ -431,7 +459,10 @@ export default function Checkout() {
                           placeholder="e.g. Apartment, suite, unit, building, street"
                           value={newAddress.street}
                           onChange={(e) =>
-                            setNewAddress({ ...newAddress, street: e.target.value })
+                            setNewAddress({
+                              ...newAddress,
+                              street: e.target.value,
+                            })
                           }
                         />
                       </div>
@@ -446,7 +477,10 @@ export default function Checkout() {
                           placeholder="San Francisco"
                           value={newAddress.city}
                           onChange={(e) =>
-                            setNewAddress({ ...newAddress, city: e.target.value })
+                            setNewAddress({
+                              ...newAddress,
+                              city: e.target.value,
+                            })
                           }
                         />
                       </div>
@@ -458,10 +492,13 @@ export default function Checkout() {
                           className="bg-surface-container-low border border-outline-variant/15 focus:border-champagne focus:outline-none px-4 py-2.5 text-sm font-semibold rounded-lg"
                           type="text"
                           required
-                          placeholder="CA"
+                          placeholder="California"
                           value={newAddress.state}
                           onChange={(e) =>
-                            setNewAddress({ ...newAddress, state: e.target.value })
+                            setNewAddress({
+                              ...newAddress,
+                              state: e.target.value,
+                            })
                           }
                         />
                       </div>
@@ -552,7 +589,7 @@ export default function Checkout() {
                         <div
                           key={addr._id}
                           onClick={() => setSelectedAddress(addr._id)}
-                          className={`relative border rounded-xl p-4 cursor-pointer transition-all duration-300 flex flex-col justify-between min-h-[140px] ${
+                          className={`relative border rounded-xl p-4 cursor-pointer transition-all duration-300 flex flex-col justify-between min-h-35 ${
                             isSelected
                               ? "border-champagne bg-champagne/5"
                               : "border-outline-variant/12 hover:border-outline-variant/30 bg-surface-container-lowest"
@@ -614,7 +651,7 @@ export default function Checkout() {
                   {/* Razorpay Option */}
                   <div
                     onClick={() => setPaymentMethod("Razorpay")}
-                    className={`payment-tab p-5 rounded-xl flex flex-col justify-between cursor-pointer transition-all duration-300 min-h-[120px] border ${
+                    className={`payment-tab p-5 rounded-xl flex flex-col justify-between cursor-pointer transition-all duration-300 min-h-30 border ${
                       paymentMethod === "Razorpay"
                         ? "border-champagne bg-champagne/5"
                         : "border-outline-variant/12 hover:border-outline-variant/30"
@@ -653,7 +690,7 @@ export default function Checkout() {
                   {/* Cash on Delivery Option */}
                   <div
                     onClick={() => setPaymentMethod("COD")}
-                    className={`payment-tab p-5 rounded-xl flex flex-col justify-between cursor-pointer transition-all duration-300 min-h-[120px] border ${
+                    className={`payment-tab p-5 rounded-xl flex flex-col justify-between cursor-pointer transition-all duration-300 min-h-30 border ${
                       paymentMethod === "COD"
                         ? "border-champagne bg-champagne/5"
                         : "border-outline-variant/12 hover:border-outline-variant/30"
@@ -702,7 +739,10 @@ export default function Checkout() {
                 {/* Items Summary list */}
                 <div className="divide-y divide-outline-variant/5 max-h-72 overflow-y-auto pr-1">
                   {hydratedItems.map((item) => (
-                    <div key={item._id} className="flex gap-3 py-3 first:pt-0 last:pb-0">
+                    <div
+                      key={item._id}
+                      className="flex gap-3 py-3 first:pt-0 last:pb-0"
+                    >
                       <div className="w-12 h-12 bg-surface-container border border-outline-variant/5 rounded-lg overflow-hidden shrink-0">
                         <img
                           className="w-full h-full object-cover"
