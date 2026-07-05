@@ -6,6 +6,7 @@ import Home from "../../pages/Home";
 import Shop from "../../pages/Shop";
 import ProductDetail from "../../pages/ProductDetail";
 import Cart from "../../pages/Cart";
+import Checkout from "../../pages/Checkout";
 import NotFound from "../../pages/NotFound";
 import UserLayout from "../../shared/components/layout/UserLayout";
 
@@ -30,7 +31,7 @@ export default function AppRoutes() {
 
         {/* Protected Routes */}
         <Route element={<PrivateRoute />}>
-          {/* We can add more protected pages here, like cart checkout, profile editing, etc. */}
+          <Route path={routePaths.CHECKOUT} element={<Checkout />} />
         </Route>
       </Route>
 

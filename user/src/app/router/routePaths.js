@@ -9,4 +9,5 @@ export const routePaths = {
   SHOP: "/shop",
   PRODUCT_DETAIL: "/product/:slug",
   CART: "/cart",
+  CHECKOUT: "/checkout",
 };

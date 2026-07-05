@@ -155,14 +155,7 @@ export default function Cart() {
   };
 
   const handleCheckout = () => {
-    toast.success("Atelier checkout process initiated!", {
-      style: {
-        borderRadius: "12px",
-        background: "#1b1c1c",
-        color: "#fff",
-        border: "1px solid rgba(233, 195, 73, 0.2)",
-      },
-    });
+    navigate(routePaths.CHECKOUT || "/checkout");
   };
 
   if (loading && hydratedItems.length === 0) {
