@@ -260,6 +260,7 @@ export default function Checkout() {
           error?.message ||
           "Failed to place order.",
       );
+      setLoading(false);
     } finally {
       if (paymentMethod === "COD") {
         setLoading(false);
