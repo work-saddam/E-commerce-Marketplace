@@ -224,6 +224,14 @@ export default function Header() {
                     <User className="w-4 h-4" />
                     My Profile
                   </button>
+                  <Link
+                    to={routePaths.ORDERS}
+                    onClick={() => setMenuOpen(false)}
+                    className="w-full flex items-center gap-2.5 px-4 py-2.5 text-xs font-bold text-secondary hover:text-charcoal hover:bg-surface-container-low rounded-xl transition-all cursor-pointer font-label-caps uppercase tracking-wider text-left"
+                  >
+                    <ShoppingBag className="w-4 h-4" />
+                    My Orders
+                  </Link>
                   <button
                     onClick={logout}
                     className="w-full flex items-center gap-2.5 px-4 py-2.5 text-xs font-bold text-red-600 hover:bg-red-50 rounded-xl transition-all cursor-pointer font-label-caps uppercase tracking-wider text-left"

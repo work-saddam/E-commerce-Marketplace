@@ -10,4 +10,5 @@ export const routePaths = {
   PRODUCT_DETAIL: "/product/:slug",
   CART: "/cart",
   CHECKOUT: "/checkout",
+  ORDERS: "/account/orders",
 };
