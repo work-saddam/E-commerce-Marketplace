@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
-import { MapPin, Plus } from "lucide-react";
+import { MapPin, Plus, AlertTriangle, X, Loader2 } from "lucide-react";
 import apiClient from "../../shared/services/apiClient";
 import Loader from "../../shared/components/feedback/Loader";
 import AddressCard from "./AddressCard";
@@ -13,6 +13,7 @@ export default function ManageAddressesTab() {
   const [editingAddress, setEditingAddress] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
 
   const fetchAddresses = async () => {
     setLoading(true);
@@ -63,7 +64,13 @@ export default function ManageAddressesTab() {
     }
   };
 
-  const handleDelete = async (id) => {
+  const handleDeleteRequest = (id) => {
+    setConfirmDeleteId(id);
+  };
+
+  const handleDeleteConfirm = async () => {
+    const id = confirmDeleteId;
+    setConfirmDeleteId(null);
     setDeletingId(id);
     try {
       await apiClient.delete(`/api/users/address/${id}`);
@@ -158,10 +165,69 @@ export default function ManageAddressesTab() {
               key={addr._id}
               address={addr}
               onEdit={handleStartEdit}
-              onDelete={handleDelete}
+              onDelete={handleDeleteRequest}
               deleting={deletingId === addr._id}
             />
           ))}
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {confirmDeleteId && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          onClick={() => setConfirmDeleteId(null)}
+        >
+          {/* Backdrop */}
+          <div className="absolute inset-0 bg-charcoal/40 backdrop-blur-sm" />
+
+          {/* Dialog */}
+          <div
+            className="relative w-full max-w-sm bg-surface-container-lowest border border-outline-variant/15 rounded-2xl shadow-2xl p-6 space-y-5 animate-in fade-in zoom-in-95"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close */}
+            <button
+              onClick={() => setConfirmDeleteId(null)}
+              className="absolute top-4 right-4 text-on-surface-variant/30 hover:text-charcoal transition-colors cursor-pointer"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            {/* Icon */}
+            <div className="flex justify-center">
+              <div className="w-12 h-12 bg-red-50 border border-red-100 rounded-full flex items-center justify-center">
+                <AlertTriangle className="w-6 h-6 text-red-500" />
+              </div>
+            </div>
+
+            {/* Message */}
+            <div className="text-center space-y-1.5">
+              <h3 className="text-sm font-bold text-charcoal">
+                Delete Address?
+              </h3>
+              <p className="text-xs text-on-surface-variant/60 leading-relaxed max-w-[260px] mx-auto">
+                This action cannot be undone. The address will be permanently removed from your account.
+              </p>
+            </div>
+
+            {/* Actions */}
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setConfirmDeleteId(null)}
+                className="flex-1 text-[10px] font-bold uppercase tracking-wider text-on-surface-variant/60 hover:text-charcoal border border-outline-variant/15 px-4 py-2.5 rounded-xl hover:bg-surface-container-low transition-all cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteConfirm}
+                className="flex-1 inline-flex items-center justify-center gap-1.5 bg-red-600 text-white font-label-caps text-[10px] px-4 py-2.5 rounded-xl hover:bg-red-700 transition-all cursor-pointer font-bold uppercase shadow-sm"
+              >
+                <AlertTriangle className="w-3 h-3" />
+                <span>Delete</span>
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
