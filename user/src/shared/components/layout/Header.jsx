@@ -217,13 +217,14 @@ export default function Header() {
                       {user.email}
                     </p>
                   </div>
-                  <button
-                    onClick={() => handleFeaturePlaceholder("Profile")}
+                  <Link
+                    to={routePaths.PROFILE}
+                    onClick={() => setMenuOpen(false)}
                     className="w-full flex items-center gap-2.5 px-4 py-2.5 text-xs font-bold text-secondary hover:text-charcoal hover:bg-surface-container-low rounded-xl transition-all cursor-pointer font-label-caps uppercase tracking-wider text-left"
                   >
                     <User className="w-4 h-4" />
                     My Profile
-                  </button>
+                  </Link>
                   <Link
                     to={routePaths.ORDERS}
                     onClick={() => setMenuOpen(false)}
@@ -351,16 +352,14 @@ export default function Header() {
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-2 mt-2">
-                <button
-                  onClick={() => {
-                    handleFeaturePlaceholder("Profile");
-                    setMobileMenuOpen(false);
-                  }}
+                <Link
+                  to={routePaths.PROFILE}
+                  onClick={() => setMobileMenuOpen(false)}
                   className="flex items-center justify-center gap-2 px-4 py-2 text-xs font-bold text-secondary border border-outline-variant/30 rounded-xl hover:bg-surface-container-low transition-all font-label-caps uppercase tracking-wider cursor-pointer"
                 >
                   <User className="w-3.5 h-3.5" />
                   Profile
-                </button>
+                </Link>
                 <button
                   onClick={() => {
                     logout();

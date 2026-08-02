@@ -11,4 +11,5 @@ export const routePaths = {
   CART: "/cart",
   CHECKOUT: "/checkout",
   ORDERS: "/account/orders",
+  PROFILE: "/account/profile",
 };
