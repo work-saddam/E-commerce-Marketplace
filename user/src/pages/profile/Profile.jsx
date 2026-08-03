@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import { ChevronRight } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
+import { addUser } from "../../features/auth";
 import apiClient from "../../shared/services/apiClient";
 import { routePaths } from "../../app/router/routePaths";
 import { TABS, QUICK_LINKS } from "./profileConstants";
@@ -25,6 +27,8 @@ const TAB_COMPONENTS = {
 export default function Profile() {
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTabId = searchParams.get("tab") || "profile";
+  const dispatch = useDispatch();
+  const reduxUser = useSelector((state) => state.user.user);
 
   const [profile, setProfile] = useState(null);
   const [profileLoading, setProfileLoading] = useState(true);
@@ -52,7 +56,13 @@ export default function Profile() {
   const handleProfileSave = async (newName) => {
     try {
       const res = await apiClient.put("/api/users/profile", { name: newName });
-      setProfile(res?.data?.data || null);
+      const updatedData = res?.data?.data || null;
+      setProfile(updatedData);
+
+      // Sync Redux auth state so Header dropdown reflects the new name
+      if (updatedData && reduxUser) {
+        dispatch(addUser({ ...reduxUser, name: updatedData.name }));
+      }
       toast.success("Profile updated successfully!", {
         style: {
           borderRadius: "8px",

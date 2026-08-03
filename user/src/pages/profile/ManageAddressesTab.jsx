@@ -206,7 +206,7 @@ export default function ManageAddressesTab() {
               <h3 className="text-sm font-bold text-charcoal">
                 Delete Address?
               </h3>
-              <p className="text-xs text-on-surface-variant/60 leading-relaxed max-w-[260px] mx-auto">
+              <p className="text-xs text-on-surface-variant/60 leading-relaxed max-w-65 mx-auto">
                 This action cannot be undone. The address will be permanently removed from your account.
               </p>
             </div>
