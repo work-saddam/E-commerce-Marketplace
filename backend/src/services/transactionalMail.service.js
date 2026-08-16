@@ -12,6 +12,7 @@ const {
   buildSellerRejectedTemplate,
   buildRegistrationOtpTemplate,
   buildForgotPasswordOtpTemplate,
+  buildContactUpdateOtpTemplate,
 } = require("../templates/mailTemplates");
 
 const createMailPayload = ({
@@ -359,6 +360,29 @@ const queueRegistrationOtpEmail = async ({
   );
 };
 
+const queueContactUpdateOtpEmail = async ({ email, otp, userName, field }) => {
+  const { mailReplyTo } = getMailTemplateConfig();
+  const template = buildContactUpdateOtpTemplate({ otp, userName, field });
+
+  return enqueueMailJob(
+    createMailPayload({
+      templateKey: "contact-update-otp",
+      to: email,
+      subject: template.subject,
+      html: template.html,
+      text: template.text,
+      idempotencyKey: `contact-update-otp-${email.toLowerCase()}-${field}-${new Date().getTime()}`,
+      tags: [
+        { name: "template", value: "contact-update-otp" },
+        { name: "email", value: email.toLowerCase() },
+        { name: "field", value: field },
+      ],
+      meta: { email: email.toLowerCase(), field },
+      replyTo: mailReplyTo,
+    }),
+  );
+};
+
 module.exports = {
   queueBuyerOrderConfirmedEmail,
   queueBuyerPaymentFailedEmail,
@@ -366,4 +390,5 @@ module.exports = {
   queueSellerStatusEmail,
   queueRegistrationOtpEmail,
   queueForgotPasswordOtpEmail,
+  queueContactUpdateOtpEmail,
 };

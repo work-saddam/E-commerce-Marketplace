@@ -93,6 +93,36 @@ const validateUserEditProfileData = (req) => {
   return null;
 };
 
+const validateContactUpdateData = (req) => {
+  const { field, value } = req.body;
+
+  if (!field || !value) {
+    return { status: 400, message: "field and value are required" };
+  }
+
+  if (!["email", "phone"].includes(field)) {
+    return { status: 400, message: "Invalid field. Must be email or phone" };
+  }
+
+  if (field === "email") {
+    const normalizedEmail = normalizeEmail(value);
+    req.body.value = normalizedEmail;
+    if (!validator.isEmail(normalizedEmail)) {
+      return { status: 400, message: "Invalid email format" };
+    }
+  }
+
+  if (field === "phone") {
+    const normalizedPhone = normalizePhone(value);
+    req.body.value = normalizedPhone;
+    if (!/^[0-9]{10}$/.test(normalizedPhone)) {
+      return { status: 400, message: "Phone must be exactly 10 digits" };
+    }
+  }
+
+  return null;
+};
+
 const validateAddressData = (req) => {
   const { name, phone, street, city, state, pincode, country } = req.body;
 
@@ -228,6 +258,7 @@ module.exports = {
   validateSellerRegisterData,
   validateSellerLoginData,
   validateUserEditProfileData,
+  validateContactUpdateData,
   validateAddressData,
   validateProductData,
 };
