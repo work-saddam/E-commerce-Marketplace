@@ -470,6 +470,48 @@ const buildRegistrationOtpTemplate = ({ otp, userName, accountType }) => {
   };
 };
 
+/**
+ * Contact update OTP — sent when user wants to change email or phone number.
+ * @param {{ otp: string, userName: string, field: "email" | "phone" }} params
+ */
+const buildContactUpdateOtpTemplate = ({ otp, userName, field }) => {
+  const fieldLabel = field === "phone" ? "phone number" : "email address";
+  const intro = `Hi ${userName}, we received a request to update the ${fieldLabel} linked to your ${BRAND_NAME} account.`;
+  const detailsHtml = `
+    <p style="margin: 0 0 20px;">Use the one-time password (OTP) below to confirm this change:</p>
+    <div style="margin: 0 0 20px; padding: 16px; background: #f3f4f6; border-radius: 8px; text-align: center;">
+      <p style="margin: 0; font-size: 32px; font-weight: 700; letter-spacing: 4px; font-family: monospace; color: #111827;">${escapeHtml(otp)}</p>
+    </div>
+    <p style="margin: 0 0 12px;"><strong>Valid for:</strong> 10 minutes</p>
+    <p style="margin: 0;">Do not share this OTP with anyone. If you did not request this change, please ignore this email — your account details will remain unchanged.</p>
+  `;
+  const detailsText = [
+    `Use the one-time password (OTP) below to confirm this ${fieldLabel} change:`,
+    "",
+    otp,
+    "",
+    "Valid for: 10 minutes",
+    "",
+    "Do not share this OTP with anyone. If you did not request this change, please ignore this email — your account details will remain unchanged.",
+  ].join("\n");
+
+  return {
+    subject: `Your OTP to update your ${fieldLabel}`,
+    html: renderEmailShell({
+      title: `Update your ${fieldLabel}`,
+      intro,
+      detailsHtml,
+      footerText: `If you didn't request a ${fieldLabel} change, your account is safe, just ignore this email.`,
+    }),
+    text: renderTextShell({
+      title: `Update your ${fieldLabel}`,
+      intro,
+      detailsText,
+      footerText: `If you didn't request a ${fieldLabel} change, your account is safe, just ignore this email.`,
+    }),
+  };
+};
+
 module.exports = {
   buildBuyerOrderConfirmedTemplate,
   buildBuyerPaymentFailedTemplate,
@@ -478,4 +520,5 @@ module.exports = {
   buildSellerRejectedTemplate,
   buildRegistrationOtpTemplate,
   buildForgotPasswordOtpTemplate,
+  buildContactUpdateOtpTemplate,
 };

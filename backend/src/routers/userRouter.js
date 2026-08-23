@@ -1,6 +1,6 @@
 const express = require("express");
 const { userAuth } = require("../middlewares/authMiddleware");
-const { getProfile, editProfile } = require("../controllers/profileController");
+const { getProfile, editProfile, sendContactUpdateOtp, verifyContactUpdateOtp } = require("../controllers/profileController");
 const {
   getAllAddress,
   addAddress,
@@ -13,6 +13,8 @@ const router = express.Router();
 
 router.get("/profile", userAuth, getProfile);
 router.put("/profile", userAuth, editProfile);
+router.post("/profile/contact/send-otp", userAuth, sendContactUpdateOtp);
+router.put("/profile/contact/verify", userAuth, verifyContactUpdateOtp);
 router.get("/address", userAuth, getAllAddress);
 router.post("/address", userAuth, addAddress);
 router.put("/address/:id", userAuth, editAddress);
