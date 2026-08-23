@@ -9,7 +9,7 @@ import {
   RefreshCw,
   CheckCircle2,
 } from "lucide-react";
-import apiClient from "../../shared/services/apiClient";
+import apiClient from "../../../shared/services/apiClient";
 
 /**
  * EditContactModal — 2-step OTP flow.

@@ -10,8 +10,8 @@ import {
   Loader2,
   AlertCircle,
 } from "lucide-react";
-import Loader from "../../shared/components/feedback/Loader";
-import EditContactModal from "./EditContactModal";
+import Loader from "../../../shared/components/feedback/Loader";
+import EditContactModal from "../components/EditContactModal";
 
 export default function ProfileInfoTab({ profile, loading, onSave, onContactSave, currentEmail }) {
   const [editing, setEditing] = useState(false);

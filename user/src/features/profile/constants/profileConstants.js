@@ -1,5 +1,5 @@
 import { User, MapPin, Package, ShoppingBag, Store } from "lucide-react";
-import { routePaths } from "../../app/router/routePaths";
+import { routePaths } from "../../../app/router/routePaths";
 
 /**
  * Tab definitions for the profile page.

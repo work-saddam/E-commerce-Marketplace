@@ -1,7 +1,7 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { Save, X, Loader2 } from "lucide-react";
-import { EMPTY_ADDRESS } from "./profileConstants";
+import { EMPTY_ADDRESS } from "../constants/profileConstants";
 
 export default function AddressForm({ initialData, onSubmit, onCancel, submitting }) {
   const [form, setForm] = useState(initialData || EMPTY_ADDRESS);

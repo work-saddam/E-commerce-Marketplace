@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { MapPin, Plus, AlertTriangle, X, Loader2 } from "lucide-react";
-import apiClient from "../../shared/services/apiClient";
-import Loader from "../../shared/components/feedback/Loader";
-import AddressCard from "./AddressCard";
-import AddressForm from "./AddressForm";
+import apiClient from "../../../shared/services/apiClient";
+import Loader from "../../../shared/components/feedback/Loader";
+import AddressCard from "../components/AddressCard";
+import AddressForm from "../components/AddressForm";
 
 export default function ManageAddressesTab() {
   const [addresses, setAddresses] = useState([]);

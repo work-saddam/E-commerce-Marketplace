@@ -3,19 +3,19 @@ import { Link, useSearchParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import { ChevronRight } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
-import { addUser } from "../../features/auth";
-import apiClient from "../../shared/services/apiClient";
-import { routePaths } from "../../app/router/routePaths";
-import { TABS, QUICK_LINKS } from "./profileConstants";
-import ProfileInfoTab from "./ProfileInfoTab";
-import ManageAddressesTab from "./ManageAddressesTab";
+import { addUser } from "../../auth";
+import apiClient from "../../../shared/services/apiClient";
+import { routePaths } from "../../../app/router/routePaths";
+import { TABS, QUICK_LINKS } from "../constants/profileConstants";
+import ProfileInfoTab from "../tabs/ProfileInfoTab";
+import ManageAddressesTab from "../tabs/ManageAddressesTab";
 
 /**
- * Profile page shell — handles layout, sidebar, tab routing.
+ * ProfilePage — page shell: handles layout, sidebar, tab routing.
  *
  * To add a new tab:
- *  1. Add an entry in profileConstants.js → TABS
- *  2. Create a new <TabName>Tab.jsx component
+ *  1. Add an entry in constants/profileConstants.js → TABS
+ *  2. Create a new <TabName>Tab.jsx component in tabs/
  *  3. Import and register it in the TAB_COMPONENTS map below
  */
 
@@ -24,7 +24,7 @@ const TAB_COMPONENTS = {
   addresses: ManageAddressesTab,
 };
 
-export default function Profile() {
+export default function ProfilePage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTabId = searchParams.get("tab") || "profile";
   const dispatch = useDispatch();
@@ -104,6 +104,9 @@ export default function Profile() {
   };
 
   const currentTab = TABS.find((t) => t.id === activeTabId) || TABS[0];
+
+  // Suppress unused TAB_COMPONENTS lint warning — used for future extensibility
+  void TAB_COMPONENTS;
 
   return (
     <div className="w-full bg-surface-container-low min-h-screen text-on-background">
