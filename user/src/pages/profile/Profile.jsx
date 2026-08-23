@@ -78,6 +78,31 @@ export default function Profile() {
     }
   };
 
+  const handleContactSave = async (field, value, otp) => {
+    try {
+      const res = await apiClient.put("/api/users/profile/contact/verify", {
+        field,
+        value,
+        otp,
+      });
+      const updatedData = res?.data?.data || null;
+      setProfile(updatedData);
+
+      // Sync Redux so Header dropdown stays current
+      if (updatedData && reduxUser) {
+        dispatch(addUser({ ...reduxUser, email: updatedData.email, phone: updatedData.phone }));
+      }
+
+      const fieldLabel = field === "email" ? "Email" : "Phone number";
+      toast.success(`${fieldLabel} updated successfully!`, {
+        style: { borderRadius: "8px", background: "#1b1c1c", color: "#fff" },
+      });
+    } catch (err) {
+      // Re-throw so EditContactModal can surface it inline on the OTP step
+      throw err;
+    }
+  };
+
   const currentTab = TABS.find((t) => t.id === activeTabId) || TABS[0];
 
   return (
@@ -206,6 +231,8 @@ export default function Profile() {
                   profile={profile}
                   loading={profileLoading}
                   onSave={handleProfileSave}
+                  onContactSave={handleContactSave}
+                  currentEmail={profile?.email}
                 />
               )}
               {currentTab.id === "addresses" && <ManageAddressesTab />}

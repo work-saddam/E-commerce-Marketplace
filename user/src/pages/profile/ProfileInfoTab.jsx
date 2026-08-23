@@ -7,17 +7,20 @@ import {
   Pencil,
   Save,
   X,
-  Lock,
   Loader2,
   AlertCircle,
 } from "lucide-react";
 import Loader from "../../shared/components/feedback/Loader";
+import EditContactModal from "./EditContactModal";
 
-export default function ProfileInfoTab({ profile, loading, onSave }) {
+export default function ProfileInfoTab({ profile, loading, onSave, onContactSave, currentEmail }) {
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState("");
   const [saving, setSaving] = useState(false);
   const inputRef = useRef(null);
+
+  // Modal state: null | "email" | "phone"
+  const [activeModal, setActiveModal] = useState(null);
 
   useEffect(() => {
     if (profile) setName(profile.name || "");
@@ -52,6 +55,12 @@ export default function ProfileInfoTab({ profile, loading, onSave }) {
   const handleCancel = () => {
     setName(profile?.name || "");
     setEditing(false);
+  };
+
+  const handleContactSave = async (field, value, currentPassword) => {
+    // Delegate to parent (which handles the API call + Redux sync)
+    await onContactSave(field, value, currentPassword);
+    setActiveModal(null);
   };
 
   if (loading) {
@@ -148,52 +157,67 @@ export default function ProfileInfoTab({ profile, loading, onSave }) {
         </div>
       </div>
 
-      {/* Account Details */}
+      {/* Account Details — editable */}
       <div className="space-y-4">
         <h3 className="text-[10px] font-bold text-on-surface-variant/40 uppercase tracking-widest">
-          Account Details
+          Contact Information
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="flex items-center gap-4 p-4 bg-surface-container-lowest border border-outline-variant/10 rounded-xl">
-            <div className="w-10 h-10 bg-surface-container flex items-center justify-center rounded-lg shrink-0">
-              <Mail className="w-4.5 h-4.5 text-on-surface-variant/50" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-[9px] font-bold text-on-surface-variant/35 uppercase tracking-widest flex items-center gap-1">
-                Email Address
-                <Lock className="w-2.5 h-2.5" />
-              </p>
-              <p className="text-sm font-semibold text-charcoal truncate mt-0.5">
-                {profile.email}
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-4 p-4 bg-surface-container-lowest border border-outline-variant/10 rounded-xl">
-            <div className="w-10 h-10 bg-surface-container flex items-center justify-center rounded-lg shrink-0">
-              <Phone className="w-4.5 h-4.5 text-on-surface-variant/50" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-[9px] font-bold text-on-surface-variant/35 uppercase tracking-widest flex items-center gap-1">
-                Phone Number
-                <Lock className="w-2.5 h-2.5" />
-              </p>
-              <p className="text-sm font-semibold text-charcoal truncate mt-0.5">
-                {profile.phone}
-              </p>
-            </div>
-          </div>
+          {/* Email card */}
+          <ContactCard
+            icon={Mail}
+            label="Email Address"
+            value={profile.email}
+            onEdit={() => setActiveModal("email")}
+          />
+          {/* Phone card */}
+          <ContactCard
+            icon={Phone}
+            label="Phone Number"
+            value={profile.phone}
+            onEdit={() => setActiveModal("phone")}
+          />
         </div>
       </div>
 
-      {/* Account Security Note */}
-      <div className="flex items-start gap-3 p-4 bg-champagne/5 border border-champagne/10 rounded-xl">
-        <Lock className="w-4 h-4 text-champagne shrink-0 mt-0.5" />
-        <p className="text-xs text-on-surface-variant/65 leading-relaxed">
-          Email and phone number are linked to your account and cannot be
-          changed from here. Contact support for assistance.
+      {/* Edit Contact Modal */}
+      {activeModal && (
+        <EditContactModal
+          type={activeModal}
+          currentValue={activeModal === "email" ? profile.email : profile.phone}
+          currentEmail={currentEmail || profile.email}
+          onSave={handleContactSave}
+          onClose={() => setActiveModal(null)}
+        />
+      )}
+    </div>
+  );
+}
+
+/* ── Reusable Contact Card ── */
+
+function ContactCard({ icon: Icon, label, value, onEdit }) {
+  return (
+    <div className="group flex items-center gap-4 p-4 bg-surface-container-lowest border border-outline-variant/10 hover:border-champagne/20 rounded-xl transition-all">
+      <div className="w-10 h-10 bg-surface-container flex items-center justify-center rounded-lg shrink-0">
+        <Icon className="w-4.5 h-4.5 text-on-surface-variant/50" />
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="text-[9px] font-bold text-on-surface-variant/35 uppercase tracking-widest">
+          {label}
+        </p>
+        <p className="text-sm font-semibold text-charcoal truncate mt-0.5">
+          {value}
         </p>
       </div>
+      <button
+        onClick={onEdit}
+        className="shrink-0 inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider text-secondary hover:text-champagne border border-secondary/15 hover:border-champagne px-2.5 py-1.5 rounded-md hover:bg-champagne/5 transition-all cursor-pointer opacity-0 group-hover:opacity-100"
+        title={`Edit ${label}`}
+      >
+        <Pencil className="w-2.5 h-2.5" />
+        <span>Edit</span>
+      </button>
     </div>
   );
 }
